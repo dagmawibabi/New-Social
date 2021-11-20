@@ -18,11 +18,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // Light Mode Status Bar
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.grey[200],
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, //Colors.grey[200],
         statusBarIconBrightness: Brightness.dark,
       ),
     );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
