@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_view/photo_view.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Random random = Random();
+
   List colors = [
     Colors.red,
     Colors.blue,
@@ -29,7 +33,13 @@ class _HomePageState extends State<HomePage> {
     Colors.lightGreenAccent
   ];
   List cryptoStats = [];
-
+  List cryptoAppBarImages = [
+    "assets/images/appbar_headers/1.png",
+    "assets/images/appbar_headers/2.png",
+    "assets/images/appbar_headers/3.png",
+  ];
+  int cryptoAppBarImageIndex = 0;
+  RefreshController refreshController = RefreshController();
   ScrollController scrollController = ScrollController();
   bool isBottomBarVisible = true;
   // Function to hide the bottom nav bar on scroll
@@ -93,6 +103,8 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       isCryptoPageLoadingError = true;
     }
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
     setState(() {});
   }
 
@@ -327,6 +339,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getCryptoStats();
     hideBottomNavBar();
+    cryptoAppBarImageIndex = random.nextInt(2);
   }
 
   @override
@@ -335,242 +348,251 @@ class _HomePageState extends State<HomePage> {
       extendBody: true,
       backgroundColor: Colors.grey[200],
       // B O D Y
-      body: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          // App Bar
-          SliverAppBar(
-            backgroundColor: Colors.grey[200],
-            foregroundColor: Colors.black,
-            expandedHeight: isCryptoPageLoadingError == true ? 200.0 : 290.0,
-            pinned: true,
-            title: Row(
-              children: const [
-                Icon(
-                  Ionicons.planet_outline,
+      body: SmartRefresher(
+        controller: refreshController,
+        onRefresh: getCryptoStats,
+        header: WaterDropMaterialHeader(
+          backgroundColor: Color(0xff6C63FF),
+        ),
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            // App Bar
+            SliverAppBar(
+              backgroundColor: Colors.grey[200],
+              foregroundColor: Colors.black,
+              expandedHeight: isCryptoPageLoadingError == true ? 200.0 : 290.0,
+              pinned: true,
+              title: Row(
+                children: const [
+                  Icon(
+                    Ionicons.planet_outline,
+                  ),
+                  SizedBox(width: 12.0),
+                  Text(
+                    "AURORA",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: isCryptoPageLoadingError == false
+                      ? Image.asset(
+                          cryptoAppBarImages[cryptoAppBarImageIndex],
+                          fit: BoxFit.cover,
+                        )
+                      : Container(),
                 ),
-                SizedBox(width: 12.0),
-                Text(
-                  "AURORA",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Ionicons.person_outline,
+                    size: 20.0,
                   ),
                 ),
               ],
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: isCryptoPageLoadingError == false
-                    ? Image.asset(
-                        "assets/images/appbar_headers/3.png",
-                        fit: BoxFit.cover,
-                      )
-                    : Container(),
-              ),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Ionicons.person_outline,
-                  size: 20.0,
-                ),
-              ),
-            ],
-          ),
-          // Body + Content
-          SliverList(
-            delegate: isCryptoPageLoading == false
-                ? SliverChildBuilderDelegate(
-                    (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          showCryptoDetail(context, index);
-                        },
-                        child: Card(
-                          elevation: 0.2,
-                          color: Colors.grey[200],
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 2.0),
-                          child: Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Crypto Image, Name and Symbol
-                                Row(
-                                  children: [
-                                    // Crypto Image
-                                    Image.network(cryptoStats[index]["image"],
-                                        width: 36.0),
-                                    const SizedBox(width: 12.0),
-                                    // Crypto Name, Symbol and price up/down pointer
-                                    SizedBox(
-                                      width: 100.0,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Crypto Name
-                                          Text(
-                                            cryptoStats[index]["id"]
-                                                .toString()
-                                                .toUpperCase(),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                              fontSize: 16.0,
-                                              letterSpacing: 0.4,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          // Crypto Symbol and price up/down pointer
-                                          Row(
-                                            children: [
-                                              // Crypto Symbol
-                                              Text(
-                                                  cryptoStats[index]["symbol"]),
-                                              const SizedBox(width: 2.0),
-                                              // Crypto price up/down pointer
-                                              cryptoStats[index][
-                                                              "current_price"] >
-                                                          ((cryptoStats[index][
-                                                                      "low_24h"] +
-                                                                  cryptoStats[
-                                                                          index]
-                                                                      [
-                                                                      "high_24h"]) /
-                                                              2) ==
-                                                      true
-                                                  ? const Icon(
-                                                      Ionicons.arrow_up,
-                                                      color: Colors.green,
-                                                      size: 12.0)
-                                                  : const Icon(
-                                                      Ionicons.arrow_down,
-                                                      color: Colors.red,
-                                                      size: 12.0)
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // Crypto Daily High and Low Price
-                                SizedBox(
-                                  width: 100.0,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+            // Body + Content
+            SliverList(
+              delegate: isCryptoPageLoading == false
+                  ? SliverChildBuilderDelegate(
+                      (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            showCryptoDetail(context, index);
+                          },
+                          child: Card(
+                            elevation: 0.2,
+                            color: Colors.grey[200],
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 2.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Crypto Image, Name and Symbol
+                                  Row(
                                     children: [
-                                      // Crypto Daily High Price
-                                      Text(
-                                        cryptoStats[index]["high_24h"]
-                                            .toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          color: Colors.green,
-                                          letterSpacing: 0.3,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      // Crypto Daily Low Price
-                                      Text(
-                                        cryptoStats[index]["low_24h"]
-                                            .toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                          letterSpacing: 0.3,
-                                          fontWeight: FontWeight.bold,
+                                      // Crypto Image
+                                      Image.network(cryptoStats[index]["image"],
+                                          width: 36.0),
+                                      const SizedBox(width: 12.0),
+                                      // Crypto Name, Symbol and price up/down pointer
+                                      SizedBox(
+                                        width: 100.0,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Crypto Name
+                                            Text(
+                                              cryptoStats[index]["id"]
+                                                  .toString()
+                                                  .toUpperCase(),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                fontSize: 16.0,
+                                                letterSpacing: 0.4,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            // Crypto Symbol and price up/down pointer
+                                            Row(
+                                              children: [
+                                                // Crypto Symbol
+                                                Text(cryptoStats[index]
+                                                    ["symbol"]),
+                                                const SizedBox(width: 2.0),
+                                                // Crypto price up/down pointer
+                                                cryptoStats[index][
+                                                                "current_price"] >
+                                                            ((cryptoStats[index]
+                                                                        [
+                                                                        "low_24h"] +
+                                                                    cryptoStats[
+                                                                            index]
+                                                                        [
+                                                                        "high_24h"]) /
+                                                                2) ==
+                                                        true
+                                                    ? const Icon(
+                                                        Ionicons.arrow_up,
+                                                        color: Colors.green,
+                                                        size: 12.0)
+                                                    : const Icon(
+                                                        Ionicons.arrow_down,
+                                                        color: Colors.red,
+                                                        size: 12.0)
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                                // Crypto Current Price
-                                SizedBox(
-                                  width: 100.0,
-                                  child: Text(
-                                    "\$" +
-                                        cryptoStats[index]["current_price"]
-                                            .toString(),
-                                    textAlign: TextAlign.end,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.3,
-                                      fontWeight: FontWeight.bold,
+                                  // Crypto Daily High and Low Price
+                                  SizedBox(
+                                    width: 100.0,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        // Crypto Daily High Price
+                                        Text(
+                                          cryptoStats[index]["high_24h"]
+                                              .toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            color: Colors.green,
+                                            letterSpacing: 0.3,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        // Crypto Daily Low Price
+                                        Text(
+                                          cryptoStats[index]["low_24h"]
+                                              .toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            letterSpacing: 0.3,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: cryptoStats.length,
-                  )
-                : (isCryptoPageLoadingError == false
-                    ? SliverChildBuilderDelegate(
-                        (context, index) {
-                          return const shimmerCryptoCard();
-                        },
-                        childCount: 5,
-                      )
-                    : SliverChildBuilderDelegate(
-                        (context, index) {
-                          return Column(
-                            children: [
-                              Image.asset(
-                                "assets/images/appbar_headers/5.png",
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.warning,
-                                    color: Colors.deepOrange,
-                                  ),
-                                  const SizedBox(width: 6.0),
-                                  const Text(
-                                    "Error Fetching Content",
-                                    style: TextStyle(
-                                      color: Colors.deepPurple,
-                                      fontSize: 22.0,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      getCryptoStats();
-                                    },
-                                    icon: const Icon(
-                                      Icons.refresh,
-                                      size: 20.0,
+                                  // Crypto Current Price
+                                  SizedBox(
+                                    width: 100.0,
+                                    child: Text(
+                                      "\$" +
+                                          cryptoStats[index]["current_price"]
+                                              .toString(),
+                                      textAlign: TextAlign.end,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        letterSpacing: 0.3,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],
-                              )
-                            ],
-                          );
-                        },
-                        childCount: 1,
-                      )),
-          ),
-          // Space Below
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 200.0),
-          ),
-        ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: cryptoStats.length,
+                    )
+                  : (isCryptoPageLoadingError == false
+                      ? SliverChildBuilderDelegate(
+                          (context, index) {
+                            return const shimmerCryptoCard();
+                          },
+                          childCount: 5,
+                        )
+                      : SliverChildBuilderDelegate(
+                          (context, index) {
+                            return Column(
+                              children: [
+                                Image.asset(
+                                  "assets/images/appbar_headers/5.png",
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.warning,
+                                      color: Colors.deepOrange,
+                                    ),
+                                    const SizedBox(width: 6.0),
+                                    const Text(
+                                      "Error Fetching Content",
+                                      style: TextStyle(
+                                        color: Colors.deepPurple,
+                                        fontSize: 22.0,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        getCryptoStats();
+                                      },
+                                      icon: const Icon(
+                                        Icons.refresh,
+                                        size: 20.0,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            );
+                          },
+                          childCount: 1,
+                        )),
+            ),
+            // Space Below
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 200.0),
+            ),
+          ],
+        ),
       ),
       // B O T T O M  N A V  B A R
       bottomNavigationBar: isBottomBarVisible == true
@@ -613,7 +635,7 @@ class _HomePageState extends State<HomePage> {
                 /// Crypto
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.wallet_outline),
-                  selectedColor: Colors.green,
+                  selectedColor: Color(0xff6C63FF),
                 ),
 
                 /// chat
