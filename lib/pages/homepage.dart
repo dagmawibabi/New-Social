@@ -10,9 +10,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
+import 'package:newsocial/pages/cryptopage.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tiktoklikescroller/tiktoklikescroller.dart';
+import 'package:video_player/video_player.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -23,7 +26,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Random random = Random();
-
   List colors = [
     Colors.red,
     Colors.blue,
@@ -32,15 +34,7 @@ class _HomePageState extends State<HomePage> {
     Colors.lightBlue,
     Colors.lightGreenAccent
   ];
-  List cryptoStats = [];
-  List cryptoAppBarImages = [
-    "assets/images/appbar_headers/1.png",
-    "assets/images/appbar_headers/2.png",
-    "assets/images/appbar_headers/3.png",
-  ];
-  int cryptoAppBarImageIndex = 0;
-  RefreshController refreshController = RefreshController();
-  ScrollController scrollController = ScrollController();
+
   bool isBottomBarVisible = true;
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
@@ -69,24 +63,54 @@ class _HomePageState extends State<HomePage> {
   }
 
   // State Controllers
+  int curPage = 0;
+
+  //? HOME PAGE
+  // Home Page Variables
+  late VideoPlayerController _controller;
+  bool isFeedLoading = true;
+  List homepageFeed = [];
+  // Home Page Functions
+  // https://www.reddit.com/r/askscience/top/.json?sort=top
+  // https://www.reddit.com/r/todayilearned/top.json?limit=10
+  /*
+      timeframe = 'month' #hour, day, week, month, year, all
+      listing = 'top' # controversial, best, hot, new, random, rising, top
+      https://www.reddit.com/r/{subreddit}/{listing}.json?limit={limit}&t={timeframe} 
+  */
+  void getHomePageFeed(subreddit, sort, time) async {
+    var url = Uri.parse("https://www.reddit.com/r/" +
+        subreddit +
+        "/" +
+        sort +
+        ".json?t=" +
+        time +
+        "&limit=100");
+    var response = await http.get(url);
+    var responseJSON = jsonDecode(response.body);
+    homepageFeed = responseJSON["data"]["children"];
+    print(homepageFeed.length);
+    print(homepageFeed);
+    //print(responseJSON["data"]["children"][1]["data"]["author_fullname"]);
+    isFeedLoading = false;
+    setState(() {});
+  }
+
+  //? CRYPTO PAGE
+  //? Crypto Page Variables
   bool isCryptoPageLoading = true;
   bool isCryptoPageLoadingError = false;
-  int curPage = 0;
-  List pages = [
-    // Page 1
-    PageView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: 5, //colors.length,
-      itemBuilder: (context, index) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: Colors.lightBlue, //colors[index],
-        );
-      },
-    ),
+  int cryptoAppBarImageIndex = 0;
+  RefreshController refreshController = RefreshController();
+  ScrollController scrollController = ScrollController();
+  List cryptoStats = [];
+  List cryptoAppBarImages = [
+    "assets/images/appbar_headers/1.png",
+    "assets/images/appbar_headers/2.png",
+    "assets/images/appbar_headers/3.png",
   ];
 
+  //? Crypto Page Functions
   // Function to fetch crypto price data
   void getCryptoStats() async {
     isCryptoPageLoading = true;
@@ -333,17 +357,221 @@ class _HomePageState extends State<HomePage> {
     );*/
   }
 
+  //!
+  void startVid(video) {
+    _controller = VideoPlayerController.network(video)
+      ..addListener(() => setState(() {}))
+      ..initialize().then((_) {
+        _controller.play();
+      });
+  }
+
+  //? INIT STATE
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCryptoStats();
+
     hideBottomNavBar();
+    // Crypto INIT
+    getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
+    // HomePage INIT
+    startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
+    getHomePageFeed("imaginaryCharacters", "top", "all");
+  }
+
+  //? Dispose
+  bool playVideo = false;
+  int playVideoIndex = -1;
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    List pagesAppBarExpanded = [
+      20.0,
+      20.0,
+      20.0,
+      isCryptoPageLoadingError == true ? 200.0 : 290.0,
+      20.0,
+      20.0,
+    ];
+    List pagesAppbarFlexibleSpace = [
+      // Crypto Page
+      FlexibleSpaceBar(),
+      // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+      // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+      // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+      // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+      // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+    ];
+    List pagesBody = [
+      SliverToBoxAdapter(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: 200.0,
+          child: isFeedLoading == false
+              ? TikTokStyleFullPageScroller(
+                  contentSize: homepageFeed.length,
+                  builder: (context, index) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      //color: Colors.red,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          (homepageFeed[index]["data"][
+                                              "url"] // change to thumbnail for vids
+                                          .toString()
+                                          .endsWith(".jpg") ||
+                                      homepageFeed[index]["data"][
+                                              "url"] // change to thumbnail for vids
+                                          .toString()
+                                          .endsWith(".png")) ==
+                                  true
+                              ? GestureDetector(
+                                  onTap: () {
+                                    playVideo = true;
+                                    playVideoIndex = index;
+                                    startVid(homepageFeed[index]["data"]
+                                            ["preview"]["reddit_video_preview"]
+                                        ["fallback_url"]);
+                                    setState(() {});
+                                  },
+                                  child: (playVideoIndex != index)
+                                      ? Image.network(
+                                          homepageFeed[index]["data"]["url"],
+                                          width: 500.0,
+                                        )
+                                      : (playVideoIndex == index
+                                          ? AspectRatio(
+                                              aspectRatio:
+                                                  _controller.value.aspectRatio,
+                                              child: VideoPlayer(_controller),
+                                            )
+                                          : Container()))
+                              : Image.asset(
+                                  "assets/images/error_illustrations/1.png",
+                                ),
+                          Text(
+                            "A",
+                            /*homepageFeed[index]["data"]
+                                      ["author_fullname"],*/
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  //scrollDirection: Axis.vertical,
+                )
+              : Container(
+                  child: const Text("Loding..."),
+                ),
+        ),
+      ),
+
+      // Crypto Page
+      CryptoPage.cryptoPage(
+        isCryptoPageLoading,
+        showCryptoDetail,
+        cryptoStats,
+        isCryptoPageLoadingError,
+        getCryptoStats,
+      ),
+      // Crypto Page
+      CryptoPage.cryptoPage(
+        isCryptoPageLoading,
+        showCryptoDetail,
+        cryptoStats,
+        isCryptoPageLoadingError,
+        getCryptoStats,
+      ),
+      // Crypto Page
+      CryptoPage.cryptoPage(
+        isCryptoPageLoading,
+        showCryptoDetail,
+        cryptoStats,
+        isCryptoPageLoadingError,
+        getCryptoStats,
+      ),
+      // Crypto Page
+      CryptoPage.cryptoPage(
+        isCryptoPageLoading,
+        showCryptoDetail,
+        cryptoStats,
+        isCryptoPageLoadingError,
+        getCryptoStats,
+      ),
+      // Crypto Page
+      CryptoPage.cryptoPage(
+        isCryptoPageLoading,
+        showCryptoDetail,
+        cryptoStats,
+        isCryptoPageLoadingError,
+        getCryptoStats,
+      ),
+    ];
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.grey[200],
@@ -351,7 +579,7 @@ class _HomePageState extends State<HomePage> {
       body: SmartRefresher(
         controller: refreshController,
         onRefresh: getCryptoStats,
-        header: WaterDropMaterialHeader(
+        header: const WaterDropMaterialHeader(
           backgroundColor: Color(0xff6C63FF),
         ),
         child: CustomScrollView(
@@ -361,7 +589,7 @@ class _HomePageState extends State<HomePage> {
             SliverAppBar(
               backgroundColor: Colors.grey[200],
               foregroundColor: Colors.black,
-              expandedHeight: isCryptoPageLoadingError == true ? 200.0 : 290.0,
+              expandedHeight: pagesAppBarExpanded[curPage],
               pinned: true,
               title: Row(
                 children: const [
@@ -379,17 +607,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: isCryptoPageLoadingError == false
-                      ? Image.asset(
-                          cryptoAppBarImages[cryptoAppBarImageIndex],
-                          fit: BoxFit.cover,
-                        )
-                      : Container(),
-                ),
-              ),
+              flexibleSpace: pagesAppbarFlexibleSpace[curPage],
               actions: [
                 IconButton(
                   onPressed: () {},
@@ -401,192 +619,75 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             // Body + Content
-            SliverList(
-              delegate: isCryptoPageLoading == false
-                  ? SliverChildBuilderDelegate(
-                      (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            showCryptoDetail(context, index);
-                          },
-                          child: Card(
-                            elevation: 0.2,
-                            color: Colors.grey[200],
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 10.0, vertical: 2.0),
-                            child: Container(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Crypto Image, Name and Symbol
-                                  Row(
-                                    children: [
-                                      // Crypto Image
-                                      Image.network(cryptoStats[index]["image"],
-                                          width: 36.0),
-                                      const SizedBox(width: 12.0),
-                                      // Crypto Name, Symbol and price up/down pointer
-                                      SizedBox(
-                                        width: 100.0,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Crypto Name
-                                            Text(
-                                              cryptoStats[index]["id"]
-                                                  .toString()
-                                                  .toUpperCase(),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: const TextStyle(
-                                                fontSize: 16.0,
-                                                letterSpacing: 0.4,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            // Crypto Symbol and price up/down pointer
-                                            Row(
-                                              children: [
-                                                // Crypto Symbol
-                                                Text(cryptoStats[index]
-                                                    ["symbol"]),
-                                                const SizedBox(width: 2.0),
-                                                // Crypto price up/down pointer
-                                                cryptoStats[index][
-                                                                "current_price"] >
-                                                            ((cryptoStats[index]
-                                                                        [
-                                                                        "low_24h"] +
-                                                                    cryptoStats[
-                                                                            index]
-                                                                        [
-                                                                        "high_24h"]) /
-                                                                2) ==
-                                                        true
-                                                    ? const Icon(
-                                                        Ionicons.arrow_up,
-                                                        color: Colors.green,
-                                                        size: 12.0)
-                                                    : const Icon(
-                                                        Ionicons.arrow_down,
-                                                        color: Colors.red,
-                                                        size: 12.0)
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // Crypto Daily High and Low Price
-                                  SizedBox(
-                                    width: 100.0,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        // Crypto Daily High Price
-                                        Text(
-                                          cryptoStats[index]["high_24h"]
-                                              .toString(),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            color: Colors.green,
-                                            letterSpacing: 0.3,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        // Crypto Daily Low Price
-                                        Text(
-                                          cryptoStats[index]["low_24h"]
-                                              .toString(),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                            letterSpacing: 0.3,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Crypto Current Price
-                                  SizedBox(
-                                    width: 100.0,
-                                    child: Text(
-                                      "\$" +
-                                          cryptoStats[index]["current_price"]
-                                              .toString(),
-                                      textAlign: TextAlign.end,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                        fontSize: 16.0,
-                                        letterSpacing: 0.3,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: cryptoStats.length,
-                    )
-                  : (isCryptoPageLoadingError == false
-                      ? SliverChildBuilderDelegate(
-                          (context, index) {
-                            return const shimmerCryptoCard();
-                          },
-                          childCount: 5,
-                        )
-                      : SliverChildBuilderDelegate(
-                          (context, index) {
-                            return Column(
+            pagesBody[curPage],
+
+            /*SliverToBoxAdapter(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: 200.0,
+                child: isFeedLoading == false
+                    ? TikTokStyleFullPageScroller(
+                        contentSize: homepageFeed.length,
+                        builder: (context, index) {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                            //color: Colors.red,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Image.asset(
-                                  "assets/images/appbar_headers/5.png",
+                                (homepageFeed[index]["data"]["thumbnail"]
+                                                .toString()
+                                                .endsWith(".jpg") ||
+                                            homepageFeed[index]["data"]
+                                                    ["thumbnail"]
+                                                .toString()
+                                                .endsWith(".png")) ==
+                                        true
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          playVideo = true;
+                                          playVideoIndex = index;
+                                          startVid(homepageFeed[index]["data"]
+                                                      ["preview"]
+                                                  ["reddit_video_preview"]
+                                              ["fallback_url"]);
+                                          setState(() {});
+                                        },
+                                        child: (playVideoIndex != index)
+                                            ? Image.network(
+                                                homepageFeed[index]["data"]
+                                                    ["thumbnail"],
+                                                width: 500.0,
+                                              )
+                                            : (playVideoIndex == index
+                                                ? AspectRatio(
+                                                    aspectRatio: _controller
+                                                        .value.aspectRatio,
+                                                    child: VideoPlayer(
+                                                        _controller),
+                                                  )
+                                                : Container()))
+                                    : Image.asset(
+                                        "assets/images/error_illustrations/1.png",
+                                      ),
+                                Text(
+                                  "A",
+                                  /*homepageFeed[index]["data"]
+                                      ["author_fullname"],*/
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.warning,
-                                      color: Colors.deepOrange,
-                                    ),
-                                    const SizedBox(width: 6.0),
-                                    const Text(
-                                      "Error Fetching Content",
-                                      style: TextStyle(
-                                        color: Colors.deepPurple,
-                                        fontSize: 22.0,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        getCryptoStats();
-                                      },
-                                      icon: const Icon(
-                                        Icons.refresh,
-                                        size: 20.0,
-                                      ),
-                                    ),
-                                  ],
-                                )
                               ],
-                            );
-                          },
-                          childCount: 1,
-                        )),
-            ),
+                            ),
+                          );
+                        },
+                        //scrollDirection: Axis.vertical,
+                      )
+                    : Container(
+                        child: const Text("Loding..."),
+                      ),
+              ),
+            ),*/
+
             // Space Below
             const SliverToBoxAdapter(
               child: SizedBox(height: 200.0),
@@ -609,9 +710,10 @@ class _HomePageState extends State<HomePage> {
               paddingR: const EdgeInsets.all(2.0),
               marginR:
                   const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
-              currentIndex: 3, //curPage,
+              currentIndex: curPage,
               onTap: (index) {
                 curPage = index;
+                setState(() {});
               },
               items: [
                 /// Home
@@ -652,127 +754,6 @@ class _HomePageState extends State<HomePage> {
               ],
             )
           : Container(),
-    );
-  }
-}
-
-// ignore: camel_case_types
-class shimmerCryptoCard extends StatelessWidget {
-  const shimmerCryptoCard({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.2,
-      color: Colors.grey[200],
-      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Crypto Image, name and symbol
-            Row(
-              children: [
-                // Crypto Image
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[400]!,
-                  highlightColor: Colors.grey[600]!,
-                  child: Container(
-                    width: 36.0,
-                    height: 36.0,
-                    decoration: const BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                // Crypto name and symbol
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Crypto Name
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[400]!,
-                      highlightColor: Colors.grey[600]!,
-                      child: Container(
-                        width: 100.0,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        ),
-                        child: Text(""),
-                      ),
-                    ),
-                    const SizedBox(height: 2.0),
-                    // Crypto Symbol
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[400]!,
-                      highlightColor: Colors.grey[500]!,
-                      child: Container(
-                        width: 50.0,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        ),
-                        child: Text(""),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // Crypto high and low price
-            Column(
-              children: [
-                // Crypto high price
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[400]!,
-                  highlightColor: Colors.green[200]!, //Colors.grey[200]!,
-                  child: Container(
-                    width: 60.0,
-                    decoration: const BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                    child: Text(""),
-                  ),
-                ),
-                const SizedBox(height: 2.0),
-                // Crypto low price
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[400]!,
-                  highlightColor: Colors.pink[200]!, //Colors.grey[200]!,
-                  child: Container(
-                    width: 60.0,
-                    decoration: const BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                    child: Text(""),
-                  ),
-                ),
-              ],
-            ),
-            // Crypto current price
-            Shimmer.fromColors(
-              baseColor: Colors.grey[400]!,
-              highlightColor: Colors.grey[600]!,
-              child: Container(
-                width: 100.0,
-                decoration: const BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                ),
-                child: Text(""),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
