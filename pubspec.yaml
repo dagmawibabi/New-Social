@@ -37,6 +37,13 @@ dependencies:
   pull_to_refresh: ^2.0.0
   tiktoklikescroller: ^0.1.8
   video_player: ^2.2.7
+  audioplayers: ^0.20.1
+  path_provider: ^2.0.7
+  permission_handler: ^8.3.0
+  assets_audio_player: ^3.0.3+6
+  path: ^1.8.0
+  flip_card: ^0.6.0
+  marquee: ^2.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

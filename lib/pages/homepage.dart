@@ -1,21 +1,32 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
+import 'package:marquee/marquee.dart';
 import 'package:newsocial/pages/cryptopage.dart';
+import 'package:newsocial/pages/musicplayerpage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
+import 'package:path/path.dart' as p;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -34,7 +45,7 @@ class _HomePageState extends State<HomePage> {
     Colors.lightBlue,
     Colors.lightGreenAccent
   ];
-
+  bool fullScreenMode = false;
   bool isBottomBarVisible = true;
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
@@ -366,19 +377,106 @@ class _HomePageState extends State<HomePage> {
       });
   }
 
+  //? Music Page Variables
+  List musicFiles = [];
+  bool gotSongs = false;
+  String curSong = "No Song Playing...";
+  AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
+  bool isSongPlaying = false;
+  dynamic albumArtImage = "assets/images/appbar_headers/albumArt25.png";
+  List albumArts = [
+    "assets/images/appbar_headers/albumArt8.png",
+    "assets/images/appbar_headers/albumArt13.png",
+    "assets/images/appbar_headers/albumArt18.png",
+    "assets/images/appbar_headers/albumArt19.png",
+    "assets/images/appbar_headers/albumArt25.png",
+  ];
+  //? Music Page Functions
+  // Function to get songs from device
+  void getSongsOnDevice() async {
+    dynamic files =
+        Directory('/storage/emulated/0/Music').listSync(recursive: false);
+    for (FileSystemEntity file in files) {
+      if (file.path.endsWith(".mp3") == true ||
+          file.path.endsWith(".m4a") == true) {
+        musicFiles.add(file.path);
+      }
+    }
+    files =
+        Directory('/storage/emulated/0/Download').listSync(recursive: false);
+    for (FileSystemEntity file in files) {
+      if (file.path.endsWith(".mp3") == true ||
+          file.path.endsWith(".m4a") == true) {
+        musicFiles.add(file.path);
+      }
+    }
+    gotSongs = true;
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
+    setState(() {});
+  }
+
+  // Play Songs
+  void loadPlaySong(songPath) {
+    assetsAudioPlayer.stop();
+    assetsAudioPlayer.open(
+      Audio.file(songPath),
+    );
+    curSong = p.withoutExtension(p.basename(songPath));
+    isSongPlaying = true;
+    albumArtImage = albumArts[random.nextInt(5)];
+    setState(() {});
+  }
+
+  // Pause Songs
+  void pausePlaySong() {
+    if (isSongPlaying == true) {
+      assetsAudioPlayer.pause();
+    } else {
+      assetsAudioPlayer.play();
+    }
+    isSongPlaying = !isSongPlaying;
+    setState(() {});
+  }
+
+  //? GENERAL
+  void setFullscreen() {
+    fullScreenMode = !fullScreenMode;
+    if (fullScreenMode == true) {
+      isBottomBarVisible = false;
+    } else {
+      isBottomBarVisible = true;
+    }
+    setState(() {});
+  }
+
+  //? ASK PERMISSIONS
+  void askPermissions() async {
+    // Ask Storage Permissions
+    PermissionStatus storagePermissionStatus = await Permission.storage.status;
+    if (storagePermissionStatus.isGranted == false) {
+      await Permission.storage.request();
+    }
+    /*PermissionStatus externalStoragePermissionStatus =
+        await Permission.manageExternalStorage.status;
+    if (externalStoragePermissionStatus.isGranted == false) {
+      await Permission.manageExternalStorage.request();
+    }*/
+  }
+
   //? INIT STATE
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    askPermissions();
     hideBottomNavBar();
     // Crypto INIT
-    getCryptoStats();
+    //getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
     // HomePage INIT
-    startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    getHomePageFeed("imaginaryCharacters", "top", "all");
+    //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
+    //getHomePageFeed("imaginaryCharacters", "top", "all");
   }
 
   //? Dispose
@@ -389,10 +487,19 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement dispose
     super.dispose();
     _controller.dispose();
+    assetsAudioPlayer.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    List pageOnRefresh = [
+      getCryptoStats,
+      getCryptoStats,
+      getSongsOnDevice,
+      getCryptoStats,
+      getCryptoStats,
+      getCryptoStats,
+    ];
     List pagesAppBarExpanded = [
       20.0,
       20.0,
@@ -402,6 +509,10 @@ class _HomePageState extends State<HomePage> {
       20.0,
     ];
     List pagesAppbarFlexibleSpace = [
+      // Home Page
+      FlexibleSpaceBar(),
+      // Crypto Page
+      FlexibleSpaceBar(),
       // Crypto Page
       FlexibleSpaceBar(),
       // Crypto Page
@@ -440,32 +551,9 @@ class _HomePageState extends State<HomePage> {
               : Container(),
         ),
       ),
-      // Crypto Page
-      FlexibleSpaceBar(
-        background: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: isCryptoPageLoadingError == false
-              ? Image.asset(
-                  cryptoAppBarImages[cryptoAppBarImageIndex],
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-        ),
-      ),
-      // Crypto Page
-      FlexibleSpaceBar(
-        background: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: isCryptoPageLoadingError == false
-              ? Image.asset(
-                  cryptoAppBarImages[cryptoAppBarImageIndex],
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-        ),
-      ),
     ];
     List pagesBody = [
+      // Home Page
       SliverToBoxAdapter(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -539,14 +627,22 @@ class _HomePageState extends State<HomePage> {
         isCryptoPageLoadingError,
         getCryptoStats,
       ),
-      // Crypto Page
-      CryptoPage.cryptoPage(
-        isCryptoPageLoading,
-        showCryptoDetail,
-        cryptoStats,
-        isCryptoPageLoadingError,
-        getCryptoStats,
+
+      // Music Page
+      MusicPlayerPage.musicPlayer(
+        context,
+        gotSongs,
+        musicFiles,
+        curSong,
+        pausePlaySong,
+        loadPlaySong,
+        isSongPlaying,
+        getSongsOnDevice,
+        albumArtImage,
+        setFullscreen,
+        fullScreenMode,
       ),
+
       // Crypto Page
       CryptoPage.cryptoPage(
         isCryptoPageLoading,
@@ -572,126 +668,73 @@ class _HomePageState extends State<HomePage> {
         getCryptoStats,
       ),
     ];
+    List smartRefresherColor = [
+      Color(0xff6C63FF),
+      Color(0xff6C63FF),
+      Colors.lightBlue,
+      Color(0xff6C63FF),
+      Color(0xff6C63FF),
+      Color(0xff6C63FF),
+    ];
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.grey[200],
       // B O D Y
       body: SmartRefresher(
         controller: refreshController,
-        onRefresh: getCryptoStats,
-        header: const WaterDropMaterialHeader(
-          backgroundColor: Color(0xff6C63FF),
+        onRefresh: getSongsOnDevice,
+        header: WaterDropMaterialHeader(
+          backgroundColor: smartRefresherColor[curPage],
         ),
         child: CustomScrollView(
           controller: scrollController,
           slivers: [
             // App Bar
-            SliverAppBar(
-              backgroundColor: Colors.grey[200],
-              foregroundColor: Colors.black,
-              expandedHeight: pagesAppBarExpanded[curPage],
-              pinned: true,
-              title: Row(
-                children: const [
-                  Icon(
-                    Ionicons.planet_outline,
-                  ),
-                  SizedBox(width: 12.0),
-                  Text(
-                    "AURORA",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+            fullScreenMode == false
+                ? SliverAppBar(
+                    backgroundColor: Colors.grey[200],
+                    foregroundColor: Colors.black,
+                    expandedHeight: pagesAppBarExpanded[curPage],
+                    pinned: true,
+                    title: Row(
+                      children: const [
+                        Icon(
+                          Ionicons.planet_outline,
+                        ),
+                        SizedBox(width: 12.0),
+                        Text(
+                          "AURORA",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
                     ),
+                    flexibleSpace: pagesAppbarFlexibleSpace[curPage],
+                    actions: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Ionicons.person_outline,
+                          size: 20.0,
+                        ),
+                      ),
+                    ],
+                  )
+                : SliverAppBar(
+                    backgroundColor: Colors.grey[200],
+                    foregroundColor: Colors.black,
+                    expandedHeight: pagesAppBarExpanded[curPage],
+                    flexibleSpace: pagesAppbarFlexibleSpace[curPage],
                   ),
-                ],
-              ),
-              flexibleSpace: pagesAppbarFlexibleSpace[curPage],
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Ionicons.person_outline,
-                    size: 20.0,
-                  ),
-                ),
-              ],
-            ),
             // Body + Content
             pagesBody[curPage],
-
-            /*SliverToBoxAdapter(
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                width: 200.0,
-                child: isFeedLoading == false
-                    ? TikTokStyleFullPageScroller(
-                        contentSize: homepageFeed.length,
-                        builder: (context, index) {
-                          return Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            //color: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                (homepageFeed[index]["data"]["thumbnail"]
-                                                .toString()
-                                                .endsWith(".jpg") ||
-                                            homepageFeed[index]["data"]
-                                                    ["thumbnail"]
-                                                .toString()
-                                                .endsWith(".png")) ==
-                                        true
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          playVideo = true;
-                                          playVideoIndex = index;
-                                          startVid(homepageFeed[index]["data"]
-                                                      ["preview"]
-                                                  ["reddit_video_preview"]
-                                              ["fallback_url"]);
-                                          setState(() {});
-                                        },
-                                        child: (playVideoIndex != index)
-                                            ? Image.network(
-                                                homepageFeed[index]["data"]
-                                                    ["thumbnail"],
-                                                width: 500.0,
-                                              )
-                                            : (playVideoIndex == index
-                                                ? AspectRatio(
-                                                    aspectRatio: _controller
-                                                        .value.aspectRatio,
-                                                    child: VideoPlayer(
-                                                        _controller),
-                                                  )
-                                                : Container()))
-                                    : Image.asset(
-                                        "assets/images/error_illustrations/1.png",
-                                      ),
-                                Text(
-                                  "A",
-                                  /*homepageFeed[index]["data"]
-                                      ["author_fullname"],*/
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        //scrollDirection: Axis.vertical,
-                      )
-                    : Container(
-                        child: const Text("Loding..."),
-                      ),
-              ),
-            ),*/
-
             // Space Below
-            const SliverToBoxAdapter(
+            /*const SliverToBoxAdapter(
               child: SizedBox(height: 200.0),
-            ),
+            ),*/
           ],
         ),
       ),
@@ -731,7 +774,7 @@ class _HomePageState extends State<HomePage> {
                 /// Music
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.play_outline),
-                  selectedColor: Colors.pink,
+                  selectedColor: Colors.lightBlue,
                 ),
 
                 /// Crypto
