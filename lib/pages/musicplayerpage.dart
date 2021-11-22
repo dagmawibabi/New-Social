@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
@@ -6,24 +7,28 @@ import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 class MusicPlayerPage {
+  static double forwardRewindSpeed = 3.0;
   static SliverToBoxAdapter musicPlayer(
-      BuildContext context,
-      flipCardController,
-      gotSongs,
-      musicFiles,
-      lightModeWaveGradient,
-      getRandom,
-      empty_illustrations,
-      changeAlbumArt,
-      curSong,
-      curPlayingSongColor,
-      pausePlaySong,
-      loadPlaySong,
-      isSongPlaying,
-      getSongsOnDevice,
-      albumArtImage,
-      setFullscreen,
-      fullScreenMode) {
+    BuildContext context,
+    flipCardController,
+    gotSongs,
+    musicFiles,
+    lightModeWaveGradient,
+    getRandom,
+    empty_illustrations,
+    changeAlbumArt,
+    curSong,
+    curPlayingSongColor,
+    pausePlaySong,
+    loadPlaySong,
+    isSongPlaying,
+    getSongsOnDevice,
+    albumArtImage,
+    setFullscreen,
+    fullScreenMode,
+    curSongDuration,
+    assetsAudioPlayer,
+  ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
           // Get Songs Container
@@ -264,9 +269,9 @@ class MusicPlayerPage {
                     top: 30.0,
                     left: 20.0,
                     right: 20.0,
-                    bottom: (fullScreenMode == true ? 180.0 : 100.0),
+                    bottom: (fullScreenMode == true ? 160.0 : 100.0),
                   ),
-                  height: MediaQuery.of(context).size.height - 320,
+                  height: MediaQuery.of(context).size.height - 200,
                   width: MediaQuery.of(context).size.width,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -447,21 +452,81 @@ class MusicPlayerPage {
                                       ),
                                     ),
                             ),
-                            // Slider
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15.0),
-                              child: Slider(
-                                activeColor: Colors.grey[900],
-                                inactiveColor:
-                                    Colors.grey[500], //Color(0xaa6C63FF),
-                                value: 75,
-                                min: 0,
-                                max: 100,
-                                onChanged: (value) {
-                                  print("a");
-                                },
+                            const SizedBox(height: 20.0),
+                            // Song Position and Duration
+                            Container(
+                              width: 300.0,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  StreamBuilder(
+                                    stream: assetsAudioPlayer.currentPosition,
+                                    builder: (context, asyncSnapshot) {
+                                      final dynamic duration =
+                                          asyncSnapshot.data;
+                                      return Text(
+                                        ((duration.inSeconds / 3600).toInt())
+                                                .toString()
+                                                .padLeft(2, '0') +
+                                            ":" +
+                                            ((duration.inSeconds / 60).toInt())
+                                                .toString()
+                                                .padLeft(2, '0') +
+                                            ":" +
+                                            ((duration.inSeconds % 60).toInt())
+                                                .toString()
+                                                .padLeft(2, "0"),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    ((curSongDuration.inSeconds / 3600).toInt())
+                                            .toString()
+                                            .padLeft(2, '0') +
+                                        ":" +
+                                        ((curSongDuration.inSeconds / 60)
+                                                .toInt())
+                                            .toString()
+                                            .padLeft(2, '0') +
+                                        ":" +
+                                        ((curSongDuration.inSeconds % 60)
+                                                .toInt())
+                                            .toString()
+                                            .padLeft(2, "0"),
+                                  ),
+                                ],
                               ),
+                            ),
+                            // Slider
+                            StreamBuilder(
+                              stream: assetsAudioPlayer.currentPosition,
+                              builder: (context, asyncSnapshot) {
+                                final dynamic duration = asyncSnapshot.data;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                                  child: Slider(
+                                    activeColor: Colors.grey[900],
+                                    inactiveColor:
+                                        Colors.grey[500], //Color(0xaa6C63FF),
+                                    value: duration != null
+                                        ? duration.inSeconds.toDouble()
+                                        : 0.0,
+                                    min: 0.0,
+                                    max: curSongDuration != null
+                                        ? curSongDuration.inSeconds.toDouble()
+                                        : 100.0,
+                                    onChanged: (value) {
+                                      assetsAudioPlayer.seek(
+                                        Duration(
+                                          seconds: value.toInt(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
                             ),
                             // Controlls
                             Row(
@@ -471,17 +536,26 @@ class MusicPlayerPage {
                                 // Repeat Button
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.repeat,
                                     size: 26.0,
                                   ),
                                 ),
                                 // Fast Rewind Button
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.fast_rewind_rounded,
-                                    size: 36.0,
+                                GestureDetector(
+                                  onLongPressDown: (longPressDownDetails) {
+                                    assetsAudioPlayer.forwardOrRewind(
+                                        -MusicPlayerPage.forwardRewindSpeed);
+                                  },
+                                  onLongPressEnd: (longPressDownDetails) {
+                                    assetsAudioPlayer.forwardOrRewind(0.0);
+                                  },
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.fast_rewind_rounded,
+                                      size: 36.0,
+                                    ),
                                   ),
                                 ),
                                 // Pause and Play Button
@@ -497,17 +571,26 @@ class MusicPlayerPage {
                                   ),
                                 ),
                                 // Fast Forward Button
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.fast_forward_rounded,
-                                    size: 36.0,
+                                GestureDetector(
+                                  onLongPressDown: (longPressDownDetails) {
+                                    assetsAudioPlayer.forwardOrRewind(
+                                        MusicPlayerPage.forwardRewindSpeed);
+                                  },
+                                  onLongPressEnd: (longPressDownDetails) {
+                                    assetsAudioPlayer.forwardOrRewind(0.0);
+                                  },
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.fast_forward_rounded,
+                                      size: 36.0,
+                                    ),
                                   ),
                                 ),
                                 // Shuffle Button
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.shuffle,
                                     size: 26.0,
                                   ),

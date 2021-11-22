@@ -394,6 +394,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   //? Music Page Variables
+  Duration curSongDuration = const Duration(seconds: 0);
+  dynamic curSongPosition = "";
+
   List<List<Color>> lightModeWaveGradient = [
     [Colors.red, Color(0xEEF44336)],
     [Colors.lightBlueAccent, Colors.blue],
@@ -403,6 +406,7 @@ class _HomePageState extends State<HomePage> {
   Color curPlayingSongColor = Colors.lightBlue;
   FlipCardController flipCardController = FlipCardController();
   List musicFiles = [];
+  List<Audio> musicFilesPlaylist = [];
   bool gotSongs = false;
   String curSong = "No Song Playing...";
   AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
@@ -464,6 +468,7 @@ class _HomePageState extends State<HomePage> {
       if (file.path.endsWith(".mp3") == true ||
           file.path.endsWith(".m4a") == true) {
         musicFiles.add(file.path);
+        musicFilesPlaylist.add(Audio(file.path));
       }
     }
     files =
@@ -472,6 +477,7 @@ class _HomePageState extends State<HomePage> {
       if (file.path.endsWith(".mp3") == true ||
           file.path.endsWith(".m4a") == true) {
         musicFiles.add(file.path);
+        musicFilesPlaylist.add(Audio(file.path));
       }
     }
     gotSongs = true;
@@ -487,9 +493,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Play Songs
-  void loadPlaySong(songPath) {
+  void loadPlaySong(songPath) async {
     assetsAudioPlayer.stop();
-    assetsAudioPlayer.open(
+    // Play From Path
+    await assetsAudioPlayer.open(
+      /*Playlist(
+        audios: musicFilesPlaylist,
+      ),
+      loopMode: LoopMode.playlist,*/ //loop the full playlist
       Audio.file(songPath),
       showNotification: true,
       notificationSettings: NotificationSettings(
@@ -501,9 +512,24 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+    // Play From Playlist
+    //assetsAudioPlayer.playlistPlayAtIndex(musicFiles.indexOf(songPath));
+
+    assetsAudioPlayer.current.listen(
+      (playingAudio) {
+        curSongDuration = playingAudio!.audio.duration;
+        setState(() {});
+      },
+    );
+    assetsAudioPlayer.playlistAudioFinished.listen(
+      (Playing playing) {
+        isSongPlaying = false;
+        assetsAudioPlayer.stop();
+        setState(() {});
+      },
+    );
     curSong = p.withoutExtension(p.basename(songPath));
     isSongPlaying = true;
-
     curPlayingSongColor = getRandom(Colors.accents);
     lightModeWaveGradient = [
       [getRandom(Colors.accents), getRandom(Colors.accents)],
@@ -753,6 +779,8 @@ class _HomePageState extends State<HomePage> {
         albumArtImage,
         setFullscreen,
         fullScreenMode,
+        curSongDuration,
+        assetsAudioPlayer,
       ),
 
       // Crypto Page
