@@ -7,6 +7,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flip_card/flip_card.dart';
+import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // General
   Random random = Random();
   List colors = [
     Colors.red,
@@ -47,6 +49,20 @@ class _HomePageState extends State<HomePage> {
   ];
   bool fullScreenMode = false;
   bool isBottomBarVisible = true;
+  // Illustrations
+  List empty_illustrations = [
+    "assets/images/empty_illustrations/1.png",
+    "assets/images/empty_illustrations/2.png",
+    "assets/images/empty_illustrations/3.png",
+    "assets/images/empty_illustrations/4.png",
+    "assets/images/empty_illustrations/5.png",
+  ];
+  List error_illustrations = [
+    "assets/images/error_illustrations/3.png",
+    "assets/images/empty_illustrations/2.png",
+    "assets/images/empty_illustrations/3.png",
+  ];
+
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
     scrollController.addListener(
@@ -378,22 +394,70 @@ class _HomePageState extends State<HomePage> {
   }
 
   //? Music Page Variables
+  List<List<Color>> lightModeWaveGradient = [
+    [Colors.red, Color(0xEEF44336)],
+    [Colors.lightBlueAccent, Colors.blue],
+    [Colors.lightGreenAccent, Colors.green],
+    [Colors.yellow, Color(0x55FFEB3B)]
+  ];
+  Color curPlayingSongColor = Colors.lightBlue;
+  FlipCardController flipCardController = FlipCardController();
   List musicFiles = [];
   bool gotSongs = false;
   String curSong = "No Song Playing...";
   AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
   bool isSongPlaying = false;
-  dynamic albumArtImage = "assets/images/appbar_headers/albumArt25.png";
+  dynamic albumArtImage = "";
   List albumArts = [
-    "assets/images/appbar_headers/albumArt8.png",
-    "assets/images/appbar_headers/albumArt13.png",
-    "assets/images/appbar_headers/albumArt18.png",
-    "assets/images/appbar_headers/albumArt19.png",
-    "assets/images/appbar_headers/albumArt25.png",
+    "assets/images/album_arts/albumArt2.png",
+    "assets/images/album_arts/albumArt3.png",
+    "assets/images/album_arts/albumArt8.png",
+    "assets/images/album_arts/albumArt9.png",
+    "assets/images/album_arts/albumArt10.png",
+    "assets/images/album_arts/albumArt11.png",
+    "assets/images/album_arts/albumArt12.png",
+    "assets/images/album_arts/albumArt13.png",
+    "assets/images/album_arts/albumArt14.png",
+    "assets/images/album_arts/albumArt15.png",
+    "assets/images/album_arts/albumArt16.png",
+    "assets/images/album_arts/albumArt18.png",
+    "assets/images/album_arts/albumArt19.png",
+    "assets/images/album_arts/albumArt20.png",
+    "assets/images/album_arts/albumArt21.png",
+    "assets/images/album_arts/albumArt22.png",
+    "assets/images/album_arts/albumArt23.png",
+    "assets/images/album_arts/albumArt24.png",
+    "assets/images/album_arts/albumArt25.png",
+    "assets/images/album_arts/albumArt26.png",
+    "assets/images/album_arts/albumArt29.png",
+    "assets/images/album_arts/albumArt31.png",
+    "assets/images/album_arts/albumArt32.png",
+    "assets/images/album_arts/albumArt33.png",
+    "assets/images/album_arts/albumArt34.png",
+    "assets/images/album_arts/albumArt35.png",
+    "assets/images/album_arts/albumArt36.png",
+    "assets/images/album_arts/albumArt37.png",
+    "assets/images/album_arts/albumArt38.png",
+    "assets/images/album_arts/albumArt39.png",
+    "assets/images/album_arts/albumArt50.png",
+    "assets/images/album_arts/albumArt51.png",
+    "assets/images/album_arts/albumArt52.png",
+    "assets/images/album_arts/albumArt53.png",
+    "assets/images/album_arts/albumArt54.png",
+    "assets/images/album_arts/albumArt55.png",
+    "assets/images/album_arts/albumArt57.png",
+    "assets/images/album_arts/albumArt58.png",
+    "assets/images/album_arts/albumArt59.png",
+    "assets/images/album_arts/albumArt60.png",
+    "assets/images/album_arts/albumArt61.png",
+    "assets/images/album_arts/albumArt62.png",
+    "assets/images/album_arts/albumArt63.png",
+    "assets/images/album_arts/albumArt64.png",
   ];
   //? Music Page Functions
   // Function to get songs from device
   void getSongsOnDevice() async {
+    musicFiles = [];
     dynamic files =
         Directory('/storage/emulated/0/Music').listSync(recursive: false);
     for (FileSystemEntity file in files) {
@@ -416,30 +480,56 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  // Change Album Art
+  void changeAlbumArt() {
+    albumArtImage = getRandom(albumArts);
+    setState(() {});
+  }
+
   // Play Songs
   void loadPlaySong(songPath) {
     assetsAudioPlayer.stop();
     assetsAudioPlayer.open(
       Audio.file(songPath),
+      showNotification: true,
+      notificationSettings: NotificationSettings(
+        customPlayPauseAction: (player) {
+          pausePlaySong();
+        },
+        customNextAction: (player) {
+          print("next");
+        },
+      ),
     );
     curSong = p.withoutExtension(p.basename(songPath));
     isSongPlaying = true;
-    albumArtImage = albumArts[random.nextInt(5)];
+
+    curPlayingSongColor = getRandom(Colors.accents);
+    lightModeWaveGradient = [
+      [getRandom(Colors.accents), getRandom(Colors.accents)],
+      [getRandom(Colors.accents), getRandom(Colors.accents)],
+      [getRandom(Colors.accents), getRandom(Colors.accents)],
+      [getRandom(Colors.accents), getRandom(Colors.accents)],
+    ];
+    changeAlbumArt();
     setState(() {});
   }
 
   // Pause Songs
   void pausePlaySong() {
-    if (isSongPlaying == true) {
-      assetsAudioPlayer.pause();
-    } else {
-      assetsAudioPlayer.play();
+    if (curSong != "No Song Playing...") {
+      if (isSongPlaying == true) {
+        assetsAudioPlayer.pause();
+      } else {
+        assetsAudioPlayer.play();
+      }
+      isSongPlaying = !isSongPlaying;
     }
-    isSongPlaying = !isSongPlaying;
     setState(() {});
   }
 
   //? GENERAL
+  // Fullscreen Mode
   void setFullscreen() {
     fullScreenMode = !fullScreenMode;
     if (fullScreenMode == true) {
@@ -447,7 +537,19 @@ class _HomePageState extends State<HomePage> {
     } else {
       isBottomBarVisible = true;
     }
+    // Light Mode Status Bar
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, //Colors.grey[200],
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
     setState(() {});
+  }
+
+  // Get Random item from a list
+  dynamic getRandom(list) {
+    return list[random.nextInt(list.length)];
   }
 
   //? ASK PERMISSIONS
@@ -474,6 +576,8 @@ class _HomePageState extends State<HomePage> {
     // Crypto INIT
     getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
+    // Music INIT
+    albumArtImage = getRandom(albumArts);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
     //getHomePageFeed("imaginaryCharacters", "top", "all");
@@ -626,14 +730,22 @@ class _HomePageState extends State<HomePage> {
         cryptoStats,
         isCryptoPageLoadingError,
         getCryptoStats,
+        getRandom,
+        error_illustrations,
       ),
 
       // Music Page
       MusicPlayerPage.musicPlayer(
         context,
+        flipCardController,
         gotSongs,
         musicFiles,
+        lightModeWaveGradient,
+        getRandom,
+        empty_illustrations,
+        changeAlbumArt,
         curSong,
+        curPlayingSongColor,
         pausePlaySong,
         loadPlaySong,
         isSongPlaying,
@@ -650,7 +762,10 @@ class _HomePageState extends State<HomePage> {
         cryptoStats,
         isCryptoPageLoadingError,
         getCryptoStats,
+        getRandom,
+        error_illustrations,
       ),
+
       // Crypto Page
       CryptoPage.cryptoPage(
         isCryptoPageLoading,
@@ -658,7 +773,10 @@ class _HomePageState extends State<HomePage> {
         cryptoStats,
         isCryptoPageLoadingError,
         getCryptoStats,
+        getRandom,
+        error_illustrations,
       ),
+
       // Crypto Page
       CryptoPage.cryptoPage(
         isCryptoPageLoading,
@@ -666,6 +784,8 @@ class _HomePageState extends State<HomePage> {
         cryptoStats,
         isCryptoPageLoadingError,
         getCryptoStats,
+        getRandom,
+        error_illustrations,
       ),
     ];
     List smartRefresherColor = [
@@ -676,6 +796,7 @@ class _HomePageState extends State<HomePage> {
       Color(0xff6C63FF),
       Color(0xff6C63FF),
     ];
+
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.grey[200],
@@ -723,12 +844,22 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   )
-                : SliverAppBar(
-                    backgroundColor: Colors.grey[200],
+                : SliverToBoxAdapter(
+                    child: Container(
+                      color: fullScreenMode == true
+                          ? Colors.grey[300]!
+                          : Colors.grey[200]!,
+                      height: pagesAppBarExpanded[curPage] + 78.5,
+                    ),
+                  ),
+            /*SliverAppBar(
+                    backgroundColor: fullScreenMode == true
+                        ? Colors.grey[300]!
+                        : Colors.grey[200]!,
                     foregroundColor: Colors.black,
                     expandedHeight: pagesAppBarExpanded[curPage],
                     flexibleSpace: pagesAppbarFlexibleSpace[curPage],
-                  ),
+                  ),*/
             // Body + Content
             pagesBody[curPage],
             // Space Below

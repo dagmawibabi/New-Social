@@ -44,6 +44,7 @@ dependencies:
   path: ^1.8.0
   flip_card: ^0.6.0
   marquee: ^2.2.0
+  wave: ^0.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -73,8 +74,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/images/
+    - assets/images/album_arts/
     - assets/images/appbar_headers/
     - assets/images/error_illustrations/
+    - assets/images/empty_illustrations/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

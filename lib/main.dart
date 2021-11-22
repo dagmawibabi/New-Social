@@ -23,7 +23,6 @@ class _MyAppState extends State<MyApp> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: "/",

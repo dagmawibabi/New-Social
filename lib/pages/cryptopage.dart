@@ -3,8 +3,15 @@ import 'package:ionicons/ionicons.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CryptoPage {
-  static SliverList cryptoPage(isCryptoPageLoading, showCryptoDetail,
-      cryptoStats, isCryptoPageLoadingError, getCryptoStats) {
+  static SliverList cryptoPage(
+    isCryptoPageLoading,
+    showCryptoDetail,
+    cryptoStats,
+    isCryptoPageLoadingError,
+    getCryptoStats,
+    getRandom,
+    error_illustrations,
+  ) {
     return SliverList(
       delegate: isCryptoPageLoading == false
           ? SliverChildBuilderDelegate(
@@ -137,12 +144,13 @@ class CryptoPage {
                   },
                   childCount: 5,
                 )
+              // Error Fetching
               : SliverChildBuilderDelegate(
                   (context, index) {
                     return Column(
                       children: [
                         Image.asset(
-                          "assets/images/appbar_headers/5.png",
+                          getRandom(error_illustrations).toString(),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
