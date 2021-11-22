@@ -472,7 +472,7 @@ class _HomePageState extends State<HomePage> {
     askPermissions();
     hideBottomNavBar();
     // Crypto INIT
-    //getCryptoStats();
+    getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
