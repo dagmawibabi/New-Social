@@ -632,7 +632,7 @@ class _HomePageState extends State<HomePage> {
     ];
     List pagesAppBarExpanded = [
       20.0,
-      20.0,
+      60.0,
       20.0,
       isCryptoPageLoadingError == true ? 200.0 : 290.0,
       20.0,
@@ -641,50 +641,34 @@ class _HomePageState extends State<HomePage> {
     List pagesAppbarFlexibleSpace = [
       // Home Page
       FlexibleSpaceBar(),
-      // Crypto Page
+      // Discover Page
+      FlexibleSpaceBar(),
+      // Music Player Page
       FlexibleSpaceBar(),
       // Crypto Page
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: isCryptoPageLoadingError == false
+              ? Image.asset(
+                  cryptoAppBarImages[cryptoAppBarImageIndex],
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+        ),
+      ),
+      // Chat Page
       FlexibleSpaceBar(),
-      // Crypto Page
-      FlexibleSpaceBar(
-        background: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: isCryptoPageLoadingError == false
-              ? Image.asset(
-                  cryptoAppBarImages[cryptoAppBarImageIndex],
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-        ),
-      ),
-      // Crypto Page
-      FlexibleSpaceBar(
-        background: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: isCryptoPageLoadingError == false
-              ? Image.asset(
-                  cryptoAppBarImages[cryptoAppBarImageIndex],
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-        ),
-      ),
-      // Crypto Page
-      FlexibleSpaceBar(
-        background: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: isCryptoPageLoadingError == false
-              ? Image.asset(
-                  cryptoAppBarImages[cryptoAppBarImageIndex],
-                  fit: BoxFit.cover,
-                )
-              : Container(),
-        ),
-      ),
+      // Settings Page
+      FlexibleSpaceBar(),
     ];
     List pagesBody = [
       // Home Page
       SliverToBoxAdapter(
+        child: Container(),
+      ),
+
+      /*SliverToBoxAdapter(
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: 200.0,
@@ -747,17 +731,11 @@ class _HomePageState extends State<HomePage> {
                   child: const Text("Loding..."),
                 ),
         ),
-      ),
+      ),*/
 
-      // Crypto Page
-      CryptoPage.cryptoPage(
-        isCryptoPageLoading,
-        showCryptoDetail,
-        cryptoStats,
-        isCryptoPageLoadingError,
-        getCryptoStats,
-        getRandom,
-        error_illustrations,
+      // Discover Page
+      SliverToBoxAdapter(
+        child: Container(),
       ),
 
       // Music Page
@@ -794,26 +772,14 @@ class _HomePageState extends State<HomePage> {
         error_illustrations,
       ),
 
-      // Crypto Page
-      CryptoPage.cryptoPage(
-        isCryptoPageLoading,
-        showCryptoDetail,
-        cryptoStats,
-        isCryptoPageLoadingError,
-        getCryptoStats,
-        getRandom,
-        error_illustrations,
+      // Chat Page
+      SliverToBoxAdapter(
+        child: Container(),
       ),
 
-      // Crypto Page
-      CryptoPage.cryptoPage(
-        isCryptoPageLoading,
-        showCryptoDetail,
-        cryptoStats,
-        isCryptoPageLoadingError,
-        getCryptoStats,
-        getRandom,
-        error_illustrations,
+      // Settings Page
+      SliverToBoxAdapter(
+        child: Container(),
       ),
     ];
     List smartRefresherColor = [
@@ -824,7 +790,64 @@ class _HomePageState extends State<HomePage> {
       Color(0xff6C63FF),
       Color(0xff6C63FF),
     ];
-
+    List pagesAppBarBottom = [
+      // Home Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
+      // Discover Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(68.0), // here the desired height
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.black,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(20.0),
+            ),
+          ),
+          height: 50.0,
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+          margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+          child: Row(
+            children: [
+              Icon(Ionicons.compass_outline),
+              const SizedBox(width: 10.0),
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: "Search",
+                  ),
+                ),
+              ),
+              Icon(Icons.search),
+            ],
+          ),
+        ),
+      ),
+      // Music Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
+      // Crypto Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
+      // Chat Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
+      // Setting Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
+    ];
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.grey[200],
@@ -862,6 +885,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     flexibleSpace: pagesAppbarFlexibleSpace[curPage],
+                    bottom: pagesAppBarBottom[curPage],
                     actions: [
                       IconButton(
                         onPressed: () {},
