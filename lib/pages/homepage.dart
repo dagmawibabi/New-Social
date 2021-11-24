@@ -117,7 +117,6 @@ class _HomePageState extends State<HomePage> {
     var response = await http.get(url);
     var responseJSON = jsonDecode(response.body);
     homepageFeed = responseJSON["data"]["children"];
-    print(homepageFeed.length);
     print(homepageFeed);
     //print(responseJSON["data"]["children"][1]["data"]["author_fullname"]);
     isFeedLoading = false;
@@ -470,6 +469,7 @@ class _HomePageState extends State<HomePage> {
   //? Music Page Functions
   // Function to get songs from device
   void getSongsOnDevice() async {
+    askPermissions();
     musicFiles = [];
     dynamic files =
         Directory('/storage/emulated/0/Music').listSync(recursive: false);
@@ -666,7 +666,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    askPermissions();
     hideBottomNavBar();
     // Crypto INIT
     getCryptoStats();
@@ -675,7 +674,7 @@ class _HomePageState extends State<HomePage> {
     albumArtImage = getRandom(albumArts);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    //getHomePageFeed("imaginaryCharacters", "top", "all");
+    getHomePageFeed("pics", "top", "all");
   }
 
   //? Dispose
@@ -692,12 +691,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     List pageOnRefresh = [
-      getCryptoStats,
-      getCryptoStats,
+      getSongsOnDevice,
+      getSongsOnDevice,
       getSongsOnDevice,
       getCryptoStats,
-      getCryptoStats,
-      getCryptoStats,
+      getSongsOnDevice,
+      getSongsOnDevice,
     ];
     List pagesAppBarExpanded = [
       20.0,
@@ -734,73 +733,26 @@ class _HomePageState extends State<HomePage> {
     List pagesBody = [
       // Home Page
       SliverToBoxAdapter(
-        child: Container(),
-      ),
-
-      /*SliverToBoxAdapter(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: 200.0,
-          child: isFeedLoading == false
-              ? TikTokStyleFullPageScroller(
-                  contentSize: homepageFeed.length,
-                  builder: (context, index) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      //color: Colors.red,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          (homepageFeed[index]["data"][
-                                              "url"] // change to thumbnail for vids
-                                          .toString()
-                                          .endsWith(".jpg") ||
-                                      homepageFeed[index]["data"][
-                                              "url"] // change to thumbnail for vids
-                                          .toString()
-                                          .endsWith(".png")) ==
-                                  true
-                              ? GestureDetector(
-                                  onTap: () {
-                                    playVideo = true;
-                                    playVideoIndex = index;
-                                    startVid(homepageFeed[index]["data"]
-                                            ["preview"]["reddit_video_preview"]
-                                        ["fallback_url"]);
-                                    setState(() {});
-                                  },
-                                  child: (playVideoIndex != index)
-                                      ? Image.network(
-                                          homepageFeed[index]["data"]["url"],
-                                          width: 500.0,
-                                        )
-                                      : (playVideoIndex == index
-                                          ? AspectRatio(
-                                              aspectRatio:
-                                                  _controller.value.aspectRatio,
-                                              child: VideoPlayer(_controller),
-                                            )
-                                          : Container()))
-                              : Image.asset(
-                                  "assets/images/error_illustrations/1.png",
-                                ),
-                          Text(
-                            "A",
-                            /*homepageFeed[index]["data"]
-                                      ["author_fullname"],*/
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  //scrollDirection: Axis.vertical,
-                )
-              : Container(
-                  child: const Text("Loding..."),
+        child: isFeedLoading == true
+            ? Container(
+                height: MediaQuery.of(context).size.height - 250,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.grey[800],
+                  ),
                 ),
-        ),
-      ),*/
+              )
+            : Container(
+                height: 100.0,
+                width: MediaQuery.of(context).size.width,
+                child: ListView.builder(
+                  itemCount: homepageFeed.length,
+                  itemBuilder: (context, index) {
+                    return Image.network(homepageFeed[index]["data"]["url"]);
+                  },
+                ),
+              ),
+      ),
 
       // Discover Page
       SliverToBoxAdapter(
@@ -925,7 +877,7 @@ class _HomePageState extends State<HomePage> {
       // B O D Y
       body: SmartRefresher(
         controller: refreshController,
-        onRefresh: getSongsOnDevice,
+        onRefresh: pageOnRefresh[curPage],
         header: WaterDropMaterialHeader(
           backgroundColor: smartRefresherColor[curPage],
         ),
@@ -1013,37 +965,37 @@ class _HomePageState extends State<HomePage> {
                 setState(() {});
               },
               items: [
-                /// Home
+                // Home
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.planet_outline),
                   selectedColor: Colors.purple,
                 ),
 
-                /// Search / Discover
+                // Search / Discover
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.compass_outline),
                   selectedColor: Colors.purple,
                 ),
 
-                /// Music
+                // Music
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.play_outline),
                   selectedColor: Colors.lightBlue,
                 ),
 
-                /// Crypto
+                // Crypto
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.wallet_outline),
                   selectedColor: Color(0xff6C63FF),
                 ),
 
-                /// chat
+                // chat
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.paper_plane_outline),
                   selectedColor: Colors.teal,
                 ),
 
-                /// Settings
+                // Settings
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.hardware_chip_outline),
                   selectedColor: Colors.teal,

@@ -157,17 +157,17 @@ class MusicPlayerPage {
                       // Song list
                       back: Container(
                         margin: EdgeInsets.only(
-                          top: 0.0,
-                          left: 5.0,
-                          right: 5.0,
+                          top: 10.0,
+                          left: 0.0,
+                          right: 0.0,
                           bottom: fullScreenMode == true ? 0.0 : 50.0,
                         ),
                         height: MediaQuery.of(context).size.height,
                         width: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.only(
                           top: fullScreenMode == true ? 10.0 : 0.0,
-                          left: fullScreenMode == true ? 8.0 : 20.0,
-                          right: fullScreenMode == true ? 8.0 : 20.0,
+                          left: fullScreenMode == true ? 0.0 : 10.0,
+                          right: fullScreenMode == true ? 0.0 : 10.0,
                           bottom: fullScreenMode == true ? 10.0 : 100.0,
                         ),
                         decoration: BoxDecoration(
@@ -200,108 +200,134 @@ class MusicPlayerPage {
                                             musicFiles[index].toString());
                                       }
                                     },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[900],
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(10.0)),
-                                        border: curSong ==
-                                                p.withoutExtension(p.basename(
-                                                    musicFiles[index]
-                                                        .toString()))
-                                            ? Border.all(
-                                                color: curPlayingSongColor)
-                                            : Border.all(color: Colors.black),
-                                      ),
-                                      margin:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0, vertical: 12.0),
-                                      child: Row(
-                                        children: [
-                                          // Music Note Icon
-                                          Icon(
-                                            Icons.music_note_outlined,
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
                                             color: curSong ==
                                                     p.withoutExtension(
                                                         p.basename(
                                                             musicFiles[index]
                                                                 .toString()))
-                                                ? curPlayingSongColor
-                                                : Colors.grey[200],
+                                                ? (fullScreenMode == true
+                                                    ? Colors.black
+                                                        .withOpacity(0.8)
+                                                    : Colors.grey[800]!
+                                                        .withOpacity(0.9))
+                                                : Colors
+                                                    .transparent, // Colors.grey[900],
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                    fullScreenMode == true
+                                                        ? 5.0
+                                                        : 15.0)),
+                                            /*border: curSong ==
+                                                    p.withoutExtension(p.basename(
+                                                        musicFiles[index]
+                                                            .toString()))
+                                                ? Border.all(
+                                                    color: curPlayingSongColor)
+                                                : Border.all(color: Colors.black),*/
                                           ),
-                                          const SizedBox(width: 5.0),
-                                          // Music Title
-                                          Expanded(
-                                            child: p
-                                                        .basename(
-                                                            musicFiles[index]
-                                                                .toString())
-                                                        .length <
-                                                    30
-                                                ? Text(
-                                                    p.basename(musicFiles[index]
-                                                        .toString()),
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: curSong ==
-                                                              p.withoutExtension(
-                                                                  p.basename(musicFiles[
-                                                                          index]
-                                                                      .toString()))
-                                                          ? curPlayingSongColor
-                                                          : Colors.grey[200],
-                                                    ),
-                                                    maxLines: 1,
-                                                  )
-                                                : Container(
-                                                    height: 30.0,
-                                                    child: Marquee(
-                                                      text: p.basename(
-                                                          musicFiles[index]
-                                                              .toString()),
-                                                      blankSpace: 80.0,
-                                                      velocity: 30.0,
-                                                      numberOfRounds: 3,
-                                                      style: TextStyle(
-                                                        fontSize: 16.0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: curSong ==
-                                                                p.withoutExtension(
-                                                                    p.basename(musicFiles[
-                                                                            index]
-                                                                        .toString()))
-                                                            ? curPlayingSongColor
-                                                            : Colors.grey[200],
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 5.0),
-                                          // Choose Song
-                                          Icon(
-                                            (curSong ==
+                                          /*margin:
+                                              const EdgeInsets.only(bottom: 8.0),*/
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0, vertical: 15.0),
+                                          child: Row(
+                                            children: [
+                                              // Music Note Icon
+                                              Icon(
+                                                Icons.music_note_outlined,
+                                                color: curSong ==
                                                         p.withoutExtension(p
                                                             .basename(musicFiles[
                                                                     index]
-                                                                .toString())) &&
-                                                    isSongPlaying)
-                                                ? Icons.pause
-                                                : Icons.play_arrow,
-                                            color: curSong ==
-                                                    p.withoutExtension(
+                                                                .toString()))
+                                                    ? curPlayingSongColor
+                                                    : Colors.grey[900],
+                                              ),
+                                              const SizedBox(width: 10.0),
+                                              // Music Title
+                                              Expanded(
+                                                child: p
+                                                            .basename(
+                                                                musicFiles[
+                                                                        index]
+                                                                    .toString())
+                                                            .length <
+                                                        30
+                                                    ? Text(
                                                         p.basename(
                                                             musicFiles[index]
+                                                                .toString()),
+                                                        style: TextStyle(
+                                                          fontSize: 18.0,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: curSong ==
+                                                                  p.withoutExtension(
+                                                                      p.basename(
+                                                                          musicFiles[index]
+                                                                              .toString()))
+                                                              ? curPlayingSongColor
+                                                              : Colors
+                                                                  .grey[900],
+                                                        ),
+                                                        maxLines: 1,
+                                                      )
+                                                    : Container(
+                                                        height: 30.0,
+                                                        child: Marquee(
+                                                          text: p.basename(
+                                                              musicFiles[index]
+                                                                  .toString()),
+                                                          blankSpace: 80.0,
+                                                          velocity: 30.0,
+                                                          numberOfRounds: 3,
+                                                          style: TextStyle(
+                                                            fontSize: 18.0,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: curSong ==
+                                                                    p.withoutExtension(p.basename(
+                                                                        musicFiles[index]
+                                                                            .toString()))
+                                                                ? curPlayingSongColor
+                                                                : Colors
+                                                                    .grey[900],
+                                                          ),
+                                                        ),
+                                                      ),
+                                              ),
+                                              const SizedBox(width: 10.0),
+                                              // Choose Song
+                                              Icon(
+                                                (curSong ==
+                                                            p.withoutExtension(p
+                                                                .basename(musicFiles[
+                                                                        index]
+                                                                    .toString())) &&
+                                                        isSongPlaying)
+                                                    ? Icons.pause
+                                                    : Icons.play_arrow,
+                                                color: curSong ==
+                                                        p.withoutExtension(p
+                                                            .basename(musicFiles[
+                                                                    index]
                                                                 .toString()))
-                                                ? curPlayingSongColor
-                                                : Colors.grey[200],
-                                            size: 30.0,
+                                                    ? curPlayingSongColor
+                                                    : Colors.grey[900],
+                                                size: 30.0,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Divider(
+                                          color: Colors.grey[600],
+                                          thickness: 0.2,
+                                          height: 5,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
@@ -314,7 +340,7 @@ class MusicPlayerPage {
                                     width: 300.0,
                                     padding: const EdgeInsets.only(top: 30.0),
                                     child: const Text(
-                                      "Click here to see list of songs",
+                                      "Click here to see music player controls",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 14.0,
@@ -694,7 +720,7 @@ class MusicPlayerPage {
                                           padding:
                                               const EdgeInsets.only(top: 30.0),
                                           child: const Text(
-                                            "Click here to see list of songs",
+                                            "Click here to see your list of songs",
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 14.0,
