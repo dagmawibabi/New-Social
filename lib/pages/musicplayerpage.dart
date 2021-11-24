@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,8 @@ class MusicPlayerPage {
     fullScreenMode,
     curSongDuration,
     assetsAudioPlayer,
+    songPositionStreamBuilder,
+    sliderStreamBuilder,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -116,127 +120,74 @@ class MusicPlayerPage {
           // Music Player, controls and Song list
           : Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Colors.transparent,
+              height: fullScreenMode == false
+                  ? MediaQuery.of(context).size.height - 100
+                  : MediaQuery.of(context).size.height,
               child: Stack(
                 children: [
+                  // Background image
                   Container(
+                    decoration: new BoxDecoration(
+                      image: new DecorationImage(
+                        image: new ExactAssetImage(albumArtImage),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height - 100,
-                    color: Colors.transparent,
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: Image.asset(albumArtImage),
+                    height: fullScreenMode == false
+                        ? MediaQuery.of(context).size.height - 100
+                        : MediaQuery.of(context).size.height,
+                    child: new BackdropFilter(
+                      filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: new Container(
+                        decoration: new BoxDecoration(
+                            color: Colors.white.withOpacity(0.0)),
+                      ),
                     ),
                   ),
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      /*fullScreenMode == true
-                          ? Colors.grey[300]!
-                          : Colors.grey[200]!,*/
-                      boxShadow: [
-                        BoxShadow(
-                          color: fullScreenMode == true
-                              ? Colors.grey[400]!
-                              : Colors.grey[200]!,
-                          spreadRadius: 0.5,
-                          blurRadius: 10.0,
-                        ),
-                      ],
-                    ),
-                    height: MediaQuery.of(context).size.height - 100,
+                    margin: EdgeInsets.only(
+                        top: (fullScreenMode == false ? 0.0 : 30.0)),
+                    height: MediaQuery.of(context).size.height - 0,
+                    color: fullScreenMode == false
+                        ? Colors.grey[200]
+                        : Colors.transparent,
                     child: FlipCard(
                       controller: flipCardController,
                       // Song list
                       back: Container(
-                        margin: const EdgeInsets.only(
-                            top: 20.0, left: 5.0, right: 5.0, bottom: 50.0),
-                        height: MediaQuery.of(context).size.height - 320,
+                        margin: EdgeInsets.only(
+                          top: 0.0,
+                          left: 5.0,
+                          right: 5.0,
+                          bottom: fullScreenMode == true ? 0.0 : 50.0,
+                        ),
+                        height: MediaQuery.of(context).size.height,
                         width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.only(
-                            left: 20.0, right: 20.0, bottom: 150.0),
+                        padding: EdgeInsets.only(
+                          top: fullScreenMode == true ? 10.0 : 0.0,
+                          left: fullScreenMode == true ? 8.0 : 20.0,
+                          right: fullScreenMode == true ? 8.0 : 20.0,
+                          bottom: fullScreenMode == true ? 10.0 : 100.0,
+                        ),
                         decoration: BoxDecoration(
                           color: fullScreenMode == true
-                              ? Colors.grey[300]!
+                              ? Colors.transparent // Colors.grey[300]!
                               : Colors.grey[200]!,
                         ),
                         // Indie Songs Button
-                        child: ListView.builder(
-                          itemCount: musicFiles.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[900],
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(10.0)),
-                                border: curSong ==
-                                        p.withoutExtension(p.basename(
-                                            musicFiles[index].toString()))
-                                    ? Border.all(color: curPlayingSongColor)
-                                    : Border.all(color: Colors.black),
-                              ),
-                              margin: const EdgeInsets.only(bottom: 8.0),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0, vertical: 12.0),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.music_note_outlined,
-                                    color: curSong ==
-                                            p.withoutExtension(p.basename(
-                                                musicFiles[index].toString()))
-                                        ? curPlayingSongColor
-                                        : Colors.grey[200],
-                                  ),
-                                  const SizedBox(width: 5.0),
-                                  Expanded(
-                                    child: p
-                                                .basename(musicFiles[index]
-                                                    .toString())
-                                                .length <
-                                            30
-                                        ? Text(
-                                            p.basename(
-                                                musicFiles[index].toString()),
-                                            style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: curSong ==
-                                                      p.withoutExtension(
-                                                          p.basename(
-                                                              musicFiles[index]
-                                                                  .toString()))
-                                                  ? curPlayingSongColor
-                                                  : Colors.grey[200],
-                                            ),
-                                            maxLines: 1,
-                                          )
-                                        : Container(
-                                            height: 30.0,
-                                            child: Marquee(
-                                              text: p.basename(
-                                                  musicFiles[index].toString()),
-                                              blankSpace: 80.0,
-                                              velocity: 30.0,
-                                              numberOfRounds: 3,
-                                              style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: curSong ==
-                                                        p.withoutExtension(p
-                                                            .basename(musicFiles[
-                                                                    index]
-                                                                .toString()))
-                                                    ? curPlayingSongColor
-                                                    : Colors.grey[200],
-                                              ),
-                                            ),
-                                          ),
-                                  ),
-                                  const SizedBox(width: 5.0),
-                                  // Choose Song
-                                  GestureDetector(
+                        child: Column(
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height -
+                                  (fullScreenMode == true ? 130 : 320),
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                primary: false,
+                                shrinkWrap: true,
+                                itemCount: musicFiles.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
                                     onTap: () {
                                       if ((curSong ==
                                               p.withoutExtension(p.basename(
@@ -249,48 +200,156 @@ class MusicPlayerPage {
                                             musicFiles[index].toString());
                                       }
                                     },
-                                    child: Icon(
-                                      (curSong ==
-                                                  p.withoutExtension(p.basename(
-                                                      musicFiles[index]
-                                                          .toString())) &&
-                                              isSongPlaying)
-                                          ? Icons.pause
-                                          : Icons.play_arrow,
-                                      color: curSong ==
-                                              p.withoutExtension(p.basename(
-                                                  musicFiles[index].toString()))
-                                          ? curPlayingSongColor
-                                          : Colors.grey[200],
-                                      size: 30.0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[900],
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                        border: curSong ==
+                                                p.withoutExtension(p.basename(
+                                                    musicFiles[index]
+                                                        .toString()))
+                                            ? Border.all(
+                                                color: curPlayingSongColor)
+                                            : Border.all(color: Colors.black),
+                                      ),
+                                      margin:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0, vertical: 12.0),
+                                      child: Row(
+                                        children: [
+                                          // Music Note Icon
+                                          Icon(
+                                            Icons.music_note_outlined,
+                                            color: curSong ==
+                                                    p.withoutExtension(
+                                                        p.basename(
+                                                            musicFiles[index]
+                                                                .toString()))
+                                                ? curPlayingSongColor
+                                                : Colors.grey[200],
+                                          ),
+                                          const SizedBox(width: 5.0),
+                                          // Music Title
+                                          Expanded(
+                                            child: p
+                                                        .basename(
+                                                            musicFiles[index]
+                                                                .toString())
+                                                        .length <
+                                                    30
+                                                ? Text(
+                                                    p.basename(musicFiles[index]
+                                                        .toString()),
+                                                    style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: curSong ==
+                                                              p.withoutExtension(
+                                                                  p.basename(musicFiles[
+                                                                          index]
+                                                                      .toString()))
+                                                          ? curPlayingSongColor
+                                                          : Colors.grey[200],
+                                                    ),
+                                                    maxLines: 1,
+                                                  )
+                                                : Container(
+                                                    height: 30.0,
+                                                    child: Marquee(
+                                                      text: p.basename(
+                                                          musicFiles[index]
+                                                              .toString()),
+                                                      blankSpace: 80.0,
+                                                      velocity: 30.0,
+                                                      numberOfRounds: 3,
+                                                      style: TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: curSong ==
+                                                                p.withoutExtension(
+                                                                    p.basename(musicFiles[
+                                                                            index]
+                                                                        .toString()))
+                                                            ? curPlayingSongColor
+                                                            : Colors.grey[200],
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ),
+                                          const SizedBox(width: 5.0),
+                                          // Choose Song
+                                          Icon(
+                                            (curSong ==
+                                                        p.withoutExtension(p
+                                                            .basename(musicFiles[
+                                                                    index]
+                                                                .toString())) &&
+                                                    isSongPlaying)
+                                                ? Icons.pause
+                                                : Icons.play_arrow,
+                                            color: curSong ==
+                                                    p.withoutExtension(
+                                                        p.basename(
+                                                            musicFiles[index]
+                                                                .toString()))
+                                                ? curPlayingSongColor
+                                                : Colors.grey[200],
+                                            size: 30.0,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            // Click to flip
+                            fullScreenMode == true
+                                ? Container()
+                                : Container(
+                                    width: 300.0,
+                                    padding: const EdgeInsets.only(top: 30.0),
+                                    child: const Text(
+                                      "Click here to see list of songs",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        //fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            );
-                          },
+                          ],
                         ),
                       ),
                       // Music Player and controls
                       front: Container(
                         decoration: BoxDecoration(
-                          color: Colors.transparent, //Colors.grey[200],
+                          color: fullScreenMode == true
+                              ? Colors.white.withOpacity(
+                                  fullScreenMode == true ? 0.0 : 0.4)
+                              : Colors.grey[200],
                           borderRadius: BorderRadius.all(Radius.circular(20.0)),
                           boxShadow: [
                             BoxShadow(
                               color: fullScreenMode == true
-                                  ? Colors.grey[400]!
+                                  ? Colors.grey[700]!.withOpacity(
+                                      fullScreenMode == true ? 0.0 : 0.3)
                                   : Colors.grey[200]!,
-                              spreadRadius: 0.5,
+                              spreadRadius: 2,
                               blurRadius: 10.0,
                             ),
                           ],
                         ),
                         margin: EdgeInsets.only(
-                          top: 30.0,
-                          left: 20.0,
-                          right: 20.0,
-                          bottom: (fullScreenMode == true ? 160.0 : 100.0),
+                          top: fullScreenMode == true ? 50.0 : 30.0,
+                          left: fullScreenMode == true ? 0.0 : 20.0,
+                          right: fullScreenMode == true ? 0.0 : 20.0,
+                          bottom:
+                              30.0, /*(fullScreenMode == true ? 160.0 : 100.0), --> mini player*/
                         ),
                         height: MediaQuery.of(context).size.height - 200,
                         width: MediaQuery.of(context).size.width,
@@ -302,46 +361,57 @@ class MusicPlayerPage {
                             FlipCard(
                               // Album Art Back
                               back: Container(
-                                height: 350.0,
+                                height: fullScreenMode == true ? 400.0 : 350.0,
                                 width: 400.0,
                                 decoration: BoxDecoration(
-                                  color: Colors.transparent, //Colors.grey[200],
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(30.0),
-                                  ),
-                                  //border: Border.all(color: Colors.grey[300]!),
+                                  color: Colors.grey[200]!.withOpacity(0.4),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey[300]!,
-                                      blurRadius: 3.0,
+                                      color: Colors.white.withOpacity(0.3),
+                                      blurRadius: 100.0,
                                       spreadRadius: 1.0,
                                     ),
                                   ],
                                 ),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal:
+                                        fullScreenMode == true ? 16.0 : 18.0,
+                                    vertical: 5.0),
                                 clipBehavior: Clip.hardEdge,
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 18.0, vertical: 5.0),
                                 child: const Center(
                                   child: Text("No Lyrics Found"),
                                 ),
                               ),
                               // Album Art + Fullscreen Button
                               front: Container(
-                                height: 350.0,
+                                height: fullScreenMode == true ? 400.0 : 350.0,
                                 width: 400.0,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: Colors.transparent,
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.3),
+                                      blurRadius: 100.0,
+                                      spreadRadius: 1.0,
+                                    ),
+                                  ],
                                 ),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 18.0, vertical: 5.0),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal:
+                                        fullScreenMode == true ? 16.0 : 18.0,
+                                    vertical: 5.0),
                                 clipBehavior: Clip.hardEdge,
                                 child: Stack(
                                   children: [
                                     // Album Art Image
                                     Container(
-                                      height: 350.0,
+                                      height: fullScreenMode == true
+                                          ? 400.0
+                                          : 350.0,
                                       width: 400.0,
                                       decoration: BoxDecoration(
                                         color: Colors.grey[200],
@@ -393,13 +463,18 @@ class MusicPlayerPage {
                                         padding:
                                             const EdgeInsets.only(bottom: 0.0),
                                         child: Container(
-                                          height: 20.0,
+                                          height: fullScreenMode == true
+                                              ? 360.0
+                                              : 30.0,
                                           decoration: const BoxDecoration(
                                             borderRadius: BorderRadius.all(
-                                                Radius.circular(30.0)),
+                                                Radius.circular(0.0)),
+                                            color: Colors.transparent,
                                           ),
-                                          padding:
-                                              const EdgeInsets.only(top: 10.0),
+                                          padding: EdgeInsets.only(
+                                              top: fullScreenMode == true
+                                                  ? 350.0
+                                                  : 20.0),
                                           clipBehavior: Clip.hardEdge,
                                           child: isSongPlaying == true
                                               ? WaveWidget(
@@ -426,7 +501,10 @@ class MusicPlayerPage {
                                                         Alignment.topRight,
                                                   ),
                                                   duration: 1000,
-                                                  waveAmplitude: 2,
+                                                  waveAmplitude:
+                                                      fullScreenMode == true
+                                                          ? 4
+                                                          : 2,
                                                   heightPercentange: 0.1,
                                                   size: const Size(
                                                     double.infinity,
@@ -444,15 +522,20 @@ class MusicPlayerPage {
                             // Song title + Controls
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey[200],
+                                color: Colors
+                                    .transparent, // grey[200]!.withOpacity(0.5),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20.0)),
                               ),
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 10.0, vertical: 0.0),
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                  vertical:
+                                      fullScreenMode == true ? 30.0 : 0.0),
                               padding:
                                   const EdgeInsets.symmetric(vertical: 10.0),
                               clipBehavior: Clip.hardEdge,
+                              height: 250.0,
+                              width: MediaQuery.of(context).size.width,
                               child: Column(
                                 children: [
                                   // Song Title : Scroll if title length is greater than 28 xers
@@ -464,8 +547,10 @@ class MusicPlayerPage {
                                             child: Text(
                                               curSong,
                                               maxLines: 1,
-                                              style: const TextStyle(
-                                                fontSize: 20.0,
+                                              style: TextStyle(
+                                                fontSize: fullScreenMode == true
+                                                    ? 23.0
+                                                    : 20.0,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -483,35 +568,14 @@ class MusicPlayerPage {
                                   const SizedBox(height: 20.0),
                                   // Song Position and Duration
                                   Container(
-                                    width: 300.0,
+                                    width: MediaQuery.of(context).size.width -
+                                        (fullScreenMode == true ? 50.0 : 100.0),
+                                    //height: 30.0,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        StreamBuilder(
-                                          stream:
-                                              assetsAudioPlayer.currentPosition,
-                                          builder: (context, asyncSnapshot) {
-                                            final dynamic duration =
-                                                asyncSnapshot.data;
-                                            return Text(
-                                              ((duration.inSeconds / 3600)
-                                                          .toInt())
-                                                      .toString()
-                                                      .padLeft(2, '0') +
-                                                  ":" +
-                                                  ((duration.inSeconds / 60)
-                                                          .toInt())
-                                                      .toString()
-                                                      .padLeft(2, '0') +
-                                                  ":" +
-                                                  ((duration.inSeconds % 60)
-                                                          .toInt())
-                                                      .toString()
-                                                      .padLeft(2, "0"),
-                                            );
-                                          },
-                                        ),
+                                        songPositionStreamBuilder(),
                                         Text(
                                           ((curSongDuration.inSeconds / 3600)
                                                       .toInt())
@@ -532,37 +596,10 @@ class MusicPlayerPage {
                                     ),
                                   ),
                                   // Slider
-                                  StreamBuilder(
-                                    stream: assetsAudioPlayer.currentPosition,
-                                    builder: (context, asyncSnapshot) {
-                                      final dynamic duration =
-                                          asyncSnapshot.data;
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15.0),
-                                        child: Slider(
-                                          activeColor: Colors.grey[900],
-                                          inactiveColor: Colors
-                                              .grey[500], //Color(0xaa6C63FF),
-                                          value: duration != null
-                                              ? duration.inSeconds.toDouble()
-                                              : 0.0,
-                                          min: 0.0,
-                                          max: curSongDuration != null
-                                              ? curSongDuration.inSeconds
-                                                  .toDouble()
-                                              : 100.0,
-                                          onChanged: (value) {
-                                            assetsAudioPlayer.seek(
-                                              Duration(
-                                                seconds: value.toInt(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  sliderStreamBuilder(),
+                                  fullScreenMode == true
+                                      ? SizedBox(height: 20.0)
+                                      : SizedBox(height: 0.0),
                                   // Controlls
                                   Row(
                                     mainAxisAlignment:
@@ -572,9 +609,11 @@ class MusicPlayerPage {
                                       // Repeat Button
                                       IconButton(
                                         onPressed: () {},
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.repeat,
-                                          size: 26.0,
+                                          size: fullScreenMode == true
+                                              ? 30.0
+                                              : 26.0,
                                         ),
                                       ),
                                       // Fast Rewind Button
@@ -591,9 +630,11 @@ class MusicPlayerPage {
                                         },
                                         child: IconButton(
                                           onPressed: () {},
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.fast_rewind_rounded,
-                                            size: 36.0,
+                                            size: fullScreenMode == true
+                                                ? 40.0
+                                                : 36.0,
                                           ),
                                         ),
                                       ),
@@ -606,7 +647,9 @@ class MusicPlayerPage {
                                           isSongPlaying
                                               ? Icons.pause
                                               : Icons.play_arrow,
-                                          size: 36.0,
+                                          size: fullScreenMode == true
+                                              ? 40.0
+                                              : 36.0,
                                         ),
                                       ),
                                       // Fast Forward Button
@@ -623,18 +666,22 @@ class MusicPlayerPage {
                                         },
                                         child: IconButton(
                                           onPressed: () {},
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.fast_forward_rounded,
-                                            size: 36.0,
+                                            size: fullScreenMode == true
+                                                ? 40.0
+                                                : 36.0,
                                           ),
                                         ),
                                       ),
                                       // Shuffle Button
                                       IconButton(
                                         onPressed: () {},
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.shuffle,
-                                          size: 26.0,
+                                          size: fullScreenMode == true
+                                              ? 30.0
+                                              : 26.0,
                                         ),
                                       ),
                                     ],

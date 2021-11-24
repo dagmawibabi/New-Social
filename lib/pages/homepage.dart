@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
@@ -174,7 +175,8 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.transparent,
               ),
               customSize: const Size(200.0, 200.0),
-              imageProvider: NetworkImage(image),
+              imageProvider:
+                  CachedNetworkImageProvider(image), /*NetworkImage(image),*/
             ),
           ),
         );
@@ -256,15 +258,22 @@ class _HomePageState extends State<HomePage> {
               children: [
                 // Crypto Image
                 GestureDetector(
-                  onTap: () {
-                    viewImageAlertDialog(cryptoStats[index]["image"]);
-                  },
-                  child: Image.network(
+                    onTap: () {
+                      viewImageAlertDialog(cryptoStats[index]["image"]);
+                    },
+                    child: SizedBox(
+                      width: 60.0,
+                      height: 60.0,
+                      child: Image(
+                        image: CachedNetworkImageProvider(
+                            cryptoStats[index]["image"]),
+                      ),
+                    ) /*Image.network(
                     cryptoStats[index]["image"],
                     width: 60.0,
                     height: 60.0,
-                  ),
-                ),
+                  ),*/
+                    ),
                 const SizedBox(height: 10.0),
                 Column(
                   //mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -554,6 +563,71 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  // Music Seeker Stream Builder
+  Widget sliderStreamBuilder() {
+    try {
+      return StreamBuilder(
+        stream: assetsAudioPlayer.currentPosition,
+        builder: (context, asyncSnapshot) {
+          final dynamic duration = asyncSnapshot.data;
+          return Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: fullScreenMode == true ? 0.0 : 15.0),
+            child: Slider(
+              activeColor: Colors.grey[900],
+              inactiveColor: Colors.grey[500], //Color(0xaa6C63FF),
+              value: duration != null ? duration.inSeconds.toDouble() : 0.0,
+              min: 0.0,
+              max: curSongDuration != null
+                  ? curSongDuration.inSeconds.toDouble()
+                  : 100.0,
+              onChanged: (value) {
+                assetsAudioPlayer.seek(
+                  Duration(
+                    seconds: value.toInt(),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      return Container();
+    }
+  }
+
+  // Stream Builder
+  Widget songPositionStreamBuilder() {
+    try {
+      return StreamBuilder(
+        stream: assetsAudioPlayer.currentPosition,
+        builder: (context, asyncSnapshot) {
+          final dynamic duration = asyncSnapshot.data;
+          try {
+            return Text(
+              ((duration.inSeconds / 3600).toInt()).toString().padLeft(2, '0') +
+                  ":" +
+                  ((duration.inSeconds / 60).toInt())
+                      .toString()
+                      .padLeft(2, '0') +
+                  ":" +
+                  ((duration.inSeconds % 60).toInt())
+                      .toString()
+                      .padLeft(2, "0"),
+            );
+          } catch (e) {
+            return Text(
+              ("00" + ":" + "00" + ":" + "00"),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      return Container();
+    }
+  }
+
   //? GENERAL
   // Fullscreen Mode
   void setFullscreen() {
@@ -585,11 +659,6 @@ class _HomePageState extends State<HomePage> {
     if (storagePermissionStatus.isGranted == false) {
       await Permission.storage.request();
     }
-    /*PermissionStatus externalStoragePermissionStatus =
-        await Permission.manageExternalStorage.status;
-    if (externalStoragePermissionStatus.isGranted == false) {
-      await Permission.manageExternalStorage.request();
-    }*/
   }
 
   //? INIT STATE
@@ -759,6 +828,8 @@ class _HomePageState extends State<HomePage> {
         fullScreenMode,
         curSongDuration,
         assetsAudioPlayer,
+        songPositionStreamBuilder,
+        sliderStreamBuilder,
       ),
 
       // Crypto Page
@@ -901,7 +972,7 @@ class _HomePageState extends State<HomePage> {
                       color: fullScreenMode == true
                           ? Colors.grey[300]!
                           : Colors.grey[200]!,
-                      height: pagesAppBarExpanded[curPage] + 78.5,
+                      //height: pagesAppBarExpanded[curPage] + 78.5,
                     ),
                   ),
             /*SliverAppBar(

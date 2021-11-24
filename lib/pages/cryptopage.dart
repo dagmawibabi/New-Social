@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shimmer/shimmer.dart';
@@ -34,8 +35,13 @@ class CryptoPage {
                           Row(
                             children: [
                               // Crypto Image
-                              Image.network(cryptoStats[index]["image"],
+                              Image(
+                                  image: CachedNetworkImageProvider(
+                                      cryptoStats[index]["image"]),
                                   width: 36.0),
+
+                              /*Image.network(cryptoStats[index]["image"],
+                                  width: 36.0),*/
                               const SizedBox(width: 12.0),
                               // Crypto Name, Symbol and price up/down pointer
                               SizedBox(
