@@ -674,7 +674,7 @@ class _HomePageState extends State<HomePage> {
     albumArtImage = getRandom(albumArts);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    getHomePageFeed("pics", "top", "all");
+    getHomePageFeed("memes", "top", "all");
   }
 
   //? Dispose
@@ -732,26 +732,71 @@ class _HomePageState extends State<HomePage> {
     ];
     List pagesBody = [
       // Home Page
-      SliverToBoxAdapter(
-        child: isFeedLoading == true
-            ? Container(
-                height: MediaQuery.of(context).size.height - 250,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.grey[800],
-                  ),
-                ),
-              )
-            : Container(
-                height: 100.0,
-                width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
-                  itemCount: homepageFeed.length,
-                  itemBuilder: (context, index) {
-                    return Image.network(homepageFeed[index]["data"]["url"]);
-                  },
-                ),
-              ),
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return (homepageFeed[index]["data"]["url"]
+                                .toString()
+                                .endsWith(".jpg") ==
+                            true ||
+                        homepageFeed[index]["data"]["url"]
+                            .toString()
+                            .endsWith(".png")) ==
+                    true
+                ? Container(
+                    margin: const EdgeInsets.all(6.0),
+                    padding: const EdgeInsets.all(14.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20.0),
+                      ),
+                      /*border: Border.all(
+                        color: Colors.black,
+                      ),*/
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey[400]!,
+                          blurRadius: 4.0,
+                        ),
+                      ],
+                      color: Colors.grey[200],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          homepageFeed[index]["data"]["author"]
+                              .toString()
+                              .toUpperCase(),
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          homepageFeed[index]["data"]["title"],
+                          textAlign: TextAlign.left,
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20.0),
+                            ),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          child:
+                              Image.network(homepageFeed[index]["data"]["url"]),
+                        ),
+                      ],
+                    ))
+                : Container();
+          },
+          childCount: homepageFeed.length,
+        ),
       ),
 
       // Discover Page
