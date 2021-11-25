@@ -117,7 +117,6 @@ class _HomePageState extends State<HomePage> {
     var response = await http.get(url);
     var responseJSON = jsonDecode(response.body);
     homepageFeed = responseJSON["data"]["children"];
-    print(homepageFeed);
     //print(responseJSON["data"]["children"][1]["data"]["author_fullname"]);
     isFeedLoading = false;
     setState(() {});
@@ -628,6 +627,47 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //? Home Page
+  TextEditingController feedSearch = TextEditingController();
+  void feedChoice() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Container(
+            height: 300.0,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  child: Text(
+                    "Enter Custom Feed",
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextField(
+                  controller: feedSearch,
+                ),
+                IconButton(
+                  onPressed: () {
+                    getHomePageFeed(feedSearch.text.trim(), "top", "all");
+                    setState(() {});
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.search),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   //? GENERAL
   // Fullscreen Mode
   void setFullscreen() {
@@ -674,7 +714,7 @@ class _HomePageState extends State<HomePage> {
     albumArtImage = getRandom(albumArts);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    getHomePageFeed("memes", "top", "all");
+    getHomePageFeed("couples", "top", "all");
   }
 
   //? Dispose
@@ -743,56 +783,61 @@ class _HomePageState extends State<HomePage> {
                             .toString()
                             .endsWith(".png")) ==
                     true
-                ? Container(
-                    margin: const EdgeInsets.all(6.0),
-                    padding: const EdgeInsets.all(14.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                      /*border: Border.all(
-                        color: Colors.black,
-                      ),*/
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey[400]!,
-                          blurRadius: 4.0,
-                        ),
-                      ],
-                      color: Colors.grey[200],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          homepageFeed[index]["data"]["author"]
-                              .toString()
-                              .toUpperCase(),
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          homepageFeed[index]["data"]["title"],
-                          textAlign: TextAlign.left,
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 10.0),
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                          margin: const EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.all(14.0),
                           decoration: BoxDecoration(
-                            color: Colors.amber,
                             borderRadius: BorderRadius.all(
                               Radius.circular(20.0),
                             ),
+                            /*border: Border.all(
+                            color: Colors.black,
+                          ),*/
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey[400]!,
+                                blurRadius: 4.0,
+                              ),
+                            ],
+                            color: Colors.grey[200],
                           ),
-                          clipBehavior: Clip.hardEdge,
-                          child:
-                              Image.network(homepageFeed[index]["data"]["url"]),
-                        ),
-                      ],
-                    ))
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                homepageFeed[index]["data"]["author"]
+                                    .toString()
+                                    .toUpperCase(),
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4.0),
+                              Text(
+                                homepageFeed[index]["data"]["title"],
+                                textAlign: TextAlign.left,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                                child: Image.network(
+                                    homepageFeed[index]["data"]["url"]),
+                              ),
+                            ],
+                          )),
+                    ],
+                  )
                 : Container();
           },
           childCount: homepageFeed.length,
@@ -955,6 +1000,14 @@ class _HomePageState extends State<HomePage> {
                     flexibleSpace: pagesAppbarFlexibleSpace[curPage],
                     bottom: pagesAppBarBottom[curPage],
                     actions: [
+                      curPage == 0
+                          ? IconButton(
+                              onPressed: () {
+                                feedChoice();
+                              },
+                              icon: Icon(Icons.add),
+                            )
+                          : Container(),
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(
