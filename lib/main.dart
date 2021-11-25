@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:newsocial/pages/contentViewerPage.dart';
 import 'package:newsocial/pages/homepage.dart';
 
 void main() {
@@ -28,6 +29,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: "/",
       routes: {
         "/": (context) => HomePage(),
+        "contentViewerPage": (context) => ContentViewerPage(),
       },
       theme: ThemeData(
         fontFamily: "BlenderProBook",

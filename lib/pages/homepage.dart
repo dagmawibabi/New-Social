@@ -16,6 +16,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
 import 'package:marquee/marquee.dart';
@@ -25,6 +26,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tiktoklikescroller/tiktoklikescroller.dart';
 import 'package:video_player/video_player.dart';
@@ -629,6 +631,7 @@ class _HomePageState extends State<HomePage> {
 
   //? Home Page
   TextEditingController feedSearch = TextEditingController();
+  // Custom Feed
   void feedChoice() {
     showDialog(
       context: context,
@@ -661,6 +664,32 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.search),
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // viewFeedImages
+  void viewFeedImages(image) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[200]!.withOpacity(0.9),
+          contentPadding: const EdgeInsets.all(2.0),
+          content: Container(
+            color: Colors.white,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height / 3,
+            child: PhotoView(
+              customSize: Size(MediaQuery.of(context).size.width - 50,
+                  MediaQuery.of(context).size.height / 2),
+              imageProvider: NetworkImage(image),
+              backgroundDecoration: BoxDecoration(
+                color: Colors.transparent,
+              ),
             ),
           ),
         );
@@ -714,7 +743,7 @@ class _HomePageState extends State<HomePage> {
     albumArtImage = getRandom(albumArts);
     // HomePage INIT
     //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    getHomePageFeed("couples", "top", "all");
+    getHomePageFeed("wholesomememes", "top", "all");
   }
 
   //? Dispose
@@ -787,55 +816,103 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
-                          margin: const EdgeInsets.all(6.0),
-                          padding: const EdgeInsets.all(14.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20.0),
-                            ),
-                            /*border: Border.all(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.all(6.0),
+                        padding: const EdgeInsets.all(14.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20.0),
+                          ),
+                          /*border: Border.all(
                             color: Colors.black,
                           ),*/
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey[400]!,
-                                blurRadius: 4.0,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey[400]!,
+                              blurRadius: 4.0,
+                            ),
+                          ],
+                          color: Colors.grey[200],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Author of content
+                            Text(
+                              homepageFeed[index]["data"]["author"]
+                                  .toString()
+                                  .toUpperCase(),
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                            color: Colors.grey[200],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                homepageFeed[index]["data"]["author"]
-                                    .toString()
-                                    .toUpperCase(),
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
+                            ),
+                            const SizedBox(height: 4.0),
+                            // Title of content
+                            Text(
+                              homepageFeed[index]["data"]["title"],
+                              textAlign: TextAlign.left,
+                            ),
+                            // Image of content
+                            Container(
+                              margin: const EdgeInsets.only(top: 10.0),
+                              decoration: BoxDecoration(
+                                color: Colors.amber,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
                                 ),
                               ),
-                              const SizedBox(height: 4.0),
-                              Text(
-                                homepageFeed[index]["data"]["title"],
-                                textAlign: TextAlign.left,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 10.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                ),
-                                clipBehavior: Clip.hardEdge,
+                              clipBehavior: Clip.hardEdge,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    "contentViewerPage",
+                                    arguments: {
+                                      "image": homepageFeed[index]["data"]
+                                          ["url"]
+                                    },
+                                  );
+                                  /*viewFeedImages(
+                                        homepageFeed[index]["data"]["url"]);*/
+                                },
                                 child: Image.network(
                                     homepageFeed[index]["data"]["url"]),
                               ),
-                            ],
-                          )),
+                            ),
+                            const SizedBox(height: 4.0),
+                            // Action Buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    String shareLink =
+                                        homepageFeed[index]["data"]["url"];
+                                    Share.share(
+                                        'Check this out \n ${shareLink}');
+                                  },
+                                  icon: Icon(
+                                    Icons.share_outlined,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    /*var imageId =
+                                        await ImageDownloader.downloadImage(
+                                            homepageFeed[index]["data"]
+                                                ["title"]);*/
+                                  },
+                                  icon: Icon(
+                                    Ionicons.download_outline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   )
                 : Container();
