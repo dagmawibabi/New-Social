@@ -927,6 +927,42 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  //? Discvover Page
+  // Discover Page Variables
+  bool discoverContent = true;
+  TextEditingController discoverTermController = TextEditingController();
+  Map dictionary = {};
+  String meaning = "";
+  String searchedTerm = "";
+  bool showMeaning = false;
+  // Discover Page Functions
+  // Get Disctionary Dataset
+  void getDictionaryJSON() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString("assets/datasets/dictionary_alpha_arrays.json");
+    List jsonResult = json.decode(data);
+    dictionary = jsonResult[0];
+    for (int i = 1; i < jsonResult.length; i++) {
+      dictionary.addAll(jsonResult[i]);
+    }
+  }
+
+  // Search meaning of word
+  void searchOfflineDictionary(searchedTerm) {
+    // Look up meaning
+    meaning = dictionary[searchedTerm];
+    // Handle errors
+    if (searchedTerm == "") {
+      searchedTerm = "Empty Search";
+      meaning = "Please type a word to search for it's meaning!";
+    }
+    if (meaning == null) {
+      meaning = "Was not found!";
+    }
+    showMeaning = true;
+    setState(() {});
+  }
+
   //? GENERAL
   // Fullscreen Mode
   void setFullscreen() {
@@ -977,6 +1013,8 @@ class _HomePageState extends State<HomePage> {
     chosenSubredditSort = getRandom(feedSortValues);
     chosenSubredditTime = getRandom(feedTimeValues);
     getHomePageFeed(chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
+    // Discover INIT
+    getDictionaryJSON();
   }
 
   //? Dispose
@@ -1249,11 +1287,61 @@ class _HomePageState extends State<HomePage> {
       // Discover Page
       SliverToBoxAdapter(
         child: Container(
-          height: MediaQuery.of(context).size.height - 300.0,
-          child: Center(
-            child: Image.asset(
-              getRandom(search_illustrations),
-            ),
+          //height: MediaQuery.of(context).size.height - 300.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Searched Term
+              showMeaning == true
+                  ? Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15.0, vertical: 8.0),
+                      margin: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                        /*border: Border.all(
+                          color: Colors.black,
+                        ),*/
+                        color: Colors.white,
+                      ),
+                      child: Text(
+                        searchedTerm,
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  : Container(),
+              // Searched Term Meaning
+              showMeaning == true
+                  ? Container(
+                      padding: const EdgeInsets.all(15.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                        /*border: Border.all(
+                          color: Colors.black,
+                        ),*/
+                        color: Colors.white,
+                      ),
+                      child: Text(
+                        meaning,
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                    )
+                  : Center(
+                      child: Image.asset(
+                        getRandom(search_illustrations),
+                      ),
+                    ),
+              const SizedBox(height: 200.0),
+            ],
           ),
         ),
       ),
@@ -1335,16 +1423,43 @@ class _HomePageState extends State<HomePage> {
           margin: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
           child: Row(
             children: [
-              Icon(Ionicons.compass_outline),
+              // Content or Dictionary
+              GestureDetector(
+                onTap: () {
+                  discoverContent = !discoverContent;
+                  if (discoverContent == true) {
+                    showMeaning = false;
+                  }
+                  setState(() {});
+                },
+                child: Icon(discoverContent == true
+                    ? Ionicons.compass_outline
+                    : Icons.menu_book_rounded),
+              ),
               const SizedBox(width: 10.0),
+              // Search Term
               Expanded(
                 child: TextField(
+                  controller: discoverTermController,
                   decoration: InputDecoration(
-                    labelText: "Search",
+                    //labelText: "Search",
+                    hintText: "Search",
                   ),
                 ),
               ),
-              Icon(Icons.search),
+              // Search Button
+              GestureDetector(
+                onTap: () {
+                  if (discoverContent == false) {
+                    searchedTerm =
+                        discoverTermController.text.toString().trim();
+                    searchOfflineDictionary(searchedTerm);
+                  }
+                },
+                child: Icon(
+                  Icons.search,
+                ),
+              ),
             ],
           ),
         ),

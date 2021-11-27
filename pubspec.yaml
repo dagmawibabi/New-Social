@@ -91,6 +91,7 @@ flutter:
     - assets/images/empty_illustrations/
     - assets/images/content_illustrations/
     - assets/images/search_illustrations/
+    - assets/datasets/dictionary_alpha_arrays.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
