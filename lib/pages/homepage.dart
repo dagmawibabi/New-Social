@@ -65,6 +65,21 @@ class _HomePageState extends State<HomePage> {
     "assets/images/empty_illustrations/2.png",
     "assets/images/empty_illustrations/3.png",
   ];
+  List content_illustrations = [
+    "assets/images/content_illustrations/1.png",
+    "assets/images/content_illustrations/2.png",
+    "assets/images/content_illustrations/3.png",
+    "assets/images/content_illustrations/4.png",
+    "assets/images/content_illustrations/2.png",
+  ];
+  List search_illustrations = [
+    "assets/images/search_illustrations/1.png",
+    "assets/images/search_illustrations/2.png",
+    "assets/images/search_illustrations/3.png",
+    "assets/images/search_illustrations/4.png",
+    "assets/images/search_illustrations/5.png",
+    "assets/images/search_illustrations/6.png",
+  ];
 
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
@@ -109,6 +124,8 @@ class _HomePageState extends State<HomePage> {
       https://www.reddit.com/r/{subreddit}/{listing}.json?limit={limit}&t={timeframe} 
   */
   void getHomePageFeed(subreddit, sort, time) async {
+    isFeedLoading = true;
+    setState(() {});
     var url = Uri.parse("https://www.reddit.com/r/" +
         subreddit +
         "/" +
@@ -467,6 +484,7 @@ class _HomePageState extends State<HomePage> {
     "assets/images/album_arts/albumArt63.png",
     "assets/images/album_arts/albumArt64.png",
   ];
+
   //? Music Page Functions
   // Function to get songs from device
   void getSongsOnDevice() async {
@@ -630,42 +648,214 @@ class _HomePageState extends State<HomePage> {
   }
 
   //? Home Page
+  List subredditList = [
+    "wholesomeMemes",
+    "pics",
+    "meme",
+    "whitePeopleTwitter",
+    "funny",
+    "damnThatsInteresting",
+    "cats",
+    "dataIsBeautiful",
+    "comics",
+    "madeMeSmile",
+    "humansForScale",
+    "imaginaryCharacters",
+    "imaginaryCityscapes",
+    "imaginaryCyberpunk",
+    "art",
+    "artefactPorn",
+    "quotesPorn",
+  ];
   TextEditingController feedSearch = TextEditingController();
+  dynamic feedTimeValue = 1;
+  dynamic feedSortValue = 1;
+  List feedTimeValues = ["hour", "day", "week", "month", "year", "all"];
+  List feedSortValues = ["new", "hot", "rising", "controversial", "top"];
+  String chosenSubreddit = "";
+  String chosenSubredditTime = "";
+  String chosenSubredditSort = "";
   // Custom Feed
   void feedChoice() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 15.0),
+          title: Container(
+            child: Text(
+              "Enter A Subreddit To Browse",
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           content: Container(
-            height: 300.0,
+            height: 160.0,
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  child: Text(
-                    "Enter Custom Feed",
-                    style: TextStyle(
-                      fontSize: 20.0,
+                // Input box
+                TextField(
+                  controller: feedSearch,
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    labelText: "Subreddit Name",
+                    labelStyle: TextStyle(
+                      fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                TextField(
-                  controller: feedSearch,
-                ),
-                IconButton(
-                  onPressed: () {
-                    getHomePageFeed(feedSearch.text.trim(), "top", "all");
-                    setState(() {});
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(Icons.search),
+                // Time and Sort
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Time: "),
+                      const SizedBox(width: 8.0),
+                      DropdownButton(
+                        value: feedTimeValue,
+                        onChanged: (choice) {
+                          feedTimeValue = choice;
+                          Navigator.pop(context);
+                          feedChoice();
+                        },
+                        items: [
+                          DropdownMenuItem(
+                            value: 1,
+                            child: Text("Hour"),
+                          ),
+                          DropdownMenuItem(
+                            value: 2,
+                            child: Text("Day"),
+                          ),
+                          DropdownMenuItem(
+                            value: 3,
+                            child: Text("Week"),
+                          ),
+                          DropdownMenuItem(
+                            value: 4,
+                            child: Text("Month"),
+                          ),
+                          DropdownMenuItem(
+                            value: 5,
+                            child: Text("Year"),
+                          ),
+                          DropdownMenuItem(
+                            value: 6,
+                            child: Text("All"),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 30.0),
+                      Text("Sort: "),
+                      const SizedBox(width: 8.0),
+                      DropdownButton(
+                        value: feedSortValue,
+                        onChanged: (choice) {
+                          feedSortValue = choice;
+                          Navigator.pop(context);
+                          feedChoice();
+                        },
+                        items: [
+                          DropdownMenuItem(
+                            value: 1,
+                            child: Text("New"),
+                          ),
+                          DropdownMenuItem(
+                            value: 2,
+                            child: Text("Hot"),
+                          ),
+                          DropdownMenuItem(
+                            value: 3,
+                            child: Text("Rising"),
+                          ),
+                          DropdownMenuItem(
+                            value: 4,
+                            child: Text("Controversial"),
+                          ),
+                          DropdownMenuItem(
+                            value: 5,
+                            child: Text("Top"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+          actions: [
+            // Search Button
+            ElevatedButton(
+              onPressed: () {
+                chosenSubreddit = feedSearch.text.trim();
+                chosenSubredditSort = feedSortValues[feedSortValue - 1];
+                chosenSubredditTime = feedTimeValues[feedTimeValue - 1];
+                getHomePageFeed(
+                    chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
+
+                /*getHomePageFeed(
+                    feedSearch.text.trim(),
+                    feedSortValues[feedSortValue - 1],
+                    feedTimeValues[feedTimeValue - 1]);*/
+                setState(() {});
+                Navigator.pop(context);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 10.0),
+                  Text(
+                    "Search",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Color(0xff6C63FF),
+                  /*getRandom(Colors
+                      .primaries),*/ //  Colors.teal[700], //deepPurple[800],
+                ),
+              ),
+            ),
+            // Back Button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Back",
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.grey[900],
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -695,6 +885,46 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  // Download Image
+  bool downloadingImage = false;
+  int downloadingImageIndex = -1;
+  bool downloadingImageDone = false;
+  void downloadImage(image) async {
+    downloadingImage = true;
+    downloadingImageDone = false;
+    setState(() {});
+    try {
+      // Saved with this method.
+      var imageId = await ImageDownloader.downloadImage(
+        image,
+        destination: AndroidDestinationType.directoryDownloads
+          ..subDirectory(image.toString().substring(18)),
+      );
+      if (imageId == null) {
+        return;
+      }
+
+      // Below is a method of obtaining saved image information.
+      var fileName = await ImageDownloader.findName(imageId);
+      var path = await ImageDownloader.findPath(imageId);
+      var size = await ImageDownloader.findByteSize(imageId);
+      var mimeType = await ImageDownloader.findMimeType(imageId);
+    } catch (error) {
+      print(error);
+    }
+    downloadingImage = false;
+    downloadingImageDone = true;
+    setState(() {});
+  }
+
+  // refresh Feed
+  void getHomePageFeedRefresh() {
+    getHomePageFeed(chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
+    setState(() {});
   }
 
   //? GENERAL
@@ -740,10 +970,13 @@ class _HomePageState extends State<HomePage> {
     getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
     // Music INIT
+    getSongsOnDevice();
     albumArtImage = getRandom(albumArts);
     // HomePage INIT
-    //startVid("https://v.redd.it/1exrjvwshr081/DASH_1080.mp4");
-    getHomePageFeed("wholesomememes", "top", "all");
+    chosenSubreddit = getRandom(subredditList);
+    chosenSubredditSort = getRandom(feedSortValues);
+    chosenSubredditTime = getRandom(feedTimeValues);
+    getHomePageFeed(chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
   }
 
   //? Dispose
@@ -760,7 +993,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     List pageOnRefresh = [
-      getSongsOnDevice,
+      getHomePageFeedRefresh,
       getSongsOnDevice,
       getSongsOnDevice,
       getCryptoStats,
@@ -801,129 +1034,228 @@ class _HomePageState extends State<HomePage> {
     ];
     List pagesBody = [
       // Home Page
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return (homepageFeed[index]["data"]["url"]
-                                .toString()
-                                .endsWith(".jpg") ==
-                            true ||
-                        homepageFeed[index]["data"]["url"]
-                            .toString()
-                            .endsWith(".png")) ==
-                    true
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.all(6.0),
-                        padding: const EdgeInsets.all(14.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20.0),
-                          ),
-                          /*border: Border.all(
-                            color: Colors.black,
-                          ),*/
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey[400]!,
-                              blurRadius: 4.0,
-                            ),
-                          ],
-                          color: Colors.grey[200],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Author of content
-                            Text(
-                              homepageFeed[index]["data"]["author"]
+      isFeedLoading == false
+          ? SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return (homepageFeed[index]["data"]["url"]
+                                      .toString()
+                                      .endsWith(".jpg") ==
+                                  true ||
+                              homepageFeed[index]["data"]["url"]
                                   .toString()
-                                  .toUpperCase(),
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            // Title of content
-                            Text(
-                              homepageFeed[index]["data"]["title"],
-                              textAlign: TextAlign.left,
-                            ),
-                            // Image of content
+                                  .endsWith(".png")) ==
+                          true
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
                             Container(
-                              margin: const EdgeInsets.only(top: 10.0),
+                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.all(6.0),
+                              padding: const EdgeInsets.all(14.0),
                               decoration: BoxDecoration(
-                                color: Colors.amber,
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(20.0),
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey[400]!,
+                                    blurRadius: 4.0,
+                                  ),
+                                ],
+                                color: Colors.grey[200],
                               ),
-                              clipBehavior: Clip.hardEdge,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    "contentViewerPage",
-                                    arguments: {
-                                      "image": homepageFeed[index]["data"]
-                                          ["url"]
-                                    },
-                                  );
-                                  /*viewFeedImages(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Author of content
+                                  Text(
+                                    homepageFeed[index]["data"]["author"]
+                                        .toString()
+                                        .toUpperCase(),
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  // Title of content
+                                  Text(
+                                    homepageFeed[index]["data"]["title"],
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  // Image of content
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0),
+                                      ),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          "contentViewerPage",
+                                          arguments: {
+                                            "image": homepageFeed[index]["data"]
+                                                ["url"],
+                                            "shareLink": homepageFeed[index]
+                                                ["data"]["url"],
+                                            "downloadingImage":
+                                                downloadingImage,
+                                            "downloadingImageIndex":
+                                                downloadingImageIndex,
+                                            "downloadingImageDone":
+                                                downloadingImageDone,
+                                            "index": index,
+                                            "downloadImage": downloadImage,
+                                          },
+                                        );
+                                        /*viewFeedImages(
                                         homepageFeed[index]["data"]["url"]);*/
-                                },
-                                child: Image.network(
-                                    homepageFeed[index]["data"]["url"]),
+                                      },
+                                      child: Image.network(
+                                          homepageFeed[index]["data"]["url"]),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  // Subreddit title, Share and Download Buttons
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // Subreddit title
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 6.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(Ionicons.planet_outline,
+                                                size: 20.0),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 6.0),
+                                              child: Text(
+                                                homepageFeed[index]["data"]
+                                                        ["subreddit"]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: 18.0,
+                                                  //fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Share and Download Buttons
+                                      Row(
+                                        children: [
+                                          // Share Button
+                                          IconButton(
+                                            onPressed: () {
+                                              String shareLink =
+                                                  homepageFeed[index]["data"]
+                                                      ["url"];
+                                              Share.share(
+                                                  'Check this out \n ${shareLink}');
+                                            },
+                                            icon: Icon(
+                                              Icons.share_outlined,
+                                            ),
+                                          ),
+                                          // Download Button
+                                          downloadingImageIndex == index
+                                              ? (downloadingImage == false
+                                                  ? IconButton(
+                                                      onPressed: () async {
+                                                        downloadingImageIndex =
+                                                            index;
+                                                        downloadImage(
+                                                            homepageFeed[index]
+                                                                    ["data"]
+                                                                ["url"]);
+                                                      },
+                                                      icon: Icon(
+                                                        downloadingImageDone ==
+                                                                true
+                                                            ? Icons.done
+                                                            : Ionicons
+                                                                .download_outline,
+                                                        color:
+                                                            downloadingImageDone ==
+                                                                    true
+                                                                ? Colors.green
+                                                                : Colors.black,
+                                                      ),
+                                                    )
+                                                  : Container(
+                                                      width: 25.0,
+                                                      height: 25.0,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: Colors.grey[900],
+                                                      ),
+                                                    ))
+                                              : IconButton(
+                                                  onPressed: () async {
+                                                    downloadingImageIndex =
+                                                        index;
+                                                    downloadImage(
+                                                        homepageFeed[index]
+                                                            ["data"]["url"]);
+                                                  },
+                                                  icon: Icon(
+                                                    Ionicons.download_outline,
+                                                  ),
+                                                )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            // Action Buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    String shareLink =
-                                        homepageFeed[index]["data"]["url"];
-                                    Share.share(
-                                        'Check this out \n ${shareLink}');
-                                  },
-                                  icon: Icon(
-                                    Icons.share_outlined,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    /*var imageId =
-                                        await ImageDownloader.downloadImage(
-                                            homepageFeed[index]["data"]
-                                                ["title"]);*/
-                                  },
-                                  icon: Icon(
-                                    Ionicons.download_outline,
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Container();
-          },
-          childCount: homepageFeed.length,
-        ),
-      ),
+                        )
+                      : Container();
+                },
+                childCount: homepageFeed.length,
+              ),
+            )
+          : SliverToBoxAdapter(
+              child: Container(
+                height: MediaQuery.of(context).size.height - 150.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 100.0),
+                    Image.asset(
+                      getRandom(content_illustrations),
+                    ),
+                    const SizedBox(height: 40.0),
+                    CircularProgressIndicator(
+                      color: Colors.grey[900],
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
       // Discover Page
       SliverToBoxAdapter(
-        child: Container(),
+        child: Container(
+          height: MediaQuery.of(context).size.height - 300.0,
+          child: Center(
+            child: Image.asset(
+              getRandom(search_illustrations),
+            ),
+          ),
+        ),
       ),
 
       // Music Page
@@ -976,7 +1308,7 @@ class _HomePageState extends State<HomePage> {
       Color(0xff6C63FF),
       Color(0xff6C63FF),
       Colors.lightBlue,
-      Color(0xff6C63FF),
+      Colors.greenAccent,
       Color(0xff6C63FF),
       Color(0xff6C63FF),
     ];
@@ -1078,11 +1410,31 @@ class _HomePageState extends State<HomePage> {
                     bottom: pagesAppBarBottom[curPage],
                     actions: [
                       curPage == 0
-                          ? IconButton(
-                              onPressed: () {
-                                feedChoice();
-                              },
-                              icon: Icon(Icons.add),
+                          ? Row(
+                              children: [
+                                // Random Feed
+                                IconButton(
+                                  onPressed: () {
+                                    chosenSubreddit = getRandom(subredditList);
+                                    chosenSubredditSort =
+                                        getRandom(feedSortValues);
+                                    chosenSubredditTime =
+                                        getRandom(feedTimeValues);
+                                    getHomePageFeed(
+                                        getRandom(subredditList),
+                                        chosenSubredditSort,
+                                        chosenSubredditTime);
+                                  },
+                                  icon: Icon(Icons.shuffle),
+                                ),
+                                // Search Subreddit
+                                IconButton(
+                                  onPressed: () {
+                                    feedChoice();
+                                  },
+                                  icon: Icon(Icons.add),
+                                ),
+                              ],
                             )
                           : Container(),
                       IconButton(
@@ -1102,20 +1454,9 @@ class _HomePageState extends State<HomePage> {
                       //height: pagesAppBarExpanded[curPage] + 78.5,
                     ),
                   ),
-            /*SliverAppBar(
-                    backgroundColor: fullScreenMode == true
-                        ? Colors.grey[300]!
-                        : Colors.grey[200]!,
-                    foregroundColor: Colors.black,
-                    expandedHeight: pagesAppBarExpanded[curPage],
-                    flexibleSpace: pagesAppbarFlexibleSpace[curPage],
-                  ),*/
+
             // Body + Content
             pagesBody[curPage],
-            // Space Below
-            /*const SliverToBoxAdapter(
-              child: SizedBox(height: 200.0),
-            ),*/
           ],
         ),
       ),
@@ -1143,7 +1484,7 @@ class _HomePageState extends State<HomePage> {
                 // Home
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.planet_outline),
-                  selectedColor: Colors.purple,
+                  selectedColor: Color(0xff6C63FF),
                 ),
 
                 // Search / Discover
@@ -1161,7 +1502,7 @@ class _HomePageState extends State<HomePage> {
                 // Crypto
                 DotNavigationBarItem(
                   icon: const Icon(Ionicons.wallet_outline),
-                  selectedColor: Color(0xff6C63FF),
+                  selectedColor: Colors.green[500],
                 ),
 
                 // chat

@@ -89,6 +89,8 @@ flutter:
     - assets/images/appbar_headers/
     - assets/images/error_illustrations/
     - assets/images/empty_illustrations/
+    - assets/images/content_illustrations/
+    - assets/images/search_illustrations/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

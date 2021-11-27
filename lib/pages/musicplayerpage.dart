@@ -39,7 +39,7 @@ class MusicPlayerPage {
           ? Container(
               margin: const EdgeInsets.only(
                   top: 20.0, left: 20.0, right: 20.0, bottom: 150.0),
-              height: MediaQuery.of(context).size.height - 100,
+              height: MediaQuery.of(context).size.height - 300,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Colors.grey[200],
