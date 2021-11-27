@@ -16,6 +16,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
@@ -930,9 +931,10 @@ class _HomePageState extends State<HomePage> {
   //? Discvover Page
   // Discover Page Variables
   bool discoverContent = true;
+  bool isDiscoverContentLoading = false;
   TextEditingController discoverTermController = TextEditingController();
   Map dictionary = {};
-  String meaning = "";
+  dynamic meaning = null;
   String searchedTerm = "";
   bool showMeaning = false;
   // Discover Page Functions
@@ -948,11 +950,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Search meaning of word
-  void searchOfflineDictionary(searchedTerm) {
+  void searchOfflineDictionary(searchedWord) {
     // Look up meaning
-    meaning = dictionary[searchedTerm];
+    meaning = dictionary[searchedWord.toString()];
     // Handle errors
-    if (searchedTerm == "") {
+    if ((searchedWord.toString() == "") || searchedWord.toString() == null) {
       searchedTerm = "Empty Search";
       meaning = "Please type a word to search for it's meaning!";
     }
@@ -960,6 +962,41 @@ class _HomePageState extends State<HomePage> {
       meaning = "Was not found!";
     }
     showMeaning = true;
+    setState(() {});
+  }
+
+  // Discover ContentSearch
+  List discoverFeed = [];
+  bool isDiscoverLoading = true;
+  void getDiscoverContent(subreddit, sort, time) async {
+    isDiscoverLoading = false;
+    isDiscoverContentLoading = true;
+    setState(() {});
+    var url = Uri.parse("https://www.reddit.com/r/" +
+        subreddit +
+        "/" +
+        sort +
+        ".json?t=" +
+        time +
+        "&limit=100");
+    var response = await http.get(url);
+    var responseJSON = jsonDecode(response.body);
+    List discoverFeedUnfiltered = responseJSON["data"]["children"];
+    for (int i = 0; i < discoverFeedUnfiltered.length; i++) {
+      if ((discoverFeedUnfiltered[i]["data"]["url"]
+                      .toString()
+                      .endsWith(".jpg") ==
+                  true ||
+              discoverFeedUnfiltered[i]["data"]["url"]
+                  .toString()
+                  .endsWith(".png")) ==
+          true) {
+        discoverFeed.add(discoverFeedUnfiltered[i]);
+      }
+    }
+    //print(responseJSON["data"]["children"][1]["data"]["author_fullname"]);
+    isDiscoverLoading = false;
+    isDiscoverContentLoading = false;
     setState(() {});
   }
 
@@ -1200,7 +1237,7 @@ class _HomePageState extends State<HomePage> {
                                                   homepageFeed[index]["data"]
                                                       ["url"];
                                               Share.share(
-                                                  'Check this out \n ${shareLink}');
+                                                  'Check this out @ Aurora \n ${shareLink}');
                                             },
                                             icon: Icon(
                                               Icons.share_outlined,
@@ -1285,66 +1322,153 @@ class _HomePageState extends State<HomePage> {
             ),
 
       // Discover Page
-      SliverToBoxAdapter(
-        child: Container(
-          //height: MediaQuery.of(context).size.height - 300.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Searched Term
-              showMeaning == true
-                  ? Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 8.0),
-                      margin: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20.0),
-                        ),
-                        /*border: Border.all(
-                          color: Colors.black,
-                        ),*/
-                        color: Colors.white,
-                      ),
-                      child: Text(
-                        searchedTerm,
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  : Container(),
-              // Searched Term Meaning
-              showMeaning == true
-                  ? Container(
-                      padding: const EdgeInsets.all(15.0),
-                      margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20.0),
-                        ),
-                        /*border: Border.all(
-                          color: Colors.black,
-                        ),*/
-                        color: Colors.white,
-                      ),
-                      child: Text(
-                        meaning,
-                        style: TextStyle(fontSize: 18.0),
-                      ),
-                    )
-                  : Center(
-                      child: Image.asset(
-                        getRandom(search_illustrations),
+      isDiscoverLoading == true
+          ? SliverToBoxAdapter(
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Searched Term
+                    showMeaning == true
+                        ? Container(
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15.0, vertical: 8.0),
+                            margin: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Searched Term
+                                Text(
+                                  searchedTerm,
+                                  style: TextStyle(
+                                    fontSize: 30.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                // Share and Copy Button
+                                Row(
+                                  children: [
+                                    // Share Button
+                                    IconButton(
+                                      onPressed: () {
+                                        Share.share(
+                                            '> ${searchedTerm.toUpperCase()} \n\n${meaning} \n\n* Defined By Aurora!');
+                                      },
+                                      icon: Icon(
+                                        Icons.share_outlined,
+                                      ),
+                                    ),
+                                    // Copy Button
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.copy,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        : Container(),
+                    // Searched Term Meaning
+                    showMeaning == true
+                        ? Container(
+                            padding: const EdgeInsets.all(15.0),
+                            margin:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Text(
+                              meaning,
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          )
+                        : Center(
+                            child: Image.asset(
+                              getRandom(search_illustrations),
+                            ),
+                          ),
+                    const SizedBox(height: 200.0),
+                  ],
+                ),
+              ),
+            )
+          : isDiscoverContentLoading == false
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 4.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: GridView.count(
+                      primary: false,
+                      shrinkWrap: true,
+                      crossAxisCount: 2,
+                      children: List.generate(
+                        discoverFeed.length,
+                        (index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                "contentViewerPage",
+                                arguments: {
+                                  "image": discoverFeed[index]["data"]["url"],
+                                  "shareLink": discoverFeed[index]["data"]
+                                      ["url"],
+                                  "downloadingImage": false,
+                                  "downloadingImageIndex": index,
+                                  "downloadingImageDone": false,
+                                  "index": index,
+                                  "downloadImage": downloadImage,
+                                },
+                              );
+                            },
+                            child: Container(
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: Image.network(
+                                    discoverFeed[index]["data"]["url"]),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-              const SizedBox(height: 200.0),
-            ],
-          ),
-        ),
-      ),
+                  ),
+                )
+              : SliverToBoxAdapter(
+                  child: Container(
+                    height: MediaQuery.of(context).size.height - 300.0,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          getRandom(search_illustrations),
+                        ),
+                        Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.grey[900],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
       // Music Page
       MusicPlayerPage.musicPlayer(
@@ -1396,7 +1520,7 @@ class _HomePageState extends State<HomePage> {
       Color(0xff6C63FF),
       Color(0xff6C63FF),
       Colors.lightBlue,
-      Colors.greenAccent,
+      Colors.green[400],
       Color(0xff6C63FF),
       Color(0xff6C63FF),
     ];
@@ -1442,7 +1566,6 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   controller: discoverTermController,
                   decoration: InputDecoration(
-                    //labelText: "Search",
                     hintText: "Search",
                   ),
                 ),
@@ -1454,6 +1577,11 @@ class _HomePageState extends State<HomePage> {
                     searchedTerm =
                         discoverTermController.text.toString().trim();
                     searchOfflineDictionary(searchedTerm);
+                  } else {
+                    getDiscoverContent(
+                        discoverTermController.text.toString().trim(),
+                        "top",
+                        "all");
                   }
                 },
                 child: Icon(
