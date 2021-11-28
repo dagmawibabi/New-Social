@@ -74,7 +74,7 @@ class _ContentViewerPageState extends State<ContentViewerPage> {
                 child: IconButton(
                   onPressed: () {
                     String shareLink = receivedData["shareLink"];
-                    Share.share('Check this out @ Aurora \n ${shareLink}');
+                    Share.share('Check this out @ Aurora \n ${shareLink} ');
                   },
                   icon: Icon(
                     Icons.share_outlined,
