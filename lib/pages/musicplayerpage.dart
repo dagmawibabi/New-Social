@@ -9,7 +9,7 @@ import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 class MusicPlayerPage {
-  static double forwardRewindSpeed = 3.0;
+  static double forwardRewindSpeed = 5.0;
   static SliverToBoxAdapter musicPlayer(
     BuildContext context,
     flipCardController,
@@ -32,6 +32,10 @@ class MusicPlayerPage {
     assetsAudioPlayer,
     songPositionStreamBuilder,
     sliderStreamBuilder,
+    curSongIndex,
+    nextInPlaylist,
+    backInPlaylist,
+    playlistLoader,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -189,6 +193,7 @@ class MusicPlayerPage {
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
+                                      curSongIndex = index;
                                       if ((curSong ==
                                               p.withoutExtension(p.basename(
                                                   musicFiles[index]
@@ -196,9 +201,23 @@ class MusicPlayerPage {
                                           true) {
                                         pausePlaySong();
                                       } else {
-                                        loadPlaySong(
-                                            musicFiles[index].toString());
+                                        playlistLoader(index);
                                       }
+                                      /*curSongIndex = index;
+                                      if ((curSong ==
+                                              p.withoutExtension(p.basename(
+                                                  musicFiles[index]
+                                                      .toString()))) ==
+                                          true) {
+                                        pausePlaySong();
+                                        //playlistLoader(curSongIndex);
+                                      } else {
+                                        loadPlaySong(musicFiles[curSongIndex]
+                                            .toString());
+                                        /*playlistLoader(curSongIndex);*/
+                                        /*loadPlaySong(
+                                            musicFiles[index].toString());*/
+                                      }*/
                                     },
                                     child: Column(
                                       children: [
@@ -655,7 +674,9 @@ class MusicPlayerPage {
                                               .forwardOrRewind(0.0);
                                         },
                                         child: IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            backInPlaylist();
+                                          },
                                           icon: Icon(
                                             Icons.fast_rewind_rounded,
                                             size: fullScreenMode == true
@@ -691,7 +712,10 @@ class MusicPlayerPage {
                                               .forwardOrRewind(0.0);
                                         },
                                         child: IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            nextInPlaylist();
+                                            print("heeeeeeeerrreee2");
+                                          },
                                           icon: Icon(
                                             Icons.fast_forward_rounded,
                                             size: fullScreenMode == true

@@ -4,34 +4,29 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
-import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
-import 'package:marquee/marquee.dart';
 import 'package:newsocial/pages/cryptopage.dart';
 import 'package:newsocial/pages/musicplayerpage.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:tiktoklikescroller/tiktoklikescroller.dart';
+import 'package:user_profile_avatar/user_profile_avatar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as p;
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -84,28 +79,42 @@ class _HomePageState extends State<HomePage> {
 
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
-    scrollController.addListener(
-      () {
-        // Hide on scroll down
-        if (scrollController.position.userScrollDirection ==
-            ScrollDirection.reverse) {
-          if (isBottomBarVisible == true) {
-            setState(() {
-              isBottomBarVisible = false;
-            });
+    if (curPage == 0 || curPage == 3) {
+      scrollController.addListener(
+        () {
+          // Hide on scroll down
+          if (scrollController.position.userScrollDirection ==
+              ScrollDirection.reverse) {
+            if (isBottomBarVisible == true) {
+              setState(() {
+                isBottomBarVisible = false;
+              });
+            }
           }
-        }
-        // Show on scroll up
-        if (scrollController.position.userScrollDirection ==
-            ScrollDirection.forward) {
-          if (isBottomBarVisible == false) {
-            setState(() {
-              isBottomBarVisible = true;
-            });
+          // Show on scroll up
+          if (scrollController.position.userScrollDirection ==
+              ScrollDirection.forward) {
+            if (isBottomBarVisible == false) {
+              setState(() {
+                isBottomBarVisible = true;
+              });
+            }
           }
+        },
+      );
+    } else {
+      scrollController.addListener(() {
+        // Show on scroll up and down
+        if (scrollController.position.userScrollDirection ==
+                ScrollDirection.forward ||
+            scrollController.position.userScrollDirection ==
+                ScrollDirection.reverse) {
+          setState(() {
+            isBottomBarVisible = true;
+          });
         }
-      },
-    );
+      });
+    }
   }
 
   // State Controllers
@@ -421,9 +430,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   //? Music Page Variables
+  bool musicInitState = true;
   Duration curSongDuration = const Duration(seconds: 0);
   dynamic curSongPosition = "";
-
+  List playlist = [];
   List<List<Color>> lightModeWaveGradient = [
     [Colors.red, Color(0xEEF44336)],
     [Colors.lightBlueAccent, Colors.blue],
@@ -438,6 +448,7 @@ class _HomePageState extends State<HomePage> {
   String curSong = "No Song Playing...";
   AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
   bool isSongPlaying = false;
+  int curSongIndex = 0;
   dynamic albumArtImage = "";
   List albumArts = [
     "assets/images/album_arts/albumArt2.png",
@@ -487,6 +498,29 @@ class _HomePageState extends State<HomePage> {
   ];
 
   //? Music Page Functions
+  // Init Playlist
+  void playlistLoader(curSongChoice) {
+    loadPlaySong(playlist[curSongChoice]);
+  }
+
+  // Next in playlist
+  void nextInPlaylist() {
+    curSongIndex++;
+    if (curSongIndex > playlist.length - 1) {
+      curSongIndex = 0;
+    }
+    playlistLoader(curSongIndex);
+  }
+
+  // Back in playlist
+  void backInPlaylist() {
+    curSongIndex--;
+    if (curSongIndex < 0) {
+      curSongIndex = playlist.length - 1;
+    }
+    playlistLoader(curSongIndex);
+  }
+
   // Function to get songs from device
   void getSongsOnDevice() async {
     askPermissions();
@@ -509,6 +543,12 @@ class _HomePageState extends State<HomePage> {
         musicFilesPlaylist.add(Audio(file.path));
       }
     }
+    // Init Playlist
+    playlist = musicFiles;
+    playlistLoader(curSongIndex);
+    assetsAudioPlayer.pause();
+    isSongPlaying = false;
+    //
     gotSongs = true;
     refreshController.loadComplete();
     refreshController.refreshCompleted();
@@ -526,12 +566,9 @@ class _HomePageState extends State<HomePage> {
     assetsAudioPlayer.stop();
     // Play From Path
     await assetsAudioPlayer.open(
-      /*Playlist(
-        audios: musicFilesPlaylist,
-      ),
-      loopMode: LoopMode.playlist,*/ //loop the full playlist
       Audio.file(songPath),
       showNotification: true,
+      autoStart: musicInitState == true ? false : true,
       notificationSettings: NotificationSettings(
         customPlayPauseAction: (player) {
           pausePlaySong();
@@ -541,15 +578,14 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
-    // Play From Playlist
-    //assetsAudioPlayer.playlistPlayAtIndex(musicFiles.indexOf(songPath));
-
+    // Get song duration and current position
     assetsAudioPlayer.current.listen(
       (playingAudio) {
         curSongDuration = playingAudio!.audio.duration;
         setState(() {});
       },
     );
+    // Know when song ends playing
     assetsAudioPlayer.playlistAudioFinished.listen(
       (Playing playing) {
         isSongPlaying = false;
@@ -558,7 +594,8 @@ class _HomePageState extends State<HomePage> {
       },
     );
     curSong = p.withoutExtension(p.basename(songPath));
-    isSongPlaying = true;
+    isSongPlaying = musicInitState == true ? false : true;
+    musicInitState = false;
     curPlayingSongColor = getRandom(Colors.accents);
     lightModeWaveGradient = [
       [getRandom(Colors.accents), getRandom(Colors.accents)],
@@ -912,8 +949,21 @@ class _HomePageState extends State<HomePage> {
       var path = await ImageDownloader.findPath(imageId);
       var size = await ImageDownloader.findByteSize(imageId);
       var mimeType = await ImageDownloader.findMimeType(imageId);
+      // Success
+      CherryToast.success(
+        title: "Downloaded Successfully!",
+        titleStyle: TextStyle(fontSize: 16.0),
+        autoDismiss: true,
+        animationDuration: Duration(milliseconds: 800),
+      ).show(context);
     } catch (error) {
-      print(error);
+      // Success
+      CherryToast.error(
+        title: "Downloading Failed!",
+        titleStyle: TextStyle(fontSize: 16.0),
+        autoDismiss: true,
+        animationDuration: Duration(milliseconds: 800),
+      ).show(context);
     }
     downloadingImage = false;
     downloadingImageDone = true;
@@ -926,6 +976,57 @@ class _HomePageState extends State<HomePage> {
     refreshController.loadComplete();
     refreshController.refreshCompleted();
     setState(() {});
+  }
+
+  // Profile
+  void showProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(40.0),
+          content: Container(
+            height: MediaQuery.of(context).size.height * 0.22,
+            width: MediaQuery.of(context).size.width - 100,
+            child: Column(
+              children: [
+                // Profile Pic
+                WidgetCircularAnimator(
+                  size: 140.0,
+                  innerColor: Colors.purpleAccent, // getRandom(Colors.accents),
+                  outerColor: Colors.purpleAccent, // getRandom(Colors.accents),
+                  child: Container(
+                    width: 20.0,
+                    height: 20.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[900],
+                      //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Image.network(
+                        "https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg",
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15.0),
+                // Username
+                Text(
+                  "Aurora User0",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   //? Discvover Page
@@ -1024,7 +1125,22 @@ class _HomePageState extends State<HomePage> {
     return list[random.nextInt(list.length)];
   }
 
-  //? ASK PERMISSIONS
+  //? PERMISSIONS
+  // Check PERMISSIONS
+  void checkPermissions() async {
+    PermissionStatus storagePermissionStatus = await Permission.storage.status;
+    if (storagePermissionStatus.isGranted == false) {
+      gotSongs = false;
+      setState(() {});
+      //await Permission.storage.request();
+    } else {
+      getSongsOnDevice();
+      gotSongs = true;
+      setState(() {});
+    }
+  }
+
+  // Ask PERMISSIONS
   void askPermissions() async {
     // Ask Storage Permissions
     PermissionStatus storagePermissionStatus = await Permission.storage.status;
@@ -1039,12 +1155,6 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     hideBottomNavBar();
-    // Crypto INIT
-    getCryptoStats();
-    cryptoAppBarImageIndex = random.nextInt(2);
-    // Music INIT
-    getSongsOnDevice();
-    albumArtImage = getRandom(albumArts);
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
@@ -1052,6 +1162,12 @@ class _HomePageState extends State<HomePage> {
     getHomePageFeed(chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
     // Discover INIT
     getDictionaryJSON();
+    // Music Player INIT
+    checkPermissions();
+    albumArtImage = getRandom(albumArts);
+    // Crypto INIT
+    getCryptoStats();
+    cryptoAppBarImageIndex = random.nextInt(2);
   }
 
   //? Dispose
@@ -1367,7 +1483,26 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     // Copy Button
                                     IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        String sharedWord = "> " +
+                                            searchedTerm.toUpperCase() +
+                                            "\n\n" +
+                                            meaning +
+                                            "\n\n" +
+                                            "* Defined by Aurora!";
+                                        Clipboard.setData(
+                                          ClipboardData(text: "sharedWord"),
+                                        ).then(
+                                          (_) {
+                                            CherryToast.success(
+                                              title: "Copied to clipboard",
+                                              autoDismiss: true,
+                                              animationDuration:
+                                                  Duration(milliseconds: 800),
+                                            ).show(context);
+                                          },
+                                        );
+                                      },
                                       icon: Icon(
                                         Icons.copy,
                                       ),
@@ -1493,6 +1628,10 @@ class _HomePageState extends State<HomePage> {
         assetsAudioPlayer,
         songPositionStreamBuilder,
         sliderStreamBuilder,
+        curSongIndex,
+        nextInPlaylist,
+        backInPlaylist,
+        playlistLoader,
       ),
 
       // Crypto Page
@@ -1680,13 +1819,45 @@ class _HomePageState extends State<HomePage> {
                               ],
                             )
                           : Container(),
-                      IconButton(
-                        onPressed: () {},
+                      // Profile
+                      Container(
+                        width: 45.0,
+                        height: 45.0,
+                        margin: const EdgeInsets.only(right: 10.0),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: UserProfileAvatar(
+                            avatarUrl:
+                                'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
+                            onAvatarTap: () {
+                              showProfileDialog();
+                            },
+                            notificationCount: 4,
+                            notificationBubbleTextStyle: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            avatarSplashColor: smartRefresherColor[0],
+                            radius: 20,
+                            isActivityIndicatorSmall: false,
+                            avatarBorderData: AvatarBorderData(
+                              borderColor: Colors.white,
+                              borderWidth: 1.0,
+                            ),
+                          ),
+                        ),
+                      )
+
+                      /*IconButton(
+                        onPressed: () {
+                          showProfileDialog();
+                        },
                         icon: const Icon(
                           Ionicons.person_outline,
                           size: 20.0,
                         ),
-                      ),
+                      ),*/
                     ],
                   )
                 : SliverToBoxAdapter(
