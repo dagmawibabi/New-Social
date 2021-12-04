@@ -138,6 +138,7 @@ class _ContentViewerPageState extends State<ContentViewerPage> {
             padding: const EdgeInsets.only(
                 left: 10.0, right: 10.0, top: 200.0, bottom: 20.0),
             child: PhotoView(
+              enableRotation: true,
               imageProvider: NetworkImage(
                 receivedData["image"],
               ),

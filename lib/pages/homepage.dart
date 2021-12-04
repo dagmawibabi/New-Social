@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:animate_icons/animate_icons.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
@@ -833,6 +834,46 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           actions: [
+            // Feeling Lucky
+            ElevatedButton(
+              onPressed: () {
+                chosenSubreddit = getRandom(subredditList);
+                feedSearch.text = chosenSubreddit;
+                chosenSubredditSort = getRandom(feedSortValues);
+                //feedSortValue = chosenSubredditSort;
+                chosenSubredditTime = getRandom(feedTimeValues);
+                //feedTimeValue = chosenSubredditTime;
+                getHomePageFeed(
+                    chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
+                setState(() {});
+                Navigator.pop(context);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.shuffle,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 10.0),
+                  Text(
+                    "Random",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.cyan, //Color(0xff6C63FF),
+                  /*getRandom(Colors
+                      .primaries),*/ //  Colors.teal[700], //deepPurple[800],
+                ),
+              ),
+            ),
             // Search Button
             ElevatedButton(
               onPressed: () {
@@ -954,7 +995,8 @@ class _HomePageState extends State<HomePage> {
         title: "Downloaded Successfully!",
         titleStyle: TextStyle(fontSize: 16.0),
         autoDismiss: true,
-        animationDuration: Duration(milliseconds: 800),
+        animationDuration: Duration(milliseconds: 200),
+        toastDuration: Duration(milliseconds: 1000),
       ).show(context);
     } catch (error) {
       // Success
@@ -962,7 +1004,8 @@ class _HomePageState extends State<HomePage> {
         title: "Downloading Failed!",
         titleStyle: TextStyle(fontSize: 16.0),
         autoDismiss: true,
-        animationDuration: Duration(milliseconds: 800),
+        animationDuration: Duration(milliseconds: 200),
+        toastDuration: Duration(milliseconds: 1000),
       ).show(context);
     }
     downloadingImage = false;
@@ -1100,6 +1143,14 @@ class _HomePageState extends State<HomePage> {
     isDiscoverContentLoading = false;
     setState(() {});
   }
+
+  //! New
+  AnimateIconController aIC_feed = AnimateIconController();
+  AnimateIconController aIC_discover = AnimateIconController();
+  AnimateIconController aIC_musicPlayer = AnimateIconController();
+  AnimateIconController aIC_wallet = AnimateIconController();
+  AnimateIconController aIC_chat = AnimateIconController();
+  AnimateIconController aIC_settings = AnimateIconController();
 
   //? GENERAL
   // Fullscreen Mode
@@ -1240,6 +1291,24 @@ class _HomePageState extends State<HomePage> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            fullScreenMode == true
+                                ? index == 0
+                                    ? Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 50.0,
+                                            bottom: 10.0,
+                                            right: 30.0),
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.fullscreen_exit,
+                                          ),
+                                          onPressed: () {
+                                            setFullscreen();
+                                          },
+                                        ),
+                                      )
+                                    : Container()
+                                : Container(),
                             Container(
                               width: MediaQuery.of(context).size.width,
                               margin: const EdgeInsets.all(6.0),
@@ -1278,9 +1347,11 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   // Image of content
                                   Container(
+                                    //width: double.infinity,
+                                    //height: 300.0,
                                     margin: const EdgeInsets.only(top: 10.0),
                                     decoration: BoxDecoration(
-                                      color: Colors.amber,
+                                      color: Colors.grey[200]!,
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(20.0),
                                       ),
@@ -1309,8 +1380,15 @@ class _HomePageState extends State<HomePage> {
                                         /*viewFeedImages(
                                         homepageFeed[index]["data"]["url"]);*/
                                       },
-                                      child: Image.network(
-                                          homepageFeed[index]["data"]["url"]),
+                                      child: PhotoView(
+                                        tightMode: true,
+                                        enableRotation: true,
+                                        backgroundDecoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                        ),
+                                        imageProvider: NetworkImage(
+                                            homepageFeed[index]["data"]["url"]),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 4.0),
@@ -1498,7 +1576,9 @@ class _HomePageState extends State<HomePage> {
                                               title: "Copied to clipboard",
                                               autoDismiss: true,
                                               animationDuration:
-                                                  Duration(milliseconds: 800),
+                                                  Duration(milliseconds: 200),
+                                              toastDuration:
+                                                  Duration(seconds: 1),
                                             ).show(context);
                                           },
                                         );
@@ -1754,7 +1834,8 @@ class _HomePageState extends State<HomePage> {
     ];
     return Scaffold(
       extendBody: true,
-      backgroundColor: Colors.grey[200],
+      backgroundColor:
+          fullScreenMode == true ? Colors.grey[300] : Colors.grey[200],
       // B O D Y
       body: SmartRefresher(
         controller: refreshController,
@@ -1797,17 +1878,9 @@ class _HomePageState extends State<HomePage> {
                                 // Random Feed
                                 IconButton(
                                   onPressed: () {
-                                    chosenSubreddit = getRandom(subredditList);
-                                    chosenSubredditSort =
-                                        getRandom(feedSortValues);
-                                    chosenSubredditTime =
-                                        getRandom(feedTimeValues);
-                                    getHomePageFeed(
-                                        getRandom(subredditList),
-                                        chosenSubredditSort,
-                                        chosenSubredditTime);
+                                    setFullscreen();
                                   },
-                                  icon: Icon(Icons.shuffle),
+                                  icon: Icon(Icons.fullscreen),
                                 ),
                                 // Search Subreddit
                                 IconButton(
@@ -1888,8 +1961,10 @@ class _HomePageState extends State<HomePage> {
               ],
               paddingR: const EdgeInsets.all(2.0),
               marginR:
-                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
               currentIndex: curPage,
+              itemPadding: EdgeInsets.all(0.0),
+              margin: EdgeInsets.all(0.0),
               onTap: (index) {
                 curPage = index;
                 setState(() {});
@@ -1897,39 +1972,227 @@ class _HomePageState extends State<HomePage> {
               items: [
                 // Home
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.planet_outline,
+                    endIcon: Ionicons.sparkles_outline,
+                    size: 22.0,
+                    controller: aIC_feed,
+                    onStartIconPress: () {
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 0;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 100),
+                    startIconColor: Colors.black,
+                    endIconColor: Color(0x886C63FF),
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+                /* DotNavigationBarItem(
                   icon: const Icon(Ionicons.planet_outline),
                   selectedColor: Color(0xff6C63FF),
-                ),
+                ),*/
 
                 // Search / Discover
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.compass_outline,
+                    endIcon: Ionicons.compass_outline,
+                    size: 24.0,
+                    controller: aIC_discover,
+                    onStartIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 1;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 500),
+                    startIconColor: Colors.black,
+                    endIconColor: Colors.purple,
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+                /*DotNavigationBarItem(
                   icon: const Icon(Ionicons.compass_outline),
                   selectedColor: Colors.purple,
-                ),
+                ),*/
 
                 // Music
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.play_outline,
+                    endIcon: Ionicons.musical_notes_outline,
+                    size: 24.0,
+                    controller: aIC_musicPlayer,
+                    onStartIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 2;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 500),
+                    startIconColor: Colors.black,
+                    endIconColor: Colors.lightBlue,
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+                /*DotNavigationBarItem(
                   icon: const Icon(Ionicons.play_outline),
                   selectedColor: Colors.lightBlue,
-                ),
+                ),*/
 
                 // Crypto
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.wallet_outline,
+                    endIcon: Ionicons.cash_outline,
+                    size: 24.0,
+                    controller: aIC_wallet,
+                    onStartIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 3;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_chat.animateToStart();
+                      aIC_settings.animateToStart();
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 500),
+                    startIconColor: Colors.black,
+                    endIconColor: Colors.green[500],
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+                /*DotNavigationBarItem(
                   icon: const Icon(Ionicons.wallet_outline),
                   selectedColor: Colors.green[500],
-                ),
+                ),*/
 
                 // chat
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.paper_plane_outline,
+                    endIcon: Ionicons.chatbubble_ellipses_outline,
+                    size: 24.0,
+                    controller: aIC_chat,
+                    onStartIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 4;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_settings.animateToStart();
+                      curPage = 4;
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 500),
+                    startIconColor: Colors.black,
+                    endIconColor: Colors.teal,
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+                /*DotNavigationBarItem(
                   icon: const Icon(Ionicons.paper_plane_outline),
                   selectedColor: Colors.teal,
-                ),
+                ),*/
 
                 // Settings
                 DotNavigationBarItem(
+                  icon: AnimateIcons(
+                    startIcon: Ionicons.hardware_chip_outline,
+                    endIcon: Ionicons.hardware_chip_outline,
+                    size: 24.0,
+                    controller: aIC_settings,
+                    onStartIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      curPage = 5;
+                      setState(() {});
+                      return true;
+                    },
+                    onEndIconPress: () {
+                      aIC_feed.animateToStart();
+                      aIC_discover.animateToStart();
+                      aIC_musicPlayer.animateToStart();
+                      aIC_wallet.animateToStart();
+                      aIC_chat.animateToStart();
+                      return true;
+                    },
+                    duration: Duration(milliseconds: 500),
+                    startIconColor: Colors.black,
+                    endIconColor: Colors.teal,
+                    clockwise: false,
+                  ),
+                  selectedColor: Colors.grey[200],
+                ),
+
+                /*DotNavigationBarItem(
                   icon: const Icon(Ionicons.hardware_chip_outline),
                   selectedColor: Colors.teal,
-                ),
+                ),*/
               ],
             )
           : Container(),

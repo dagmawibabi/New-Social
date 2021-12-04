@@ -184,8 +184,10 @@ class MusicPlayerPage {
                           children: [
                             Container(
                               height: MediaQuery.of(context).size.height -
-                                  (fullScreenMode == true ? 130 : 320),
+                                  (fullScreenMode == true ? 130 : 350),
                               width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.only(
+                                  top: fullScreenMode == true ? 0.0 : 40.0),
                               child: ListView.builder(
                                 primary: false,
                                 shrinkWrap: true,
@@ -358,11 +360,12 @@ class MusicPlayerPage {
                                 : Container(
                                     width: 300.0,
                                     padding: const EdgeInsets.only(top: 30.0),
-                                    child: const Text(
+                                    child: Text(
                                       "Click here to see music player controls",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 14.0,
+                                        color: Colors.grey[400],
                                         //fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -743,11 +746,12 @@ class MusicPlayerPage {
                                           width: 300.0,
                                           padding:
                                               const EdgeInsets.only(top: 30.0),
-                                          child: const Text(
+                                          child: Text(
                                             "Click here to see your list of songs",
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 14.0,
+                                              color: Colors.grey[400],
                                               //fontWeight: FontWeight.bold,
                                             ),
                                           ),

@@ -52,6 +52,8 @@ dependencies:
   cherry_toast: ^1.0.2
   widget_circular_animator: ^1.0.0
   user_profile_avatar: ^0.1.0
+  animate_icons: ^2.0.0
+  animated_background: ^2.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -95,6 +97,7 @@ flutter:
     - assets/images/empty_illustrations/
     - assets/images/content_illustrations/
     - assets/images/search_illustrations/
+    - assets/images/loading_page/
     - assets/datasets/dictionary_alpha_arrays.json
   #   - images/a_dot_ham.jpeg
 

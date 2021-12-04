@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
 import 'package:newsocial/pages/homepage.dart';
+import 'package:newsocial/pages/loadingPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +29,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
       routes: {
-        "/": (context) => HomePage(),
+        "/": (context) => LoadingPage(),
+        "homePage": (context) => HomePage(),
         "contentViewerPage": (context) => ContentViewerPage(),
       },
       theme: ThemeData(
