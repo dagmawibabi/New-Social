@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:animated_background/animated_background.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,15 @@ import 'package:wave/wave.dart';
 
 class MusicPlayerPage {
   static double forwardRewindSpeed = 5.0;
+  static List animatedBGBehaviours = [
+    SpaceBehaviour(
+      backgroundColor: Colors.transparent,
+    ),
+    RacingLinesBehaviour(
+      numLines: 10,
+      direction: LineDirection.Ttb,
+    ),
+  ];
   static SliverToBoxAdapter musicPlayer(
     BuildContext context,
     flipCardController,
@@ -36,6 +46,10 @@ class MusicPlayerPage {
     nextInPlaylist,
     backInPlaylist,
     playlistLoader,
+    abc,
+    containerColor,
+    iconColor,
+    textColor,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -125,7 +139,7 @@ class MusicPlayerPage {
           : Container(
               width: MediaQuery.of(context).size.width,
               height: fullScreenMode == false
-                  ? MediaQuery.of(context).size.height - 100
+                  ? MediaQuery.of(context).size.height - 99
                   : MediaQuery.of(context).size.height,
               child: Stack(
                 children: [
@@ -149,12 +163,13 @@ class MusicPlayerPage {
                       ),
                     ),
                   ),
+                  // MUSIC PLAYER Front and Back
                   Container(
                     margin: EdgeInsets.only(
                         top: (fullScreenMode == false ? 0.0 : 30.0)),
                     height: MediaQuery.of(context).size.height - 0,
                     color: fullScreenMode == false
-                        ? Colors.grey[200]
+                        ? containerColor
                         : Colors.transparent,
                     child: FlipCard(
                       controller: flipCardController,
@@ -177,7 +192,7 @@ class MusicPlayerPage {
                         decoration: BoxDecoration(
                           color: fullScreenMode == true
                               ? Colors.transparent // Colors.grey[300]!
-                              : Colors.grey[200]!,
+                              : containerColor, // Colors.grey[200]!,
                         ),
                         // Indie Songs Button
                         child: Column(
@@ -265,7 +280,7 @@ class MusicPlayerPage {
                                                                     index]
                                                                 .toString()))
                                                     ? curPlayingSongColor
-                                                    : Colors.grey[900],
+                                                    : iconColor,
                                               ),
                                               const SizedBox(width: 10.0),
                                               // Music Title
@@ -291,8 +306,7 @@ class MusicPlayerPage {
                                                                           musicFiles[index]
                                                                               .toString()))
                                                               ? curPlayingSongColor
-                                                              : Colors
-                                                                  .grey[900],
+                                                              : textColor,
                                                         ),
                                                         maxLines: 1,
                                                       )
@@ -310,12 +324,11 @@ class MusicPlayerPage {
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             color: curSong ==
-                                                                    p.withoutExtension(p.basename(
-                                                                        musicFiles[index]
-                                                                            .toString()))
+                                                                    p.withoutExtension(
+                                                                        p.basename(
+                                                                            musicFiles[index].toString()))
                                                                 ? curPlayingSongColor
-                                                                : Colors
-                                                                    .grey[900],
+                                                                : textColor,
                                                           ),
                                                         ),
                                                       ),
@@ -337,7 +350,7 @@ class MusicPlayerPage {
                                                                     index]
                                                                 .toString()))
                                                     ? curPlayingSongColor
-                                                    : Colors.grey[900],
+                                                    : iconColor,
                                                 size: 30.0,
                                               ),
                                             ],
@@ -379,14 +392,14 @@ class MusicPlayerPage {
                           color: fullScreenMode == true
                               ? Colors.white.withOpacity(
                                   fullScreenMode == true ? 0.0 : 0.4)
-                              : Colors.grey[200],
+                              : containerColor,
                           borderRadius: BorderRadius.all(Radius.circular(20.0)),
                           boxShadow: [
                             BoxShadow(
                               color: fullScreenMode == true
                                   ? Colors.grey[700]!.withOpacity(
                                       fullScreenMode == true ? 0.0 : 0.3)
-                                  : Colors.grey[200]!,
+                                  : containerColor,
                               spreadRadius: 2,
                               blurRadius: 10.0,
                             ),
@@ -412,12 +425,13 @@ class MusicPlayerPage {
                                 height: fullScreenMode == true ? 400.0 : 350.0,
                                 width: 400.0,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[200]!.withOpacity(0.4),
+                                  color: containerColor.withOpacity(
+                                      0.4), // Colors.grey[200]!.withOpacity(0.4),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withOpacity(0.1),
                                       blurRadius: 100.0,
                                       spreadRadius: 1.0,
                                     ),
@@ -428,8 +442,13 @@ class MusicPlayerPage {
                                         fullScreenMode == true ? 16.0 : 18.0,
                                     vertical: 5.0),
                                 clipBehavior: Clip.hardEdge,
-                                child: const Center(
-                                  child: Text("No Lyrics Found"),
+                                child: Center(
+                                  child: Text(
+                                    "No Lyrics Found",
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
                                 ),
                               ),
                               // Album Art + Fullscreen Button
@@ -442,7 +461,8 @@ class MusicPlayerPage {
                                       BorderRadius.all(Radius.circular(30.0)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color:
+                                          containerColor, // Colors.white.withOpacity(0.3),
                                       blurRadius: 100.0,
                                       spreadRadius: 1.0,
                                     ),
@@ -462,7 +482,8 @@ class MusicPlayerPage {
                                           : 350.0,
                                       width: 400.0,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey[200],
+                                        color:
+                                            containerColor, // Colors.grey[200],
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(30.0)),
                                       ),
@@ -472,7 +493,7 @@ class MusicPlayerPage {
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    // Fullscreen Button
+                                    // Shuffle Images and Fullscreen Button
                                     Align(
                                       alignment: Alignment.topRight,
                                       child: Padding(
@@ -486,8 +507,9 @@ class MusicPlayerPage {
                                               onPressed: () {
                                                 changeAlbumArt();
                                               },
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons.shuffle,
+                                                color: iconColor,
                                               ),
                                             ),
                                             IconButton(
@@ -498,12 +520,32 @@ class MusicPlayerPage {
                                                 fullScreenMode == true
                                                     ? Icons.fullscreen_exit
                                                     : Icons.fullscreen,
+                                                color: iconColor,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
                                     ),
+                                    // Animated BG
+                                    isSongPlaying == true
+                                        ? Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Container(
+                                              height: fullScreenMode == true
+                                                  ? 300.0
+                                                  : 100.0,
+                                              margin: const EdgeInsets.only(
+                                                  top: 20.0),
+                                              child: AnimatedBackground(
+                                                child: Text(""),
+                                                vsync: abc,
+                                                behaviour: getRandom(
+                                                    animatedBGBehaviours),
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
                                     // Wave Animation
                                     Align(
                                       alignment: Alignment.bottomCenter,
@@ -600,6 +642,7 @@ class MusicPlayerPage {
                                                     ? 23.0
                                                     : 20.0,
                                                 fontWeight: FontWeight.bold,
+                                                color: textColor,
                                               ),
                                             ),
                                           )
@@ -607,9 +650,10 @@ class MusicPlayerPage {
                                             text: curSong,
                                             blankSpace: 50.0,
                                             numberOfRounds: 3,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 20.0,
                                               fontWeight: FontWeight.bold,
+                                              color: textColor,
                                             ),
                                           ),
                                   ),
@@ -639,6 +683,9 @@ class MusicPlayerPage {
                                                       .toInt())
                                                   .toString()
                                                   .padLeft(2, "0"),
+                                          style: TextStyle(
+                                            color: textColor,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -659,6 +706,7 @@ class MusicPlayerPage {
                                         onPressed: () {},
                                         icon: Icon(
                                           Icons.repeat,
+                                          color: iconColor,
                                           size: fullScreenMode == true
                                               ? 30.0
                                               : 26.0,
@@ -682,6 +730,7 @@ class MusicPlayerPage {
                                           },
                                           icon: Icon(
                                             Icons.fast_rewind_rounded,
+                                            color: iconColor,
                                             size: fullScreenMode == true
                                                 ? 40.0
                                                 : 36.0,
@@ -697,6 +746,7 @@ class MusicPlayerPage {
                                           isSongPlaying
                                               ? Icons.pause
                                               : Icons.play_arrow,
+                                          color: iconColor,
                                           size: fullScreenMode == true
                                               ? 40.0
                                               : 36.0,
@@ -721,6 +771,7 @@ class MusicPlayerPage {
                                           },
                                           icon: Icon(
                                             Icons.fast_forward_rounded,
+                                            color: iconColor,
                                             size: fullScreenMode == true
                                                 ? 40.0
                                                 : 36.0,
@@ -732,6 +783,7 @@ class MusicPlayerPage {
                                         onPressed: () {},
                                         icon: Icon(
                                           Icons.shuffle,
+                                          color: iconColor,
                                           size: fullScreenMode == true
                                               ? 30.0
                                               : 26.0,
@@ -769,5 +821,11 @@ class MusicPlayerPage {
               ),
             ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }

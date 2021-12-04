@@ -12,6 +12,8 @@ class CryptoPage {
     getCryptoStats,
     getRandom,
     error_illustrations,
+    feedCardColor,
+    textColor,
   ) {
     return SliverList(
       delegate: isCryptoPageLoading == false
@@ -23,7 +25,7 @@ class CryptoPage {
                   },
                   child: Card(
                     elevation: 0.2,
-                    color: Colors.grey[200],
+                    color: feedCardColor, //Colors.grey[200],
                     margin: const EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 2.0),
                     child: Container(
@@ -56,17 +58,23 @@ class CryptoPage {
                                           .toUpperCase(),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16.0,
                                         letterSpacing: 0.4,
                                         fontWeight: FontWeight.bold,
+                                        color: textColor,
                                       ),
                                     ),
                                     // Crypto Symbol and price up/down pointer
                                     Row(
                                       children: [
                                         // Crypto Symbol
-                                        Text(cryptoStats[index]["symbol"]),
+                                        Text(
+                                          cryptoStats[index]["symbol"],
+                                          style: TextStyle(
+                                            color: textColor,
+                                          ),
+                                        ),
                                         const SizedBox(width: 2.0),
                                         // Crypto price up/down pointer
                                         cryptoStats[index]["current_price"] >
@@ -128,10 +136,11 @@ class CryptoPage {
                               textAlign: TextAlign.end,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16.0,
                                 letterSpacing: 0.3,
                                 fontWeight: FontWeight.bold,
+                                color: textColor,
                               ),
                             ),
                           ),

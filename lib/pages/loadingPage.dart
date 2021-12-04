@@ -13,7 +13,7 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   List backgroundBehaviours = [
     SpaceBehaviour(),
     RacingLinesBehaviour(),
@@ -25,8 +25,9 @@ class _LoadingPageState extends State<LoadingPage>
 
   // Loading Timer
   void loadingDelay() {
-    Timer.periodic(Duration(seconds: 2), (time) {
-      Navigator.pushReplacementNamed(context, "homePage");
+    Timer.periodic(Duration(seconds: 3), (time) {
+      time.cancel();
+      Navigator.popAndPushNamed(context, "homePage");
     });
   }
 
@@ -44,7 +45,6 @@ class _LoadingPageState extends State<LoadingPage>
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    TickerFuture.complete();
   }
 
   @override
