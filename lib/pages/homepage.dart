@@ -590,9 +590,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Know when song ends playing
     assetsAudioPlayer.playlistAudioFinished.listen(
       (Playing playing) {
-        nextInPlaylist();
-        //isSongPlaying = false;
-        //assetsAudioPlayer.stop();
+        //nextInPlaylist();
+        isSongPlaying = false;
+        assetsAudioPlayer.stop();
         setState(() {});
       },
     );
