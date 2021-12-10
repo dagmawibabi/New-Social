@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
 import 'package:newsocial/pages/homepage.dart';
 import 'package:newsocial/pages/loadingPage.dart';
+import 'package:newsocial/pages/videoViewerPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
         "/": (context) => LoadingPage(),
         "homePage": (context) => HomePage(),
         "contentViewerPage": (context) => ContentViewerPage(),
+        "VideoViewerPage": (content) => VideoViewerPage(),
       },
       theme: ThemeData(
         fontFamily: "BlenderProBook",

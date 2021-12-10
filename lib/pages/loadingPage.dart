@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:animated_background/animated_background.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -64,13 +65,15 @@ class _LoadingPageState extends State<LoadingPage>
               children: [
                 Icon(
                   Ionicons.planet_outline,
-                  color: Colors.grey[200],
+                  color: Colors.white,
+                  size: 34,
                 ),
                 const SizedBox(width: 10.0),
                 Text(
                   "Aurora",
                   style: TextStyle(
-                    fontSize: 30.0,
+                    fontSize: 36.0,
+                    fontWeight: FontWeight.bold,
                     color: Colors.grey[200],
                   ),
                 ),

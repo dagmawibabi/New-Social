@@ -275,7 +275,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           backgroundColor: Colors.transparent,
           content: Container(
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: containerColor, //Colors.grey[300],
               borderRadius: const BorderRadius.all(
                 Radius.circular(20.0),
               ),
@@ -309,23 +309,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   children: [
                     Text(
                       cryptoStats[index]["id"].toString().toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20.0,
                         letterSpacing: 0.4,
                         fontWeight: FontWeight.bold,
+                        color: textColor,
                       ),
                     ),
                     Text(
                       cryptoStats[index]["symbol"].toString().toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14.0,
                         letterSpacing: 0.4,
                         fontWeight: FontWeight.bold,
+                        color: textColorDim,
                       ),
                     ),
                   ],
                 ),
-                const Divider(color: Colors.black),
+                Divider(color: textColorDimmer),
                 const SizedBox(height: 4.0),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
@@ -341,18 +343,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             children: [
                               Text(
                                 cryptoDetails[index]["title"],
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  color: textColorDim,
                                 ),
                               ),
-                              Text(
-                                cryptoDetails[index]["value"],
-                              ),
+                              Text(cryptoDetails[index]["value"],
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                  )),
                             ],
                           ),
                           SizedBox(height: 2.0),
                           Divider(
-                            color: Colors.grey[400],
+                            color: textColorDimmer,
                             thickness: 0.4,
                             indent: 10.0,
                             endIndent: 10.0,
@@ -373,8 +377,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           .toString()
                           .substring(0, 10),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.0,
+                    color: textColorDimmer,
                   ),
                 ),
               ],
@@ -945,6 +950,86 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
+  Map abcdg = {};
+  // Filter Content
+  dynamic filterContent(dynamic contentObj) {
+    //print(contentObj["data"]["is_self"] == true);
+    if (contentObj["data"]["is_self"] == true) {
+      return Text("TEXT: " + contentObj["data"]["title"].toString());
+    } else {
+      try {
+        _controller = VideoPlayerController.network(contentObj["data"]
+            ["preview"]["reddit_video_preview"]["fallback_url"])
+          ..initialize().then((_) {
+            setState(() {});
+          });
+        if (contentObj["data"]["preview"]["reddit_video_preview"]
+                ["fallback_url"]
+            .toString()
+            .endsWith(".mp4")) {
+          return Container(
+            color: Colors.red,
+            margin: const EdgeInsets.all(10),
+            width: MediaQuery.of(context).size.width,
+            height: 400.0,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                FittedBox(
+                  fit: BoxFit.cover,
+                  child: Image.network(
+                    contentObj["data"]["thumbnail"],
+                    height: 200.0,
+                    width: 300.0,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      "VideoViewerPage",
+                      arguments: {
+                        "video": contentObj["data"]["preview"]
+                            ["reddit_video_preview"]["fallback_url"],
+                        "thumbnail": contentObj["data"]["thumbnail"],
+                      },
+                    );
+                  },
+                  icon: Icon(
+                    Icons.play_circle_fill_outlined,
+                    size: 34.0,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        /*return Text("VIDEO: " +
+            contentObj["data"]["preview"]["reddit_video_preview"]
+                ["fallback_url"]);*/
+      } catch (e) {
+        try {
+          if (contentObj["data"]["url"].toString().endsWith(".png") ||
+              contentObj["data"]["url"].toString().endsWith(".jpg") ||
+              contentObj["data"]["url"].toString().endsWith(".gif") ||
+              contentObj["data"]["url"].toString().endsWith(".webp") ||
+              contentObj["data"]["url"].toString().endsWith(".bmp") ||
+              contentObj["data"]["url"].toString().endsWith(".wbmp")) {
+            return Image.network(contentObj["data"]["url"]);
+          }
+        } catch (e) {
+          return Text("DONNOW");
+        }
+      }
+      /*if (Map.from((contentObj["data"]["preview"]))
+          .containsKey("reddit_video_preview")) {
+        return Text("VIDEO: " + contentObj["title"]);
+      } else {
+        return Text("IMAGE: " + contentObj["title"]);
+      }*/
+    }
+  }
+
   // viewFeedImages
   void viewFeedImages(image) {
     showDialog(
@@ -1161,6 +1246,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Color scaffoldBGColor = Colors.grey[200]!;
   Color appBarBGColor = Colors.grey[200]!;
   Color textColor = Colors.black;
+  Color textColorDim = Colors.grey[900]!;
+  Color textColorDimmer = Colors.grey[900]!;
   Color iconColor = Colors.black;
   Color containerColor = Colors.grey[200]!;
   Color feedCardsColor = Colors.grey[200]!;
@@ -1175,6 +1262,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       scaffoldBGColor = Colors.grey[900]!;
       appBarBGColor = Colors.grey[900]!;
       textColor = Colors.grey[200]!;
+      textColorDim = Colors.grey[400]!;
+      textColorDimmer = Colors.grey[500]!;
       iconColor = Colors.grey[200]!;
       containerColor = Colors.grey[900]!;
       feedCardsColor = Colors.grey[900]!;
@@ -1218,6 +1307,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       scaffoldBGColor = Colors.grey[200]!;
       appBarBGColor = Colors.grey[200]!;
       textColor = Colors.black;
+      textColorDim = Colors.grey[800]!;
+      textColorDimmer = Colors.grey[900]!;
       iconColor = Colors.black;
       containerColor = Colors.grey[200]!;
       feedCardsColor = Colors.grey[200]!;
@@ -1310,7 +1401,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-    hideBottomNavBar();
+    //hideBottomNavBar();
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
@@ -1382,6 +1473,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ];
     List pagesBody = [
       // Home Page
+      /*isFeedLoading == false
+          ? SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return filterContent(homepageFeed[index]);
+                },
+                childCount: homepageFeed.length,
+              ),
+            )
+          : SliverToBoxAdapter(
+              child: Container(),
+            ),*/
       isFeedLoading == false
           ? SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -1454,7 +1557,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     homepageFeed[index]["data"]["title"],
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
-                                      color: textColor,
+                                      color: textColorDim,
                                     ),
                                   ),
                                   // Image of content
@@ -1852,6 +1955,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         containerColor,
         iconColor,
         textColor,
+        textColorDimmer,
+        isDarkMode,
       ),
 
       // Crypto Page
@@ -1879,34 +1984,94 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           padding: const EdgeInsets.symmetric(
             horizontal: 20.0,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
+              fullScreenMode == true
+                  ? Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            top: 50.0, bottom: 10.0, right: 0.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.fullscreen_exit,
+                            color: iconColor,
+                          ),
+                          onPressed: () {
+                            setFullscreen();
+                          },
+                        ),
+                      ),
+                    )
+                  : Container(),
+              // DarkMode
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    isDarkMode == false ? Icons.dark_mode : Icons.light_mode,
-                    color: iconColor,
+                  Row(
+                    children: [
+                      Icon(
+                        isDarkMode == false
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Text(
+                        "Dark Mode",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10.0),
-                  Text(
-                    "Dark Mode",
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Switch(
+                    activeColor: Colors.cyan,
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      isDarkMode = value;
+                      setDarkMode();
+                      setState(() {});
+                    },
                   ),
                 ],
               ),
-              Switch(
-                activeColor: Colors.cyan,
-                value: isDarkMode,
-                onChanged: (value) {
-                  isDarkMode = value;
-                  setDarkMode();
-                  setState(() {});
-                },
+              Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Hide Bottom Nav Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isDarkMode == false
+                            ? Icons.dark_mode
+                            : Icons.light_mode,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Text(
+                        "Hide Nav-Bar on Scroll",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: Colors.cyan,
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      isDarkMode = value;
+                      setDarkMode();
+                      setState(() {});
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -2512,6 +2677,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             : Container(),
       ),
     ];
+    List pagesAppBarIconTitle = [
+      {
+        "icon": Ionicons.planet_outline,
+        "title": "Aurora",
+      },
+      {
+        "icon": Ionicons.compass_outline,
+        "title": "Discover",
+      },
+      {
+        "icon": Ionicons.play_outline,
+        "title": "Music",
+      },
+      {
+        "icon": Ionicons.wallet_outline,
+        "title": "Wallet",
+      },
+      {
+        "icon": Ionicons.paper_plane_outline,
+        "title": "Chat",
+      },
+      {
+        "icon": Ionicons.hardware_chip_outline,
+        "title": "Settings",
+      },
+    ];
     return Scaffold(
       extendBody: true,
       backgroundColor: scaffoldBGColor,
@@ -2535,12 +2726,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     title: Row(
                       children: [
                         Icon(
-                          Ionicons.planet_outline,
+                          pagesAppBarIconTitle[curPage]["icon"],
                           color: iconColor,
                         ),
+                        /*Icon(
+                          Ionicons.planet_outline,
+                          color: iconColor,
+                        ),*/
                         SizedBox(width: 12.0),
                         Text(
-                          "AURORA",
+                          pagesAppBarIconTitle[curPage]["title"],
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.bold,

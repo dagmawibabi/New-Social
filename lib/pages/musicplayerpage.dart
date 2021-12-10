@@ -50,6 +50,8 @@ class MusicPlayerPage {
     containerColor,
     iconColor,
     textColor,
+    textColorDimmer,
+    isDarkMode,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -60,7 +62,7 @@ class MusicPlayerPage {
               height: MediaQuery.of(context).size.height - 300,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: containerColor,
                 borderRadius: const BorderRadius.all(Radius.circular(30.0)),
               ),
               // Get Songs Warning and Button
@@ -71,9 +73,10 @@ class MusicPlayerPage {
                   // No Songs Illustration
                   Image.asset(getRandom(empty_illustrations).toString()),
                   // No Songs Warning
-                  const Text(
+                  Text(
                     "You have no songs imported!",
                     style: TextStyle(
+                      color: textColor,
                       fontSize: 22.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -86,7 +89,9 @@ class MusicPlayerPage {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[900],
+                        color: isDarkMode == false
+                            ? Colors.grey[900]
+                            : Colors.grey[850],
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10.0)),
                       ),
@@ -121,13 +126,14 @@ class MusicPlayerPage {
                   ),
                   // Fetch directory Warning
                   const SizedBox(height: 8.0),
-                  const SizedBox(
+                  SizedBox(
                     width: 300.0,
                     child: Text(
                       "Will fetch songs from your device's Downloads and Music folder",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.0,
+                        color: textColorDimmer,
                         //fontWeight: FontWeight.bold,
                       ),
                     ),
