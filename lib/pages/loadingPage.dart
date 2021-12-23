@@ -17,10 +17,16 @@ class _LoadingPageState extends State<LoadingPage>
     with SingleTickerProviderStateMixin {
   List backgroundBehaviours = [
     SpaceBehaviour(),
-    RacingLinesBehaviour(),
+    RacingLinesBehaviour(direction: LineDirection.Btt),
     SpaceBehaviour(),
-    RacingLinesBehaviour(),
+    RacingLinesBehaviour(direction: LineDirection.Ltr),
     SpaceBehaviour(),
+    RacingLinesBehaviour(direction: LineDirection.Rtl),
+    SpaceBehaviour(),
+    RacingLinesBehaviour(direction: LineDirection.Ttb),
+    EmptyBehaviour(),
+    BubblesBehaviour(),
+    RectanglesBehaviour(),
   ];
   Behaviour backgroundBehaviour = SpaceBehaviour();
 

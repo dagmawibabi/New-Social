@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
-    if (curPage == 0 || curPage == 3) {
+    if (hideBottomNav == true) {
       scrollController.addListener(
         () {
           // Hide on scroll down
@@ -105,17 +105,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         },
       );
     } else {
-      scrollController.addListener(() {
-        // Show on scroll up and down
-        if (scrollController.position.userScrollDirection ==
-                ScrollDirection.forward ||
-            scrollController.position.userScrollDirection ==
-                ScrollDirection.reverse) {
-          setState(() {
-            isBottomBarVisible = true;
-          });
-        }
-      });
+      scrollController.addListener(
+        () {
+          // Show on scroll down
+          if (scrollController.position.userScrollDirection ==
+              ScrollDirection.reverse) {
+            setState(() {
+              isBottomBarVisible = true;
+            });
+          }
+          // Show on scroll up
+          if (scrollController.position.userScrollDirection ==
+              ScrollDirection.forward) {
+            setState(() {
+              isBottomBarVisible = true;
+            });
+          }
+        },
+      );
     }
   }
 
@@ -708,6 +715,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     "dataIsBeautiful",
     "comics",
     "madeMeSmile",
+    "sketchPad",
+    "illustration",
+    "artProgressPics",
+    "pixelArt",
+    "logoDesign",
+    "typography",
     "humansForScale",
     "imaginaryCharacters",
     "imaginaryCityscapes",
@@ -715,6 +728,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     "art",
     "artefactPorn",
     "quotesPorn",
+    "aww",
+    "movies",
+    "earthPorn",
+    "food",
+    "mildlyInteresting",
+    "space",
+    "campingAndHiking",
+    "100YearsAgo",
+    "awwducational",
+    "cozyPlaces",
+    "programmingHumor",
+    "getMotivated",
+    "nostalgia",
+    "designPorn",
+    "cringePics",
+    "creepy",
+    "historyPorn",
+    "verticalWallpapers",
+    "militaryPorn",
+    "skyPorn",
+    "abandonedPorn",
+    "noTitle",
+    "iTookAPicture",
+    "roomPorn",
+    "me_IRL"
   ];
   TextEditingController feedSearch = TextEditingController();
   dynamic feedTimeValue = 1;
@@ -1253,6 +1291,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Color feedCardsColor = Colors.grey[200]!;
   Color feedCardShadow = Colors.grey[400]!;
   Color bottomNavBarColor = Colors.grey[200]!;
+  bool hideBottomNav = false;
 
   //? GENERAL
   // Dark Mode
@@ -2046,9 +2085,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Row(
                     children: [
                       Icon(
-                        isDarkMode == false
-                            ? Icons.dark_mode
-                            : Icons.light_mode,
+                        hideBottomNav == true
+                            ? Icons.highlight_off_rounded
+                            : Icons.navigation_outlined,
                         color: iconColor,
                       ),
                       const SizedBox(width: 10.0),
@@ -2064,10 +2103,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   Switch(
                     activeColor: Colors.cyan,
-                    value: isDarkMode,
+                    value: hideBottomNav,
                     onChanged: (value) {
-                      isDarkMode = value;
-                      setDarkMode();
+                      hideBottomNav = value;
+                      hideBottomNavBar();
                       setState(() {});
                     },
                   ),
