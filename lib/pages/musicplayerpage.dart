@@ -38,6 +38,7 @@ class MusicPlayerPage {
     albumArtImage,
     setFullscreen,
     fullScreenMode,
+    fullScreenModeMP,
     curSongDuration,
     assetsAudioPlayer,
     songPositionStreamBuilder,
@@ -374,7 +375,7 @@ class MusicPlayerPage {
                               ),
                             ),
                             // Click to flip
-                            fullScreenMode == true
+                            (fullScreenMode == true || fullScreenModeMP == true)
                                 ? Container()
                                 : Container(
                                     width: 300.0,
@@ -798,7 +799,8 @@ class MusicPlayerPage {
                                     ],
                                   ),
                                   // Click to flip
-                                  fullScreenMode == true
+                                  (fullScreenMode == true ||
+                                          fullScreenModeMP == true)
                                       ? Container()
                                       : Container(
                                           width: 300.0,

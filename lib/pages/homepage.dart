@@ -569,6 +569,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     refreshController.loadComplete();
     refreshController.refreshCompleted();
     setState(() {});
+    setState(() {});
   }
 
   // Change Album Art
@@ -579,7 +580,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Play Songs
   void loadPlaySong(songPath) async {
-    assetsAudioPlayer.stop();
+    //assetsAudioPlayer.stop();
     // Play From Path
     await assetsAudioPlayer.open(
       Audio.file(songPath),
@@ -708,18 +709,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // Music Bottom Sheet
   void musicListBottomSheet(context) {
     showModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (context) {
         return Container(
-          color: containerColor,
-          height: MediaQuery.of(context).size.height * 0.5,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(20.0),
+            ),
+            color: feedCardsColor,
+          ),
+          clipBehavior: Clip.hardEdge,
+          height: MediaQuery.of(context).size.height * 0.9,
           width: double.infinity,
-          padding: const EdgeInsets.only(bottom: 10.0),
           child: Column(
             children: [
               // Wave
               Container(
-                height: 2.0,
+                height: 3.0,
                 child: WaveWidget(
                   config: CustomConfig(
                     gradients: lightModeWaveGradient,
@@ -729,8 +736,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     gradientBegin: Alignment.bottomLeft,
                     gradientEnd: Alignment.topRight,
                   ),
-                  duration: 1000,
-                  waveAmplitude: 2,
+                  duration: 10,
+                  waveAmplitude: 4,
                   heightPercentange: 0.1,
                   size: const Size(
                     double.infinity,
@@ -738,24 +745,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              const SizedBox(height: 20.0),
 
               // Controlls
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 5.0),
                 padding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 20.0),
+                    vertical: 20.0, horizontal: 30.0),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20.0),
-                  ),
                   color: feedCardsColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: feedCardShadow,
-                      blurRadius: 4.0,
-                    ),
-                  ],
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 ),
                 child: Column(
                   children: [
@@ -799,7 +796,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           icon: Icon(
                             isSongPlaying ? Icons.pause : Icons.play_arrow,
                             color: iconColor,
-                            size: 3.0,
+                            size: 35.0,
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -847,7 +844,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            songPositionStreamBuilder(),
+                            SizedBox(
+                              height: 16.0,
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: songPositionStreamBuilder(),
+                              ),
+                            ),
                             Text(
                               (curSongDuration.inSeconds ~/ 3600)
                                       .toString()
@@ -862,13 +865,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       .padLeft(2, "0"),
                               style: TextStyle(
                                 color: textColor,
+                                fontSize: 12.0,
                               ),
                             ),
                           ],
                         ),
                         // Slider
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: sliderStreamBuilder(),
                         ),
                       ],
@@ -876,93 +880,144 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              const SizedBox(height: 12.0),
+
+              // Wave
+              Container(
+                height: 3.0,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: WaveWidget(
+                  config: CustomConfig(
+                    gradients: lightModeWaveGradient,
+                    durations: [35000, 19440, 10800, 6000],
+                    heightPercentages: [0.20, 0.23, 0.25, 0.30],
+                    blur: const MaskFilter.blur(BlurStyle.solid, 10),
+                    gradientBegin: Alignment.bottomLeft,
+                    gradientEnd: Alignment.topRight,
+                  ),
+                  duration: 10,
+                  waveAmplitude: 0.1,
+                  heightPercentange: 0.1,
+                  size: const Size(
+                    double.infinity,
+                    double.infinity,
+                  ),
+                ),
+              ),
 
               // Indie Songs
               Expanded(
-                child: ListView.builder(
-                  primary: false,
-                  shrinkWrap: true,
-                  itemCount: musicFiles.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        // Music note icon and Song Titles
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                            curSongIndex = index;
-                            if ((curSong ==
-                                    p.withoutExtension(p.basename(
-                                        musicFiles[index].toString()))) ==
-                                true) {
-                              pausePlaySong();
-                            } else {
-                              playlistLoader(index);
-                            }
-                          },
-                          // Music note Icon and Song Title
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: curSong ==
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
+                    ),
+                    color: feedCardsColor,
+                    /*boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[400]!,
+                        blurRadius: 5.0,
+                      ),
+                    ],*/
+                    /*border: Border.all(color: Colors.black),*/
+                  ),
+                  child: ListView.builder(
+                    primary: false,
+                    shrinkWrap: true,
+                    itemCount: musicFiles.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          index == 0
+                              ? const SizedBox(height: 20.0)
+                              : Container(),
+                          // Music note icon and Song Titles
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              curSongIndex = index;
+                              if ((curSong ==
                                       p.withoutExtension(p.basename(
-                                          musicFiles[index].toString()))
-                                  ? Colors.black.withOpacity(0.2)
-                                  : Colors.transparent,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12.0)),
-                            ),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 3.0),
-                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Row(
-                              children: [
-                                // Music Note Icon
-                                Icon(
-                                  Icons.music_note_outlined,
-                                  size: 18.0,
-                                  color: curSong ==
-                                          p.withoutExtension(p.basename(
-                                              musicFiles[index].toString()))
-                                      ? curPlayingSongColor
-                                      : textColorDimmer,
-                                ),
-                                const SizedBox(width: 6.0),
-                                // Song Title
-                                Expanded(
-                                  child: Container(
-                                    height: 30.0,
-                                    child: Marquee(
-                                      text: p.basename(
-                                          musicFiles[index].toString()),
-                                      blankSpace: 80.0,
-                                      velocity: 30.0,
-                                      numberOfRounds: 3,
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: curSong ==
-                                                p.withoutExtension(p.basename(
-                                                    musicFiles[index]
-                                                        .toString()))
-                                            ? curPlayingSongColor
-                                            : textColorDimmer,
+                                          musicFiles[index].toString()))) ==
+                                  true) {
+                                pausePlaySong();
+                              } else {
+                                playlistLoader(index);
+                              }
+                            },
+                            // Music note Icon and Song Title
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: curSong ==
+                                        p.withoutExtension(p.basename(
+                                            musicFiles[index].toString()))
+                                    ? Colors.black.withOpacity(0.2)
+                                    : Colors.transparent,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(12.0)),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3.0, vertical: 5.0),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 5.0, vertical: 2.0),
+                              child: Row(
+                                children: [
+                                  // Music Note Icon
+                                  Icon(
+                                    Icons.music_note_outlined,
+                                    size: 18.0,
+                                    color: curSong ==
+                                            p.withoutExtension(p.basename(
+                                                musicFiles[index].toString()))
+                                        ? curPlayingSongColor
+                                        : textColorDimmer,
+                                  ),
+                                  const SizedBox(width: 6.0),
+                                  // Song Title
+                                  Expanded(
+                                    child: Container(
+                                      height: 30.0,
+                                      child: Marquee(
+                                        text: p.basename(
+                                            musicFiles[index].toString()),
+                                        blankSpace: 80.0,
+                                        velocity: 30.0,
+                                        numberOfRounds: 3,
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: curSong ==
+                                                  p.withoutExtension(p.basename(
+                                                      musicFiles[index]
+                                                          .toString()))
+                                              ? curPlayingSongColor
+                                              : textColorDimmer,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Divider(
-                          color: textColorDimmer,
-                          indent: 5.0,
-                          endIndent: 5.0,
-                        ),
-                      ],
-                    );
-                  },
+                          Divider(
+                            height: 0.25,
+                            color: textColorDimmer.withOpacity(0.2),
+                            indent: 5.0,
+                            endIndent: 5.0,
+                          ),
+                          index == musicFiles.length - 1
+                              ? const SizedBox(height: 50.0)
+                              : Container(),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -1660,6 +1715,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // Fullscreen Mode
   void setFullscreen() {
     fullScreenMode = !fullScreenMode;
+    fullScreenModeMP = false;
     if (fullScreenMode == true) {
       isBottomBarVisible = false;
     } else {
@@ -1670,6 +1726,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, //Colors.grey[200],
         statusBarIconBrightness: Brightness.light,
+      ),
+    );
+    setState(() {});
+  }
+
+  // Fullscreen Mode for music player
+  bool fullScreenModeMP = false;
+  void setFullscreenMusicPlayer() {
+    fullScreenModeMP = !fullScreenModeMP;
+    if (fullScreenModeMP == true) {
+      isBottomBarVisible = false;
+    } else {
+      isBottomBarVisible = true;
+    }
+    // Light Mode Status Bar
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, //Colors.grey[200],
+        statusBarIconBrightness: Brightness.dark,
       ),
     );
     setState(() {});
@@ -2251,6 +2326,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         albumArtImage,
         setFullscreen,
         fullScreenMode,
+        fullScreenModeMP,
         curSongDuration,
         assetsAudioPlayer,
         songPositionStreamBuilder,
@@ -2505,109 +2581,183 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // Discover Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 50.0 : 0.0), // here the desired height
-        child: isSongPlaying == true
-            ? Container(
-                decoration: BoxDecoration(
-                  color: containerColor,
-                  border: Border.all(
-                    color: feedCardShadow.withOpacity(0.3),
-                  ),
+            isSongPlaying == true ? 120.0 : 68.0), // here the desired height
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: textColor,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        musicListBottomSheet(context);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.music_note_outlined,
-                            color: iconColor,
-                          ),
-                          const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 180.0,
-                            height: 20.0,
-                            child: Marquee(
-                              text: curSong,
-                              blankSpace: 40.0,
-                              pauseAfterRound: Duration(milliseconds: 1500),
-                              velocity: 10.0,
-                              style: TextStyle(
-                                color: textColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20.0),
+                ),
+              ),
+              height: 50.0,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  // Content or Dictionary
+                  GestureDetector(
+                    onTap: () {
+                      discoverContent = !discoverContent;
+                      if (discoverContent == true) {
+                        showMeaning = false;
+                      }
+                      setState(() {});
+                    },
+                    child: Icon(
+                      discoverContent == true
+                          ? Ionicons.compass_outline
+                          : Icons.menu_book_rounded,
+                      color: iconColor,
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  // Search Term
+                  Expanded(
+                    child: TextField(
+                      controller: discoverTermController,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        hintStyle: TextStyle(
+                          color: textColor,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  // Search Button
+                  GestureDetector(
+                    onTap: () {
+                      if (discoverContent == false) {
+                        searchedTerm =
+                            discoverTermController.text.toString().trim();
+                        searchOfflineDictionary(searchedTerm);
+                      } else {
+                        getDiscoverContent(
+                            discoverTermController.text.toString().trim(),
+                            "top",
+                            "all");
+                      }
+                    },
+                    child: Icon(
+                      Icons.search,
+                      color: iconColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            isSongPlaying == true
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: containerColor,
+                      border: Border.all(
+                        color: feedCardShadow.withOpacity(0.3),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            musicListBottomSheet(context);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.music_note_outlined,
+                                color: iconColor,
                               ),
-                            ),
-                            /*Text(
+                              const SizedBox(width: 8.0),
+                              SizedBox(
+                                width: 180.0,
+                                height: 20.0,
+                                child: Marquee(
+                                  text: curSong,
+                                  blankSpace: 40.0,
+                                  pauseAfterRound: Duration(milliseconds: 1500),
+                                  velocity: 10.0,
+                                  style: TextStyle(
+                                    color: textColor,
+                                  ),
+                                ),
+                                /*Text(
                               curSong,
                               maxLines: 1,
                               style: TextStyle(
                                 color: textColor,
                               ),
                             ),*/
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        // Rewind
-                        GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                -MusicPlayerPage.forwardRewindSpeed);
-                          },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              backInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_rewind_rounded,
-                              color: iconColor,
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Pause Play
-                        IconButton(
-                          onPressed: () {
-                            pausePlaySong();
-                          },
-                          icon: Icon(
-                            isSongPlaying ? Icons.pause : Icons.play_arrow,
-                            color: iconColor,
-                          ),
-                        ),
-                        // Forward
-                        GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                MusicPlayerPage.forwardRewindSpeed);
-                          },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              nextInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_forward_rounded,
-                              color: iconColor,
+                        Row(
+                          children: [
+                            // Rewind
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    -MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  backInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_rewind_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
                             ),
-                          ),
+                            // Pause Play
+                            IconButton(
+                              onPressed: () {
+                                pausePlaySong();
+                              },
+                              icon: Icon(
+                                isSongPlaying ? Icons.pause : Icons.play_arrow,
+                                color: iconColor,
+                              ),
+                            ),
+                            // Forward
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  nextInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_forward_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              )
-            : Container(),
+                  )
+                : Container(),
+          ],
+        ),
       ),
       // Music Page
       PreferredSize(
@@ -2977,108 +3127,120 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           slivers: [
             // App Bar
             fullScreenMode == false
-                ? SliverAppBar(
-                    backgroundColor: appBarBGColor,
-                    foregroundColor: Colors.black,
-                    expandedHeight: pagesAppBarExpanded[curPage],
-                    pinned: true,
-                    title: Row(
-                      children: [
-                        Icon(
-                          pagesAppBarIconTitle[curPage]["icon"],
-                          color: iconColor,
-                        ),
-                        /*Icon(
-                          Ionicons.planet_outline,
-                          color: iconColor,
-                        ),*/
-                        SizedBox(width: 12.0),
-                        Text(
-                          pagesAppBarIconTitle[curPage]["title"],
-                          style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    flexibleSpace: pagesAppbarFlexibleSpace[curPage],
-                    bottom: pagesAppBarBottom[curPage],
-                    actions: [
-                      curPage == 0
-                          ? Row(
-                              children: [
-                                // Random Feed
-                                IconButton(
-                                  onPressed: () {
-                                    setFullscreen();
-                                  },
-                                  icon: Icon(
-                                    Icons.fullscreen,
-                                    color: iconColor,
-                                  ),
-                                ),
-                                // Search Subreddit
-                                IconButton(
-                                  onPressed: () {
-                                    feedChoice();
-                                  },
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: iconColor,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Container(),
-                      // Profile
-                      Container(
-                        width: 45.0,
-                        height: 45.0,
-                        margin: const EdgeInsets.only(right: 10.0),
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: UserProfileAvatar(
-                            avatarUrl:
-                                'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
-                            onAvatarTap: () {
-                              showProfileDialog();
-                            },
-                            notificationCount: 4,
-                            notificationBubbleTextStyle: TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                ? fullScreenModeMP == false
+                    ? SliverAppBar(
+                        backgroundColor: appBarBGColor,
+                        foregroundColor: Colors.black,
+                        expandedHeight: pagesAppBarExpanded[curPage],
+                        pinned: true,
+                        title: Row(
+                          children: [
+                            Icon(
+                              pagesAppBarIconTitle[curPage]["icon"],
+                              color: iconColor,
                             ),
-                            avatarSplashColor: smartRefresherColor[0],
-                            radius: 20,
-                            isActivityIndicatorSmall: false,
-                            avatarBorderData: AvatarBorderData(
-                              borderColor: Colors.white,
-                              borderWidth: 1.0,
+                            SizedBox(width: 12.0),
+                            Text(
+                              pagesAppBarIconTitle[curPage]["title"],
+                              style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                        flexibleSpace: pagesAppbarFlexibleSpace[curPage],
+                        bottom: pagesAppBarBottom[curPage],
+                        actions: [
+                          curPage == 0
+                              ? Row(
+                                  children: [
+                                    // Search Subreddit
+                                    IconButton(
+                                      onPressed: () {
+                                        feedChoice();
+                                      },
+                                      icon: Icon(
+                                        Icons.add,
+                                        color: iconColor,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Container(),
+                          // Fullscreen
+                          IconButton(
+                            onPressed: () {
+                              if (curPage == 2) {
+                                setFullscreenMusicPlayer();
+                              } else {
+                                setFullscreen();
+                              }
+                            },
+                            icon: Icon(
+                              fullScreenModeMP == false
+                                  ? Icons.fullscreen
+                                  : Icons.fullscreen_exit,
+                              color: iconColor,
+                            ),
+                          ),
+                          // Profile
+                          Container(
+                            width: 45.0,
+                            height: 45.0,
+                            margin: const EdgeInsets.only(right: 10.0),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: UserProfileAvatar(
+                                avatarUrl:
+                                    'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
+                                onAvatarTap: () {
+                                  showProfileDialog();
+                                },
+                                notificationCount: 4,
+                                notificationBubbleTextStyle: TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                avatarSplashColor: smartRefresherColor[0],
+                                radius: 20,
+                                isActivityIndicatorSmall: false,
+                                avatarBorderData: AvatarBorderData(
+                                  borderColor: Colors.white,
+                                  borderWidth: 1.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : SliverToBoxAdapter(
+                        child: Container(
+                          height: 99.0,
+                          color: containerColor,
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(right: 55.0, bottom: 4.0),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.fullscreen_exit,
+                                color: iconColor.withOpacity(0.2),
+                              ),
+                              onPressed: () {
+                                setFullscreenMusicPlayer();
+                              },
                             ),
                           ),
                         ),
                       )
-
-                      /*IconButton(
-                        onPressed: () {
-                          showProfileDialog();
-                        },
-                        icon: const Icon(
-                          Ionicons.person_outline,
-                          size: 20.0,
-                        ),
-                      ),*/
-                    ],
-                  )
                 : SliverToBoxAdapter(
                     child: Container(
                       color: fullScreenMode == true
                           ? Colors.grey[300]!
                           : Colors.grey[200]!,
-                      //height: pagesAppBarExpanded[curPage] + 78.5,
                     ),
                   ),
 
