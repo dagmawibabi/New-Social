@@ -799,7 +799,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           icon: Icon(
                             isSongPlaying ? Icons.pause : Icons.play_arrow,
                             color: iconColor,
-                            size: 38.0,
+                            size: 3.0,
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -2505,178 +2505,109 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // Discover Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 120.0 : 68.0), // here the desired height
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: textColor,
+            isSongPlaying == true ? 50.0 : 0.0), // here the desired height
+        child: isSongPlaying == true
+            ? Container(
+                decoration: BoxDecoration(
+                  color: containerColor,
+                  border: Border.all(
+                    color: feedCardShadow.withOpacity(0.3),
+                  ),
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20.0),
-                ),
-              ),
-              height: 50.0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  // Content or Dictionary
-                  GestureDetector(
-                    onTap: () {
-                      discoverContent = !discoverContent;
-                      if (discoverContent == true) {
-                        showMeaning = false;
-                      }
-                      setState(() {});
-                    },
-                    child: Icon(
-                      discoverContent == true
-                          ? Ionicons.compass_outline
-                          : Icons.menu_book_rounded,
-                      color: iconColor,
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  // Search Term
-                  Expanded(
-                    child: TextField(
-                      controller: discoverTermController,
-                      decoration: InputDecoration(
-                        hintText: "Search",
-                        hintStyle: TextStyle(
-                          color: textColor,
-                        ),
-                      ),
-                      style: TextStyle(
-                        color: textColor,
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
+                          ),
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: Marquee(
+                              text: curSong,
+                              blankSpace: 40.0,
+                              pauseAfterRound: Duration(milliseconds: 1500),
+                              velocity: 10.0,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),
+                            /*Text(
+                              curSong,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),*/
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  // Search Button
-                  GestureDetector(
-                    onTap: () {
-                      if (discoverContent == false) {
-                        searchedTerm =
-                            discoverTermController.text.toString().trim();
-                        searchOfflineDictionary(searchedTerm);
-                      } else {
-                        getDiscoverContent(
-                            discoverTermController.text.toString().trim(),
-                            "top",
-                            "all");
-                      }
-                    },
-                    child: Icon(
-                      Icons.search,
-                      color: iconColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            isSongPlaying == true
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: containerColor,
-                      border: Border.all(
-                        color: feedCardShadow.withOpacity(0.3),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.music_note_outlined,
+                        // Rewind
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                -MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              backInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_rewind_rounded,
                               color: iconColor,
                             ),
-                            const SizedBox(width: 8.0),
-                            SizedBox(
-                              width: 180.0,
-                              height: 20.0,
-                              child: Marquee(
-                                text: curSong,
-                                blankSpace: 40.0,
-                                pauseAfterRound: Duration(milliseconds: 1500),
-                                velocity: 10.0,
-                                style: TextStyle(
-                                  color: textColor,
-                                ),
-                              ),
-                              /*Text(
-                            curSong,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: textColor,
-                            ),
-                          ),*/
-                            ),
-                          ],
+                          ),
                         ),
-                        Row(
-                          children: [
-                            // Rewind
-                            GestureDetector(
-                              onLongPressDown: (longPressDownDetails) {
-                                assetsAudioPlayer.forwardOrRewind(
-                                    -MusicPlayerPage.forwardRewindSpeed);
-                              },
-                              onLongPressEnd: (longPressDownDetails) {
-                                assetsAudioPlayer.forwardOrRewind(0.0);
-                              },
-                              child: IconButton(
-                                onPressed: () {
-                                  backInPlaylist();
-                                },
-                                icon: Icon(
-                                  Icons.fast_rewind_rounded,
-                                  color: iconColor,
-                                ),
-                              ),
+                        // Pause Play
+                        IconButton(
+                          onPressed: () {
+                            pausePlaySong();
+                          },
+                          icon: Icon(
+                            isSongPlaying ? Icons.pause : Icons.play_arrow,
+                            color: iconColor,
+                          ),
+                        ),
+                        // Forward
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              nextInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_forward_rounded,
+                              color: iconColor,
                             ),
-                            // Pause Play
-                            IconButton(
-                              onPressed: () {
-                                pausePlaySong();
-                              },
-                              icon: Icon(
-                                isSongPlaying ? Icons.pause : Icons.play_arrow,
-                                color: iconColor,
-                              ),
-                            ),
-                            // Forward
-                            GestureDetector(
-                              onLongPressDown: (longPressDownDetails) {
-                                assetsAudioPlayer.forwardOrRewind(
-                                    MusicPlayerPage.forwardRewindSpeed);
-                              },
-                              onLongPressEnd: (longPressDownDetails) {
-                                assetsAudioPlayer.forwardOrRewind(0.0);
-                              },
-                              child: IconButton(
-                                onPressed: () {
-                                  nextInPlaylist();
-                                },
-                                icon: Icon(
-                                  Icons.fast_forward_rounded,
-                                  color: iconColor,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                  )
-                : Container(),
-          ],
-        ),
+                  ],
+                ),
+              )
+            : Container(),
       ),
       // Music Page
       PreferredSize(
@@ -2699,34 +2630,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.music_note_outlined,
-                          color: iconColor,
-                        ),
-                        const SizedBox(width: 8.0),
-                        SizedBox(
-                          width: 180.0,
-                          height: 20.0,
-                          child: Marquee(
-                            text: curSong,
-                            blankSpace: 40.0,
-                            pauseAfterRound: Duration(milliseconds: 1500),
-                            velocity: 10.0,
-                            style: TextStyle(
-                              color: textColor,
-                            ),
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
                           ),
-                          /*Text(
-                            curSong,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: textColor,
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: Marquee(
+                              text: curSong,
+                              blankSpace: 40.0,
+                              pauseAfterRound: Duration(milliseconds: 1500),
+                              velocity: 10.0,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
                             ),
-                          ),*/
-                        ),
-                      ],
+                            /*Text(
+                              curSong,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),*/
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
@@ -2801,34 +2737,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.music_note_outlined,
-                          color: iconColor,
-                        ),
-                        const SizedBox(width: 8.0),
-                        SizedBox(
-                          width: 180.0,
-                          height: 20.0,
-                          child: Marquee(
-                            text: curSong,
-                            blankSpace: 40.0,
-                            pauseAfterRound: Duration(milliseconds: 1500),
-                            velocity: 10.0,
-                            style: TextStyle(
-                              color: textColor,
-                            ),
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
                           ),
-                          /*Text(
-                            curSong,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: textColor,
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: Marquee(
+                              text: curSong,
+                              blankSpace: 40.0,
+                              pauseAfterRound: Duration(milliseconds: 1500),
+                              velocity: 10.0,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
                             ),
-                          ),*/
-                        ),
-                      ],
+                            /*Text(
+                              curSong,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),*/
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
@@ -2903,34 +2844,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.music_note_outlined,
-                          color: iconColor,
-                        ),
-                        const SizedBox(width: 8.0),
-                        SizedBox(
-                          width: 180.0,
-                          height: 20.0,
-                          child: Marquee(
-                            text: curSong,
-                            blankSpace: 40.0,
-                            pauseAfterRound: Duration(milliseconds: 1500),
-                            velocity: 10.0,
-                            style: TextStyle(
-                              color: textColor,
-                            ),
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
                           ),
-                          /*Text(
-                            curSong,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: textColor,
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: Marquee(
+                              text: curSong,
+                              blankSpace: 40.0,
+                              pauseAfterRound: Duration(milliseconds: 1500),
+                              velocity: 10.0,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
                             ),
-                          ),*/
-                        ),
-                      ],
+                            /*Text(
+                              curSong,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),*/
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
