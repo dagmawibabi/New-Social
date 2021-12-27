@@ -28,6 +28,8 @@ import 'package:user_profile_avatar/user_profile_avatar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as p;
 import 'package:cherry_toast/cherry_toast.dart';
+import 'package:wave/config.dart';
+import 'package:wave/wave.dart';
 import 'package:widget_circular_animator/widget_circular_animator.dart';
 
 class HomePage extends StatefulWidget {
@@ -701,6 +703,273 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } catch (e) {
       return Container();
     }
+  }
+
+  // Music Bottom Sheet
+  void musicListBottomSheet(context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          color: containerColor,
+          height: MediaQuery.of(context).size.height * 0.5,
+          width: double.infinity,
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: Column(
+            children: [
+              // Wave
+              Container(
+                height: 2.0,
+                child: WaveWidget(
+                  config: CustomConfig(
+                    gradients: lightModeWaveGradient,
+                    durations: [35000, 19440, 10800, 6000],
+                    heightPercentages: [0.20, 0.23, 0.25, 0.30],
+                    blur: const MaskFilter.blur(BlurStyle.solid, 10),
+                    gradientBegin: Alignment.bottomLeft,
+                    gradientEnd: Alignment.topRight,
+                  ),
+                  duration: 1000,
+                  waveAmplitude: 2,
+                  heightPercentange: 0.1,
+                  size: const Size(
+                    double.infinity,
+                    double.infinity,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+
+              // Controlls
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 20.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: feedCardShadow,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Pause/Play and Rewind/Forward
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Repeat Button
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.repeat,
+                            color: iconColor,
+                            size: 24.0,
+                          ),
+                        ),
+                        // Rewind
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                -MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              backInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_rewind_rounded,
+                              color: iconColor,
+                              size: 34.0,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10.0),
+                        // Pause Play
+                        IconButton(
+                          icon: Icon(
+                            isSongPlaying ? Icons.pause : Icons.play_arrow,
+                            color: iconColor,
+                            size: 38.0,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            pausePlaySong();
+                          },
+                        ),
+                        const SizedBox(width: 10.0),
+                        // Forward
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              nextInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_forward_rounded,
+                              color: iconColor,
+                              size: 34.0,
+                            ),
+                          ),
+                        ),
+                        // Shuffle Button
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.shuffle,
+                            color: iconColor,
+                            size: 24.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Slider and Music Positions
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Current Song Position and Duration
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            songPositionStreamBuilder(),
+                            Text(
+                              (curSongDuration.inSeconds ~/ 3600)
+                                      .toString()
+                                      .padLeft(2, '0') +
+                                  ":" +
+                                  ((curSongDuration.inSeconds ~/ 60).toInt())
+                                      .toString()
+                                      .padLeft(2, '0') +
+                                  ":" +
+                                  ((curSongDuration.inSeconds % 60).toInt())
+                                      .toString()
+                                      .padLeft(2, "0"),
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Slider
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                          child: sliderStreamBuilder(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12.0),
+
+              // Indie Songs
+              Expanded(
+                child: ListView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  itemCount: musicFiles.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        // Music note icon and Song Titles
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            curSongIndex = index;
+                            if ((curSong ==
+                                    p.withoutExtension(p.basename(
+                                        musicFiles[index].toString()))) ==
+                                true) {
+                              pausePlaySong();
+                            } else {
+                              playlistLoader(index);
+                            }
+                          },
+                          // Music note Icon and Song Title
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: curSong ==
+                                      p.withoutExtension(p.basename(
+                                          musicFiles[index].toString()))
+                                  ? Colors.black.withOpacity(0.2)
+                                  : Colors.transparent,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12.0)),
+                            ),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 3.0),
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Row(
+                              children: [
+                                // Music Note Icon
+                                Icon(
+                                  Icons.music_note_outlined,
+                                  size: 18.0,
+                                  color: curSong ==
+                                          p.withoutExtension(p.basename(
+                                              musicFiles[index].toString()))
+                                      ? curPlayingSongColor
+                                      : textColorDimmer,
+                                ),
+                                const SizedBox(width: 6.0),
+                                // Song Title
+                                Expanded(
+                                  child: Container(
+                                    height: 30.0,
+                                    child: Marquee(
+                                      text: p.basename(
+                                          musicFiles[index].toString()),
+                                      blankSpace: 80.0,
+                                      velocity: 30.0,
+                                      numberOfRounds: 3,
+                                      style: TextStyle(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: curSong ==
+                                                p.withoutExtension(p.basename(
+                                                    musicFiles[index]
+                                                        .toString()))
+                                            ? curPlayingSongColor
+                                            : textColorDimmer,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          color: textColorDimmer,
+                          indent: 5.0,
+                          endIndent: 5.0,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   //? Home Page
@@ -1567,13 +1836,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(20.0),
                                 ),
+                                color: feedCardsColor,
                                 boxShadow: [
                                   BoxShadow(
                                     color: feedCardShadow,
                                     blurRadius: 4.0,
                                   ),
                                 ],
-                                color: feedCardsColor,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2142,34 +2411,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.music_note_outlined,
-                          color: iconColor,
-                        ),
-                        const SizedBox(width: 8.0),
-                        SizedBox(
-                          width: 180.0,
-                          height: 20.0,
-                          child: Marquee(
-                            text: curSong,
-                            blankSpace: 40.0,
-                            pauseAfterRound: Duration(milliseconds: 1500),
-                            velocity: 10.0,
-                            style: TextStyle(
-                              color: textColor,
-                            ),
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
                           ),
-                          /*Text(
-                            curSong,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: textColor,
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: Marquee(
+                              text: curSong,
+                              blankSpace: 40.0,
+                              pauseAfterRound: Duration(milliseconds: 1500),
+                              velocity: 10.0,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
                             ),
-                          ),*/
-                        ),
-                      ],
+                            /*Text(
+                              curSong,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                              ),
+                            ),*/
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
