@@ -53,6 +53,7 @@ class MusicPlayerPage {
     textColor,
     textColorDimmer,
     isDarkMode,
+    marqueeMusicTitle,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -319,25 +320,56 @@ class MusicPlayerPage {
                                                       )
                                                     : Container(
                                                         height: 30.0,
-                                                        child: Marquee(
-                                                          text: p.basename(
-                                                              musicFiles[index]
-                                                                  .toString()),
-                                                          blankSpace: 80.0,
-                                                          velocity: 30.0,
-                                                          numberOfRounds: 3,
-                                                          style: TextStyle(
-                                                            fontSize: 18.0,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: curSong ==
-                                                                    p.withoutExtension(
-                                                                        p.basename(
-                                                                            musicFiles[index].toString()))
-                                                                ? curPlayingSongColor
-                                                                : textColor,
-                                                          ),
-                                                        ),
+                                                        padding: EdgeInsets.only(
+                                                            top:
+                                                                marqueeMusicTitle ==
+                                                                        true
+                                                                    ? 0.0
+                                                                    : 3.0),
+                                                        child:
+                                                            marqueeMusicTitle ==
+                                                                    true
+                                                                ? Marquee(
+                                                                    text: p.basename(
+                                                                        musicFiles[index]
+                                                                            .toString()),
+                                                                    blankSpace:
+                                                                        80.0,
+                                                                    velocity:
+                                                                        30.0,
+                                                                    numberOfRounds:
+                                                                        3,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          18.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: curSong ==
+                                                                              p.withoutExtension(p.basename(musicFiles[index].toString()))
+                                                                          ? curPlayingSongColor
+                                                                          : textColor,
+                                                                    ),
+                                                                  )
+                                                                : Text(
+                                                                    p.basename(musicFiles[
+                                                                            index]
+                                                                        .toString()),
+                                                                    maxLines: 1,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          18.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: curSong ==
+                                                                              p.withoutExtension(p.basename(musicFiles[index].toString()))
+                                                                          ? curPlayingSongColor
+                                                                          : textColor,
+                                                                    ),
+                                                                  ),
                                                       ),
                                               ),
                                               const SizedBox(width: 10.0),
@@ -653,16 +685,30 @@ class MusicPlayerPage {
                                               ),
                                             ),
                                           )
-                                        : Marquee(
-                                            text: curSong,
-                                            blankSpace: 50.0,
-                                            numberOfRounds: 3,
-                                            style: TextStyle(
-                                              fontSize: 20.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: textColor,
-                                            ),
-                                          ),
+                                        : marqueeMusicTitle == true
+                                            ? Marquee(
+                                                text: curSong,
+                                                blankSpace: 50.0,
+                                                numberOfRounds: 3,
+                                                style: TextStyle(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: textColor,
+                                                ),
+                                              )
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 5.0),
+                                                child: Text(
+                                                  curSong,
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ),
                                   ),
                                   const SizedBox(height: 20.0),
                                   // Song Position and Duration

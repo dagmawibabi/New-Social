@@ -23,6 +23,7 @@ import 'package:newsocial/pages/musicplayerpage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:user_profile_avatar/user_profile_avatar.dart';
 import 'package:video_player/video_player.dart';
@@ -706,6 +707,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  bool marqueeMusicTitle = true;
   // Music Bottom Sheet
   void musicListBottomSheet(context) {
     showModalBottomSheet(
@@ -982,23 +984,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   Expanded(
                                     child: Container(
                                       height: 30.0,
-                                      child: Marquee(
-                                        text: p.basename(
-                                            musicFiles[index].toString()),
-                                        blankSpace: 80.0,
-                                        velocity: 30.0,
-                                        numberOfRounds: 3,
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: curSong ==
-                                                  p.withoutExtension(p.basename(
-                                                      musicFiles[index]
-                                                          .toString()))
-                                              ? curPlayingSongColor
-                                              : textColorDimmer,
-                                        ),
-                                      ),
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: marqueeMusicTitle == false
+                                          ? Text(
+                                              p.basename(
+                                                  musicFiles[index].toString()),
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: curSong ==
+                                                        p.withoutExtension(p
+                                                            .basename(musicFiles[
+                                                                    index]
+                                                                .toString()))
+                                                    ? curPlayingSongColor
+                                                    : textColorDimmer,
+                                              ),
+                                            )
+                                          : Marquee(
+                                              text: p.basename(
+                                                  musicFiles[index].toString()),
+                                              blankSpace: 80.0,
+                                              velocity: 5.0,
+                                              numberOfRounds: 3,
+                                              style: TextStyle(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: curSong ==
+                                                        p.withoutExtension(p
+                                                            .basename(musicFiles[
+                                                                    index]
+                                                                .toString()))
+                                                    ? curPlayingSongColor
+                                                    : textColorDimmer,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ],
@@ -1086,6 +1107,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String chosenSubreddit = "";
   String chosenSubredditTime = "";
   String chosenSubredditSort = "";
+
+  //Create an instance of ScreenshotController
+  ScreenshotController screenshotController = ScreenshotController();
+
   // Custom Feed
   void feedChoice() {
     showDialog(
@@ -2341,6 +2366,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         textColor,
         textColorDimmer,
         isDarkMode,
+        marqueeMusicTitle,
       ),
 
       // Crypto Page
@@ -2457,6 +2483,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ],
               ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Scroll Music Title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        marqueeMusicTitle == false
+                            ? Icons.music_note_outlined
+                            : Icons.music_off_outlined,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Text(
+                        "Marquee Music Title",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: Colors.cyan,
+                    value: marqueeMusicTitle,
+                    onChanged: (value) {
+                      marqueeMusicTitle = value;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
             ],
           ),
         ),
@@ -2501,22 +2562,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           SizedBox(
                             width: 180.0,
                             height: 20.0,
-                            child: Marquee(
-                              text: curSong,
-                              blankSpace: 40.0,
-                              pauseAfterRound: Duration(milliseconds: 1500),
-                              velocity: 10.0,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),
-                            /*Text(
-                              curSong,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),*/
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -2680,22 +2743,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               SizedBox(
                                 width: 180.0,
                                 height: 20.0,
-                                child: Marquee(
-                                  text: curSong,
-                                  blankSpace: 40.0,
-                                  pauseAfterRound: Duration(milliseconds: 1500),
-                                  velocity: 10.0,
-                                  style: TextStyle(
-                                    color: textColor,
-                                  ),
-                                ),
-                                /*Text(
-                              curSong,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),*/
+                                child: marqueeMusicTitle == true
+                                    ? Marquee(
+                                        text: curSong,
+                                        blankSpace: 40.0,
+                                        pauseAfterRound:
+                                            Duration(milliseconds: 1500),
+                                        velocity: 10.0,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      )
+                                    : Text(
+                                        curSong,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      ),
                               ),
                             ],
                           ),
@@ -2794,22 +2859,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           SizedBox(
                             width: 180.0,
                             height: 20.0,
-                            child: Marquee(
-                              text: curSong,
-                              blankSpace: 40.0,
-                              pauseAfterRound: Duration(milliseconds: 1500),
-                              velocity: 10.0,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),
-                            /*Text(
-                              curSong,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),*/
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -2901,22 +2968,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           SizedBox(
                             width: 180.0,
                             height: 20.0,
-                            child: Marquee(
-                              text: curSong,
-                              blankSpace: 40.0,
-                              pauseAfterRound: Duration(milliseconds: 1500),
-                              velocity: 10.0,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),
-                            /*Text(
-                              curSong,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),*/
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -3008,22 +3077,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           SizedBox(
                             width: 180.0,
                             height: 20.0,
-                            child: Marquee(
-                              text: curSong,
-                              blankSpace: 40.0,
-                              pauseAfterRound: Duration(milliseconds: 1500),
-                              velocity: 10.0,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),
-                            /*Text(
-                              curSong,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: textColor,
-                              ),
-                            ),*/
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
