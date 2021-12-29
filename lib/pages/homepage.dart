@@ -14,6 +14,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
@@ -736,7 +737,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             borderRadius: BorderRadius.all(
               Radius.circular(20.0),
             ),
-            color: feedCardsColor,
+            color: modalBottomSheetColor,
           ),
           clipBehavior: Clip.hardEdge,
           height: MediaQuery.of(context).size.height * 0.9,
@@ -770,7 +771,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(
                     vertical: 20.0, horizontal: 30.0),
                 decoration: BoxDecoration(
-                  color: feedCardsColor,
+                  color: modalBottomSheetColor,
                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 ),
                 child: Column(
@@ -936,7 +937,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.all(
                       Radius.circular(10.0),
                     ),
-                    color: feedCardsColor,
+                    color: modalBottomSheetColor,
                     /*boxShadow: [
                       BoxShadow(
                         color: Colors.grey[400]!,
@@ -1772,17 +1773,224 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AnimateIconController aIC_settings = AnimateIconController();
   late dynamic abc;
   bool isDarkMode = false;
-  Color scaffoldBGColor = Colors.grey[200]!;
-  Color appBarBGColor = Colors.grey[200]!;
-  Color textColor = Colors.black;
-  Color textColorDim = Colors.grey[900]!;
-  Color textColorDimmer = Colors.grey[900]!;
-  Color iconColor = Colors.black;
-  Color containerColor = Colors.grey[200]!;
-  Color feedCardsColor = Colors.grey[200]!;
-  Color feedCardShadow = Colors.grey[400]!;
-  Color bottomNavBarColor = Colors.grey[200]!;
+  static Color scaffoldBGColor = Colors.grey[200]!;
+  static Color appBarBGColor = Colors.grey[200]!;
+  static Color textColor = Colors.black;
+  static Color textColorDim = Colors.grey[900]!;
+  static Color textColorDimmer = Colors.grey[900]!;
+  static Color iconColor = Colors.black;
+  static Color containerColor = Colors.grey[200]!;
+  static Color feedCardsColor = Colors.grey[200]!;
+  static Color feedCardShadow = Colors.grey[400]!;
+  static Color bottomNavBarColor = Colors.grey[200]!;
+  static Color modalBottomSheetColor = Colors.grey[200]!;
   bool hideBottomNav = false;
+
+  //? Settings
+  int themeEditorOptionIndex = 0;
+  List themeEditorOptions = [
+    {
+      "icon": Icons.dashboard_outlined,
+      "title": "Icons",
+      "color": iconColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "App Bar",
+      "color": appBarBGColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Scaffold",
+      "color": scaffoldBGColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Containers",
+      "color": containerColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Feed Cards",
+      "color": feedCardsColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Primary Text",
+      "color": textColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Secondary Text",
+      "color": textColorDim
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Tirtiary Text",
+      "color": textColorDimmer,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Modal Bottom Sheet",
+      "color": modalBottomSheetColor,
+    },
+    {
+      "icon": Icons.keyboard_arrow_up,
+      "title": "Bottom Navigation Bar",
+      "color": bottomNavBarColor,
+    },
+  ];
+  void themeEditor() {
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+          color: modalBottomSheetColor,
+          //height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          child: Column(
+            children: [
+              Text(
+                "Theme Editor",
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 40.0),
+              Expanded(
+                child: ListView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  itemCount: themeEditorOptions.length,
+                  itemBuilder: (context, index) {
+                    // Individual Options
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            themeEditorOptionIndex = index;
+                            Navigator.of(context).pop();
+                            themeEditorColorPicker();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Icon and Option Title
+                              Row(
+                                children: [
+                                  // Option Icon
+                                  Icon(
+                                    themeEditorOptions[index]["icon"],
+                                    color: iconColor,
+                                  ),
+                                  // Option Title
+                                  Text(
+                                    themeEditorOptions[index]["title"],
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Current Color
+                              Container(
+                                width: 25.0,
+                                height: 25.0,
+                                margin: const EdgeInsets.only(right: 5.0),
+                                decoration: BoxDecoration(
+                                  color: themeEditorOptions[index]["color"],
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: feedCardShadow,
+                                      blurRadius: 4.0,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(color: textColorDimmer.withOpacity(0.2)),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void themeEditorColorPicker() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: containerColor,
+          title: const Text('Pick a color!'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: containerColor,
+              onColorChanged: (color) {
+                themeEditorOptions[themeEditorOptionIndex]["color"] = color;
+                switch (themeEditorOptionIndex) {
+                  case 0:
+                    iconColor = color;
+                    break;
+                  case 1:
+                    appBarBGColor = color;
+                    break;
+                  case 2:
+                    scaffoldBGColor = color;
+                    break;
+                  case 3:
+                    containerColor = color;
+                    break;
+                  case 4:
+                    feedCardsColor = color;
+                    break;
+                  case 5:
+                    textColor = color;
+                    break;
+                  case 6:
+                    textColorDim = color;
+                    break;
+                  case 7:
+                    textColorDimmer = color;
+                    break;
+                  case 8:
+                    modalBottomSheetColor = color;
+                    break;
+                  case 9:
+                    bottomNavBarColor = color;
+                    break;
+                }
+                setState(() {});
+              },
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('Done'),
+              onPressed: () {
+                setState(() {});
+                Navigator.of(context).pop();
+                themeEditor();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   //? GENERAL
   bool enableFlexibleSpace = true;
@@ -1801,6 +2009,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardsColor = Colors.grey[900]!;
       feedCardShadow = Colors.grey[800]!;
       bottomNavBarColor = Colors.grey[900]!;
+      modalBottomSheetColor = Colors.grey[900]!;
+      themeEditorOptions = [
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Icons",
+          "color": iconColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "App Bar",
+          "color": appBarBGColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Scaffold",
+          "color": scaffoldBGColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Containers",
+          "color": containerColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Feed Cards",
+          "color": feedCardsColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Primary Text",
+          "color": textColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Secondary Text",
+          "color": textColorDim
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Tirtiary Text",
+          "color": textColorDimmer,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Modal Bottom Sheet",
+          "color": modalBottomSheetColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Bottom Navigation Bar",
+          "color": bottomNavBarColor,
+        },
+      ];
+
       content_illustrations = [
         "assets/images/content_illustrations/11.png",
         "assets/images/content_illustrations/22.png",
@@ -1863,6 +2125,61 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardsColor = Colors.grey[200]!;
       feedCardShadow = Colors.grey[400]!;
       bottomNavBarColor = Colors.grey[200]!;
+      modalBottomSheetColor = Colors.grey[200]!;
+
+      themeEditorOptions = [
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Icons",
+          "color": iconColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "App Bar",
+          "color": appBarBGColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Scaffold",
+          "color": scaffoldBGColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Containers",
+          "color": containerColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Feed Cards",
+          "color": feedCardsColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Primary Text",
+          "color": textColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Secondary Text",
+          "color": textColorDim
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Tirtiary Text",
+          "color": textColorDimmer,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Modal Bottom Sheet",
+          "color": modalBottomSheetColor,
+        },
+        {
+          "icon": Icons.keyboard_arrow_up,
+          "title": "Bottom Navigation Bar",
+          "color": bottomNavBarColor,
+        },
+      ];
+
       content_illustrations = [
         "assets/images/content_illustrations/1.png",
         "assets/images/content_illustrations/2.png",
@@ -2713,6 +3030,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     )
                   : Container(),
+              // Theme
+              Padding(
+                padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Theme",
+                      style: TextStyle(
+                        color: textColorDimmer.withOpacity(0.3),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // DarkMode
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2762,6 +3095,75 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Theme Editor
+              GestureDetector(
+                onTap: () {
+                  themeEditor();
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.format_paint_outlined,
+                          color: iconColor,
+                        ),
+                        const SizedBox(width: 10.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Theme Editor",
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2.0),
+                            SizedBox(
+                              width: 250.0,
+                              child: Text(
+                                "Customize the theme of the app",
+                                style: TextStyle(
+                                  color: textColorDimmer,
+                                  fontSize: 12.0,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15.0),
+                      child: Icon(
+                        Icons.brush,
+                        color: iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Microinteractions
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Microinterations",
+                      style: TextStyle(
+                        color: textColorDimmer.withOpacity(0.3),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // Enable App Bar Images
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
