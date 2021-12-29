@@ -98,6 +98,7 @@ flutter:
     - assets/images/empty_illustrations/
     - assets/images/content_illustrations/
     - assets/images/search_illustrations/
+    - assets/images/chat_illustrations/
     - assets/datasets/dictionary_alpha_arrays.json
   #   - images/a_dot_ham.jpeg
 

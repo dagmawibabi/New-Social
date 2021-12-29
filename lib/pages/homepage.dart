@@ -81,6 +81,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     "assets/images/search_illustrations/5.png",
     "assets/images/search_illustrations/6.png",
   ];
+  List chat_illustrations = [
+    "assets/images/chat_illustrations/01.png",
+    "assets/images/chat_illustrations/2.png",
+    "assets/images/chat_illustrations/6.png",
+    "assets/images/chat_illustrations/7.png",
+    "assets/images/chat_illustrations/8.png",
+    "assets/images/chat_illustrations/9.png",
+    "assets/images/chat_illustrations/10.png",
+    "assets/images/chat_illustrations/11.png",
+    "assets/images/chat_illustrations/12.png",
+    "assets/images/chat_illustrations/13.png",
+    "assets/images/chat_illustrations/14.png",
+    "assets/images/chat_illustrations/15.png",
+    "assets/images/chat_illustrations/16.png",
+    "assets/images/chat_illustrations/17.png",
+    "assets/images/chat_illustrations/18.png",
+  ];
 
   // Function to hide the bottom nav bar on scroll
   void hideBottomNavBar() {
@@ -540,7 +557,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Function to get songs from device
   void getSongsOnDevice() async {
-    askPermissions();
+    await askPermissions();
     musicFiles = [];
     dynamic files =
         Directory('/storage/emulated/0/Music').listSync(recursive: false);
@@ -1621,6 +1638,131 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  //? Chat Page
+  int chatAppBarImageIndex = 0;
+  List users = [
+    {
+      "username": "Bill Gates",
+      "dp":
+          "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
+      "online": false,
+    },
+    {
+      "username": "Elon Musk",
+      "dp":
+          "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
+      "online": true,
+    },
+    {
+      "username": "Jesus Christ",
+      "dp":
+          "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
+      "online": true,
+    },
+    {
+      "username": "Babi Dagmawi",
+      "dp":
+          "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
+      "online": false,
+    },
+    {
+      "username": "Dagmawi Babi",
+      "dp":
+          "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
+      "online": true,
+    },
+    {
+      "username": "Bill Gates",
+      "dp":
+          "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
+      "online": false,
+    },
+    {
+      "username": "Elon Musk",
+      "dp":
+          "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
+      "online": true,
+    },
+    {
+      "username": "Jesus Christ",
+      "dp":
+          "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
+      "online": true,
+    },
+    {
+      "username": "Babi Dagmawi",
+      "dp":
+          "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
+      "online": false,
+    },
+    {
+      "username": "Dagmawi Babi",
+      "dp":
+          "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
+      "online": true,
+    },
+    {
+      "username": "Bill Gates",
+      "dp":
+          "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
+      "online": false,
+    },
+    {
+      "username": "Elon Musk",
+      "dp":
+          "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
+      "online": true,
+    },
+    {
+      "username": "Jesus Christ",
+      "dp":
+          "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
+      "online": true,
+    },
+    {
+      "username": "Babi Dagmawi",
+      "dp":
+          "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
+      "online": false,
+    },
+    {
+      "username": "Dagmawi Babi",
+      "dp":
+          "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
+      "online": true,
+    },
+    {
+      "username": "Bill Gates",
+      "dp":
+          "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
+      "online": false,
+    },
+    {
+      "username": "Elon Musk",
+      "dp":
+          "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
+      "online": true,
+    },
+    {
+      "username": "Jesus Christ",
+      "dp":
+          "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
+      "online": true,
+    },
+    {
+      "username": "Babi Dagmawi",
+      "dp":
+          "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
+      "online": false,
+    },
+    {
+      "username": "Dagmawi Babi",
+      "dp":
+          "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
+      "online": true,
+    },
+  ];
+
   //! New
   AnimateIconController aIC_feed = AnimateIconController();
   AnimateIconController aIC_discover = AnimateIconController();
@@ -1643,6 +1785,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool hideBottomNav = false;
 
   //? GENERAL
+  bool enableFlexibleSpace = true;
+
   // Dark Mode
   void setDarkMode() {
     // Dark Mode Colors
@@ -1689,6 +1833,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "assets/images/search_illustrations/55.png",
         "assets/images/search_illustrations/66.png",
       ];
+      chat_illustrations = [
+        "assets/images/chat_illustrations/0101.png",
+        "assets/images/chat_illustrations/22.png",
+        "assets/images/chat_illustrations/66.png",
+        "assets/images/chat_illustrations/77.png",
+        "assets/images/chat_illustrations/88.png",
+        "assets/images/chat_illustrations/99.png",
+        "assets/images/chat_illustrations/1010.png",
+        "assets/images/chat_illustrations/1111.png",
+        "assets/images/chat_illustrations/1212.png",
+        "assets/images/chat_illustrations/1313.png",
+        "assets/images/chat_illustrations/1414.png",
+        "assets/images/chat_illustrations/1515.png",
+        "assets/images/chat_illustrations/1616.png",
+        "assets/images/chat_illustrations/1717.png",
+        "assets/images/chat_illustrations/1818.png",
+      ];
     }
     // Light Mode Colors
     else {
@@ -1734,6 +1895,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "assets/images/search_illustrations/5.png",
         "assets/images/search_illustrations/6.png",
       ];
+      chat_illustrations = [
+        "assets/images/chat_illustrations/01.png",
+        "assets/images/chat_illustrations/2.png",
+        "assets/images/chat_illustrations/6.png",
+        "assets/images/chat_illustrations/7.png",
+        "assets/images/chat_illustrations/8.png",
+        "assets/images/chat_illustrations/9.png",
+        "assets/images/chat_illustrations/10.png",
+        "assets/images/chat_illustrations/11.png",
+        "assets/images/chat_illustrations/12.png",
+        "assets/images/chat_illustrations/13.png",
+        "assets/images/chat_illustrations/14.png",
+        "assets/images/chat_illustrations/15.png",
+        "assets/images/chat_illustrations/16.png",
+        "assets/images/chat_illustrations/17.png",
+        "assets/images/chat_illustrations/18.png",
+      ];
     }
   }
 
@@ -1767,9 +1945,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
     // Light Mode Status Bar
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, //Colors.grey[200],
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness:
+            isDarkMode == true ? Brightness.dark : Brightness.light,
       ),
     );
     setState(() {});
@@ -1796,7 +1975,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   // Ask PERMISSIONS
-  void askPermissions() async {
+  Future<void> askPermissions() async {
     // Ask Storage Permissions
     PermissionStatus storagePermissionStatus = await Permission.storage.status;
     if (storagePermissionStatus.isGranted == false) {
@@ -1823,6 +2002,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Crypto INIT
     getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
+    chatAppBarImageIndex = random.nextInt(chat_illustrations.length - 1);
     abc = this;
   }
 
@@ -1852,7 +2032,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       60.0,
       20.0,
       isCryptoPageLoadingError == true ? 200.0 : 300.0,
-      20.0,
+      280.0,
       20.0,
     ];
     List pagesAppbarFlexibleSpace = [
@@ -1875,7 +2055,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       // Chat Page
-      FlexibleSpaceBar(),
+      FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: 80.0),
+          child: Image.asset(
+            chat_illustrations[chatAppBarImageIndex],
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
       // Settings Page
       FlexibleSpaceBar(),
     ];
@@ -2383,8 +2571,119 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
 
       // Chat Page
-      SliverToBoxAdapter(
-        child: Container(),
+      SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  chatAppBarImageIndex =
+                      random.nextInt(chat_illustrations.length - 1);
+                  setState(() {});
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 15.0, vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          // DP and Status
+                          Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              Container(
+                                width: 35.0,
+                                height: 35.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey[900],
+                                  //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Image.network(
+                                    users[index]["dp"],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 6.0,
+                                height: 6.0,
+                                margin: const EdgeInsets.only(right: 2.5),
+                                decoration: BoxDecoration(
+                                  //shape: BoxShape.circle,
+                                  color: users[index]["online"] == true
+                                      ? Colors.lightGreenAccent
+                                      : Colors.transparent,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12.0),
+                          // Username and text preview
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                users[index]["username"],
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 17.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "abcd eftg sbkdak adad ...",
+                                style: TextStyle(
+                                  color: textColorDimmer.withOpacity(0.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // OnlineOffline
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          // Seen Icon
+                          Icon(
+                            Ionicons.checkmark,
+                            color: iconColor.withOpacity(0.9),
+                            size: 19.0,
+                          ),
+                          const SizedBox(height: 5.0),
+                          // Date
+                          Text(
+                            "Dec 27",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.5),
+                              fontSize: 10.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Divider(
+                  color: textColorDimmer.withOpacity(0.3),
+                ),
+              ),
+              index == users.length - 1
+                  ? const SizedBox(height: 200.0)
+                  : Container(),
+            ],
+          );
+        }, childCount: users.length),
       ),
 
       // Settings Page
@@ -2417,6 +2716,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               // DarkMode
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -2427,13 +2727,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         color: iconColor,
                       ),
                       const SizedBox(width: 10.0),
-                      Text(
-                        "Dark Mode",
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Dark Mode",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Changes to a darker theme",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -2449,35 +2762,47 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Hide Bottom Nav Bar
+              // Enable App Bar Images
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Icon(
-                        hideBottomNav == true
-                            ? Icons.highlight_off_rounded
-                            : Icons.navigation_outlined,
+                        enableFlexibleSpace == false
+                            ? Icons.image_not_supported_outlined
+                            : Icons.image_outlined,
                         color: iconColor,
                       ),
                       const SizedBox(width: 10.0),
-                      Text(
-                        "Hide Nav-Bar on Scroll",
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "App Bar Images",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Removes illustrations from the app bar",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                   Switch(
                     activeColor: Colors.cyan,
-                    value: hideBottomNav,
+                    value: enableFlexibleSpace,
                     onChanged: (value) {
-                      hideBottomNav = value;
-                      hideBottomNavBar();
+                      enableFlexibleSpace = value;
                       setState(() {});
                     },
                   ),
@@ -2497,13 +2822,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         color: iconColor,
                       ),
                       const SizedBox(width: 10.0),
-                      Text(
-                        "Marquee Music Title",
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Marquee Music Title",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Enables/Disables music titles from scrolling",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -2512,6 +2850,58 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     value: marqueeMusicTitle,
                     onChanged: (value) {
                       marqueeMusicTitle = value;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Hide Bottom Nav Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        hideBottomNav == true
+                            ? Icons.highlight_off_rounded
+                            : Icons.navigation_outlined,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hide Nav-Bar On Scroll",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          SizedBox(
+                            width: 250.0,
+                            child: Text(
+                              "Hides the bottom navigation bar when scrolling",
+                              style: TextStyle(
+                                color: textColorDimmer,
+                                fontSize: 12.0,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: Colors.cyan,
+                    value: hideBottomNav,
+                    onChanged: (value) {
+                      hideBottomNav = value;
+                      hideBottomNavBar();
                       setState(() {});
                     },
                   ),
@@ -3202,7 +3592,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ? SliverAppBar(
                         backgroundColor: appBarBGColor,
                         foregroundColor: Colors.black,
-                        expandedHeight: pagesAppBarExpanded[curPage],
+                        expandedHeight: enableFlexibleSpace == true
+                            ? pagesAppBarExpanded[curPage]
+                            : 0.0,
                         pinned: true,
                         title: Row(
                           children: [
@@ -3221,7 +3613,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                           ],
                         ),
-                        flexibleSpace: pagesAppbarFlexibleSpace[curPage],
+                        flexibleSpace: enableFlexibleSpace == true
+                            ? pagesAppbarFlexibleSpace[curPage]
+                            : FlexibleSpaceBar(),
                         bottom: pagesAppBarBottom[curPage],
                         actions: [
                           curPage == 0
