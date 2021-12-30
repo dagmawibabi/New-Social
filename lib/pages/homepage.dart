@@ -64,7 +64,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   ];
   List error_illustrations = [
     "assets/images/error_illustrations/3.png",
-    "assets/images/empty_illustrations/2.png",
     "assets/images/empty_illustrations/3.png",
   ];
   List content_illustrations = [
@@ -85,12 +84,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List chat_illustrations = [
     "assets/images/chat_illustrations/01.png",
     "assets/images/chat_illustrations/2.png",
-    "assets/images/chat_illustrations/6.png",
     "assets/images/chat_illustrations/7.png",
     "assets/images/chat_illustrations/8.png",
     "assets/images/chat_illustrations/9.png",
     "assets/images/chat_illustrations/10.png",
-    "assets/images/chat_illustrations/11.png",
     "assets/images/chat_illustrations/12.png",
     "assets/images/chat_illustrations/13.png",
     "assets/images/chat_illustrations/14.png",
@@ -191,7 +188,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List cryptoStats = [];
   List cryptoAppBarImages = [
     "assets/images/appbar_headers/1.png",
-    "assets/images/appbar_headers/2.png",
     "assets/images/appbar_headers/3.png",
   ];
 
@@ -1647,122 +1643,484 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       "dp":
           "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Elon Musk",
       "dp":
           "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Jesus Christ",
       "dp":
           "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Babi Dagmawi",
       "dp":
           "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Dagmawi Babi",
       "dp":
           "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Bill Gates",
       "dp":
           "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Elon Musk",
       "dp":
           "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Jesus Christ",
       "dp":
           "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Babi Dagmawi",
       "dp":
           "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Dagmawi Babi",
       "dp":
           "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Bill Gates",
       "dp":
           "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Elon Musk",
       "dp":
           "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Jesus Christ",
       "dp":
           "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
       "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Babi Dagmawi",
       "dp":
           "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
       "online": false,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
     {
       "username": "Dagmawi Babi",
       "dp":
           "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
       "online": true,
-    },
-    {
-      "username": "Bill Gates",
-      "dp":
-          "https://i.pinimg.com/564x/6e/b9/34/6eb9348adb10b42ce591b83b3c803f27.jpg",
-      "online": false,
-    },
-    {
-      "username": "Elon Musk",
-      "dp":
-          "https://i.pinimg.com/564x/73/6c/81/736c81cb4c0a4a3f21130ed70d0b0182.jpg",
-      "online": true,
-    },
-    {
-      "username": "Jesus Christ",
-      "dp":
-          "https://i.pinimg.com/564x/b4/ad/d4/b4add4267d4578208b4faee8d399c664.jpg",
-      "online": true,
-    },
-    {
-      "username": "Babi Dagmawi",
-      "dp":
-          "https://i.pinimg.com/564x/26/c8/81/26c881f5ff55a8baf6eaa74e3166d382.jpg",
-      "online": false,
-    },
-    {
-      "username": "Dagmawi Babi",
-      "dp":
-          "https://i.pinimg.com/564x/f1/6a/81/f16a8191c6e42ea15a014cbf6e411130.jpg",
-      "online": true,
+      "chat": [
+        {
+          "content": "This app Rocks",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": false,
+        },
+        {
+          "content": "So much man!",
+          "date": "Dec 27",
+          "time": "14:18",
+          "fromMe": true,
+        },
+        {
+          "content": "I'm happy bruh",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": false,
+        },
+        {
+          "content": "I'm happy for you too!",
+          "date": "Dec 27",
+          "time": "14:19",
+          "fromMe": true,
+        },
+      ],
     },
   ];
+  List userText = [];
+  int userIndex = 0;
 
   //! New
   AnimateIconController aIC_feed = AnimateIconController();
@@ -1790,52 +2148,52 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int themeEditorOptionIndex = 0;
   List themeEditorOptions = [
     {
-      "icon": Icons.dashboard_outlined,
+      "icon": Icons.bubble_chart,
       "title": "Icons",
       "color": iconColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.border_top,
       "title": "App Bar",
       "color": appBarBGColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.border_all,
       "title": "Scaffold",
       "color": scaffoldBGColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.center_focus_weak,
       "title": "Containers",
       "color": containerColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.api,
       "title": "Feed Cards",
       "color": feedCardsColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.create,
       "title": "Primary Text",
       "color": textColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.create_outlined,
       "title": "Secondary Text",
       "color": textColorDim
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.brush_outlined,
       "title": "Tirtiary Text",
       "color": textColorDimmer,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.call_to_action,
       "title": "Modal Bottom Sheet",
       "color": modalBottomSheetColor,
     },
     {
-      "icon": Icons.keyboard_arrow_up,
+      "icon": Icons.call_to_action_outlined,
       "title": "Bottom Navigation Bar",
       "color": bottomNavBarColor,
     },
@@ -1873,7 +2231,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           onTap: () {
                             themeEditorOptionIndex = index;
                             Navigator.of(context).pop();
-                            themeEditorColorPicker();
+                            themeEditorColorPicker(true);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1885,12 +2243,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   Icon(
                                     themeEditorOptions[index]["icon"],
                                     color: iconColor,
+                                    size: 20.0,
                                   ),
+                                  const SizedBox(width: 10.0),
                                   // Option Title
                                   Text(
                                     themeEditorOptions[index]["title"],
                                     style: TextStyle(
                                       color: textColor,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
@@ -1929,13 +2290,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  void themeEditorColorPicker() {
+  void themeEditorColorPicker(bool fromThemeEditor) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: containerColor,
-          title: const Text('Pick a color!'),
+          title: Text(
+            "Pick a color and it's opacity!",
+            style: TextStyle(
+              color: textColor,
+            ),
+          ),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: containerColor,
@@ -1983,8 +2349,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onPressed: () {
                 setState(() {});
                 Navigator.of(context).pop();
-                themeEditor();
+                fromThemeEditor == true ? themeEditor() : () {};
               },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Color(0xff6C63FF),
+                ),
+              ),
             ),
           ],
         );
@@ -1994,6 +2365,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   //? GENERAL
   bool enableFlexibleSpace = true;
+
+  // Sample Future Function Placeholder
+  Future<void> sampleFuture() async {
+    await Future.delayed(Duration(seconds: 3));
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
+  }
 
   // Dark Mode
   void setDarkMode() {
@@ -2012,105 +2390,55 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       modalBottomSheetColor = Colors.grey[900]!;
       themeEditorOptions = [
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.bubble_chart,
           "title": "Icons",
           "color": iconColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.border_top,
           "title": "App Bar",
           "color": appBarBGColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.border_all,
           "title": "Scaffold",
           "color": scaffoldBGColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.center_focus_weak,
           "title": "Containers",
           "color": containerColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.api,
           "title": "Feed Cards",
           "color": feedCardsColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.create,
           "title": "Primary Text",
           "color": textColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.create_outlined,
           "title": "Secondary Text",
           "color": textColorDim
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.brush_outlined,
           "title": "Tirtiary Text",
           "color": textColorDimmer,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.call_to_action,
           "title": "Modal Bottom Sheet",
           "color": modalBottomSheetColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.call_to_action_outlined,
           "title": "Bottom Navigation Bar",
           "color": bottomNavBarColor,
         },
-      ];
-
-      content_illustrations = [
-        "assets/images/content_illustrations/11.png",
-        "assets/images/content_illustrations/22.png",
-        "assets/images/content_illustrations/33.png",
-        "assets/images/content_illustrations/44.png",
-        "assets/images/content_illustrations/55.png",
-      ];
-      cryptoAppBarImages = [
-        "assets/images/appbar_headers/11.png",
-        "assets/images/appbar_headers/22.png",
-        "assets/images/appbar_headers/33.png",
-      ];
-      empty_illustrations = [
-        "assets/images/empty_illustrations/11.png",
-        "assets/images/empty_illustrations/22.png",
-        "assets/images/empty_illustrations/33.png",
-        "assets/images/empty_illustrations/44.png",
-        "assets/images/empty_illustrations/55.png",
-      ];
-      error_illustrations = [
-        "assets/images/error_illustrations/33.png",
-        "assets/images/empty_illustrations/22.png",
-        "assets/images/empty_illustrations/33.png",
-      ];
-      search_illustrations = [
-        "assets/images/search_illustrations/11.png",
-        "assets/images/search_illustrations/22.png",
-        "assets/images/search_illustrations/33.png",
-        "assets/images/search_illustrations/44.png",
-        "assets/images/search_illustrations/55.png",
-        "assets/images/search_illustrations/66.png",
-      ];
-      chat_illustrations = [
-        "assets/images/chat_illustrations/0101.png",
-        "assets/images/chat_illustrations/22.png",
-        "assets/images/chat_illustrations/66.png",
-        "assets/images/chat_illustrations/77.png",
-        "assets/images/chat_illustrations/88.png",
-        "assets/images/chat_illustrations/99.png",
-        "assets/images/chat_illustrations/1010.png",
-        "assets/images/chat_illustrations/1111.png",
-        "assets/images/chat_illustrations/1212.png",
-        "assets/images/chat_illustrations/1313.png",
-        "assets/images/chat_illustrations/1414.png",
-        "assets/images/chat_illustrations/1515.png",
-        "assets/images/chat_illustrations/1616.png",
-        "assets/images/chat_illustrations/1717.png",
-        "assets/images/chat_illustrations/1818.png",
       ];
     }
     // Light Mode Colors
@@ -2126,108 +2454,57 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardShadow = Colors.grey[400]!;
       bottomNavBarColor = Colors.grey[200]!;
       modalBottomSheetColor = Colors.grey[200]!;
-
       themeEditorOptions = [
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.bubble_chart,
           "title": "Icons",
           "color": iconColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.border_top,
           "title": "App Bar",
           "color": appBarBGColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.border_all,
           "title": "Scaffold",
           "color": scaffoldBGColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.center_focus_weak,
           "title": "Containers",
           "color": containerColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.api,
           "title": "Feed Cards",
           "color": feedCardsColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.create,
           "title": "Primary Text",
           "color": textColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.create_outlined,
           "title": "Secondary Text",
           "color": textColorDim
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.brush_outlined,
           "title": "Tirtiary Text",
           "color": textColorDimmer,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.call_to_action,
           "title": "Modal Bottom Sheet",
           "color": modalBottomSheetColor,
         },
         {
-          "icon": Icons.keyboard_arrow_up,
+          "icon": Icons.call_to_action_outlined,
           "title": "Bottom Navigation Bar",
           "color": bottomNavBarColor,
         },
-      ];
-
-      content_illustrations = [
-        "assets/images/content_illustrations/1.png",
-        "assets/images/content_illustrations/2.png",
-        "assets/images/content_illustrations/3.png",
-        "assets/images/content_illustrations/4.png",
-        "assets/images/content_illustrations/2.png",
-      ];
-      cryptoAppBarImages = [
-        "assets/images/appbar_headers/1.png",
-        "assets/images/appbar_headers/2.png",
-        "assets/images/appbar_headers/3.png",
-      ];
-      empty_illustrations = [
-        "assets/images/empty_illustrations/1.png",
-        "assets/images/empty_illustrations/2.png",
-        "assets/images/empty_illustrations/3.png",
-        "assets/images/empty_illustrations/4.png",
-        "assets/images/empty_illustrations/5.png",
-      ];
-      error_illustrations = [
-        "assets/images/error_illustrations/3.png",
-        "assets/images/empty_illustrations/2.png",
-        "assets/images/empty_illustrations/3.png",
-      ];
-      search_illustrations = [
-        "assets/images/search_illustrations/1.png",
-        "assets/images/search_illustrations/2.png",
-        "assets/images/search_illustrations/3.png",
-        "assets/images/search_illustrations/4.png",
-        "assets/images/search_illustrations/5.png",
-        "assets/images/search_illustrations/6.png",
-      ];
-      chat_illustrations = [
-        "assets/images/chat_illustrations/01.png",
-        "assets/images/chat_illustrations/2.png",
-        "assets/images/chat_illustrations/6.png",
-        "assets/images/chat_illustrations/7.png",
-        "assets/images/chat_illustrations/8.png",
-        "assets/images/chat_illustrations/9.png",
-        "assets/images/chat_illustrations/10.png",
-        "assets/images/chat_illustrations/11.png",
-        "assets/images/chat_illustrations/12.png",
-        "assets/images/chat_illustrations/13.png",
-        "assets/images/chat_illustrations/14.png",
-        "assets/images/chat_illustrations/15.png",
-        "assets/images/chat_illustrations/16.png",
-        "assets/images/chat_illustrations/17.png",
-        "assets/images/chat_illustrations/18.png",
       ];
     }
   }
@@ -2338,11 +2615,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     List pageOnRefresh = [
       getHomePageFeedRefresh,
-      getSongsOnDevice,
+      sampleFuture,
       getSongsOnDevice,
       getCryptoStats,
-      getSongsOnDevice,
-      getSongsOnDevice,
+      sampleFuture,
+      sampleFuture,
+      sampleFuture,
     ];
     List pagesAppBarExpanded = [
       isSongPlaying == true ? 110.0 : 20.0,
@@ -2350,6 +2628,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       20.0,
       isCryptoPageLoadingError == true ? 200.0 : 300.0,
       280.0,
+      20.0,
       20.0,
     ];
     List pagesAppbarFlexibleSpace = [
@@ -2382,6 +2661,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       // Settings Page
+      FlexibleSpaceBar(),
+      // DMs Page
       FlexibleSpaceBar(),
     ];
     List pagesBody = [
@@ -2433,194 +2714,235 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     : Container()
                                 : Container(),
                             // Feed Card
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: const EdgeInsets.all(6.0),
-                              padding: const EdgeInsets.all(14.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20.0),
+                            GestureDetector(
+                              onLongPress: () {
+                                themeEditorOptionIndex = 4;
+                                themeEditorColorPicker(false);
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                margin: const EdgeInsets.all(6.0),
+                                padding: const EdgeInsets.all(14.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  color: feedCardsColor,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: feedCardShadow,
+                                      blurRadius: 4.0,
+                                    ),
+                                  ],
                                 ),
-                                color: feedCardsColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: feedCardShadow,
-                                    blurRadius: 4.0,
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Author of content
-                                  Text(
-                                    homepageFeed[index]["data"]["author"]
-                                        .toString()
-                                        .toUpperCase(),
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4.0),
-                                  // Title of content
-                                  Text(
-                                    homepageFeed[index]["data"]["title"],
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      color: textColorDim,
-                                    ),
-                                  ),
-                                  // Image of content
-                                  Container(
-                                    //width: double.infinity,
-                                    //height: 300.0,
-                                    margin: const EdgeInsets.only(top: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: containerColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0),
-                                      ),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          "contentViewerPage",
-                                          arguments: {
-                                            "image": homepageFeed[index]["data"]
-                                                ["url"],
-                                            "shareLink": homepageFeed[index]
-                                                ["data"]["url"],
-                                            "downloadingImage":
-                                                downloadingImage,
-                                            "downloadingImageIndex":
-                                                downloadingImageIndex,
-                                            "downloadingImageDone":
-                                                downloadingImageDone,
-                                            "index": index,
-                                            "downloadImage": downloadImage,
-                                          },
-                                        );
-                                        /*viewFeedImages(
-                                        homepageFeed[index]["data"]["url"]);*/
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Author of content
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        themeEditorOptionIndex = 5;
+                                        themeEditorColorPicker(false);
                                       },
-                                      child: PhotoView(
-                                        tightMode: true,
-                                        enableRotation: true,
-                                        backgroundDecoration: BoxDecoration(
-                                          color: Colors.grey[200],
+                                      child: Text(
+                                        homepageFeed[index]["data"]["author"]
+                                            .toString()
+                                            .toUpperCase(),
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        imageProvider: NetworkImage(
-                                            homepageFeed[index]["data"]["url"]),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4.0),
-                                  // Subreddit title, Share and Download Buttons
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // Subreddit title
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 6.0),
-                                        child: Row(
+                                    const SizedBox(height: 4.0),
+                                    // Title of content
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        themeEditorOptionIndex = 6;
+                                        themeEditorColorPicker(false);
+                                      },
+                                      child: Text(
+                                        homepageFeed[index]["data"]["title"],
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: textColorDim,
+                                        ),
+                                      ),
+                                    ),
+                                    // Image of content
+                                    Container(
+                                      //width: double.infinity,
+                                      //height: 300.0,
+                                      margin: const EdgeInsets.only(top: 10.0),
+                                      decoration: BoxDecoration(
+                                        color: containerColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            "contentViewerPage",
+                                            arguments: {
+                                              "image": homepageFeed[index]
+                                                  ["data"]["url"],
+                                              "shareLink": homepageFeed[index]
+                                                  ["data"]["url"],
+                                              "downloadingImage":
+                                                  downloadingImage,
+                                              "downloadingImageIndex":
+                                                  downloadingImageIndex,
+                                              "downloadingImageDone":
+                                                  downloadingImageDone,
+                                              "index": index,
+                                              "downloadImage": downloadImage,
+                                            },
+                                          );
+                                          /*viewFeedImages(
+                                          homepageFeed[index]["data"]["url"]);*/
+                                        },
+                                        child: PhotoView(
+                                          tightMode: true,
+                                          enableRotation: true,
+                                          backgroundDecoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                          ),
+                                          imageProvider: NetworkImage(
+                                              homepageFeed[index]["data"]
+                                                  ["url"]),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4.0),
+                                    // Subreddit title, Share and Download Buttons
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // Subreddit title
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 6.0),
+                                          child: Row(
+                                            children: [
+                                              GestureDetector(
+                                                onLongPress: () {
+                                                  themeEditorOptionIndex = 0;
+                                                  themeEditorColorPicker(false);
+                                                },
+                                                child: Icon(
+                                                  Ionicons.planet_outline,
+                                                  size: 20.0,
+                                                  color: iconColor,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 6.0),
+                                                child: Text(
+                                                  homepageFeed[index]["data"]
+                                                          ["subreddit"]
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 18.0,
+                                                    color: textColor,
+                                                    //fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Share and Download Buttons
+                                        Row(
                                           children: [
-                                            Icon(
-                                              Ionicons.planet_outline,
-                                              size: 20.0,
-                                              color: iconColor,
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 6.0),
-                                              child: Text(
-                                                homepageFeed[index]["data"]
-                                                        ["subreddit"]
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontSize: 18.0,
-                                                  color: textColor,
-                                                  //fontWeight: FontWeight.bold,
+                                            // Share Button
+                                            GestureDetector(
+                                              onLongPress: () {
+                                                themeEditorOptionIndex = 0;
+                                                themeEditorColorPicker(false);
+                                              },
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  String shareLink =
+                                                      homepageFeed[index]
+                                                          ["data"]["url"];
+                                                  Share.share(
+                                                      'Check this out @ Aurora \n ${shareLink}');
+                                                },
+                                                icon: Icon(
+                                                  Icons.share_outlined,
+                                                  color: iconColor,
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      // Share and Download Buttons
-                                      Row(
-                                        children: [
-                                          // Share Button
-                                          IconButton(
-                                            onPressed: () {
-                                              String shareLink =
-                                                  homepageFeed[index]["data"]
-                                                      ["url"];
-                                              Share.share(
-                                                  'Check this out @ Aurora \n ${shareLink}');
-                                            },
-                                            icon: Icon(
-                                              Icons.share_outlined,
-                                              color: iconColor,
-                                            ),
-                                          ),
-                                          // Download Button
-                                          downloadingImageIndex == index
-                                              ? (downloadingImage == false
-                                                  ? IconButton(
-                                                      onPressed: () async {
-                                                        downloadingImageIndex =
-                                                            index;
-                                                        downloadImage(
-                                                            homepageFeed[index]
-                                                                    ["data"]
-                                                                ["url"]);
-                                                      },
-                                                      icon: Icon(
-                                                        downloadingImageDone ==
-                                                                true
-                                                            ? Icons.done
-                                                            : Ionicons
-                                                                .download_outline,
-                                                        color:
+                                            // Download Button
+                                            downloadingImageIndex == index
+                                                ? (downloadingImage == false
+                                                    ? GestureDetector(
+                                                        onLongPress: () {
+                                                          themeEditorOptionIndex =
+                                                              0;
+                                                          themeEditorColorPicker(
+                                                              false);
+                                                        },
+                                                        child: IconButton(
+                                                          onPressed: () async {
+                                                            downloadingImageIndex =
+                                                                index;
+                                                            downloadImage(
+                                                                homepageFeed[
+                                                                            index]
+                                                                        ["data"]
+                                                                    ["url"]);
+                                                          },
+                                                          icon: Icon(
                                                             downloadingImageDone ==
                                                                     true
-                                                                ? Colors.green
-                                                                : iconColor,
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      width: 25.0,
-                                                      height: 25.0,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: iconColor,
-                                                      ),
-                                                    ))
-                                              : IconButton(
-                                                  onPressed: () async {
-                                                    downloadingImageIndex =
-                                                        index;
-                                                    downloadImage(
-                                                        homepageFeed[index]
-                                                            ["data"]["url"]);
-                                                  },
-                                                  icon: Icon(
-                                                    Ionicons.download_outline,
-                                                    color: iconColor,
-                                                  ),
-                                                )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                                                ? Icons.done
+                                                                : Ionicons
+                                                                    .download_outline,
+                                                            color:
+                                                                downloadingImageDone ==
+                                                                        true
+                                                                    ? Colors
+                                                                        .green
+                                                                    : iconColor,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        width: 25.0,
+                                                        height: 25.0,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: iconColor,
+                                                        ),
+                                                      ))
+                                                : IconButton(
+                                                    onPressed: () async {
+                                                      downloadingImageIndex =
+                                                          index;
+                                                      downloadImage(
+                                                          homepageFeed[index]
+                                                              ["data"]["url"]);
+                                                    },
+                                                    icon: Icon(
+                                                      Ionicons.download_outline,
+                                                      color: iconColor,
+                                                    ),
+                                                  )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -2872,6 +3194,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         textColorDimmer,
         isDarkMode,
         marqueeMusicTitle,
+        scaffoldBGColor,
       ),
 
       // Crypto Page
@@ -2894,8 +3217,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             children: [
               GestureDetector(
                 onTap: () {
-                  chatAppBarImageIndex =
-                      random.nextInt(chat_illustrations.length - 1);
+                  userIndex = index;
+                  userText = users[index]["chat"];
+                  curPage = 6;
+                  isBottomBarVisible = false;
                   setState(() {});
                 },
                 child: Container(
@@ -2989,6 +3314,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              // Divider
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Divider(
@@ -3084,7 +3410,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ],
                   ),
                   Switch(
-                    activeColor: Colors.cyan,
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
                     value: isDarkMode,
                     onChanged: (value) {
                       isDarkMode = value;
@@ -3201,7 +3528,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ],
                   ),
                   Switch(
-                    activeColor: Colors.cyan,
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
                     value: enableFlexibleSpace,
                     onChanged: (value) {
                       enableFlexibleSpace = value;
@@ -3248,7 +3576,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ],
                   ),
                   Switch(
-                    activeColor: Colors.cyan,
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
                     value: marqueeMusicTitle,
                     onChanged: (value) {
                       marqueeMusicTitle = value;
@@ -3299,7 +3628,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ],
                   ),
                   Switch(
-                    activeColor: Colors.cyan,
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
                     value: hideBottomNav,
                     onChanged: (value) {
                       hideBottomNav = value;
@@ -3314,14 +3644,129 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
+
+      // DMs
+      SliverToBoxAdapter(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.89,
+          color: scaffoldBGColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Text list
+              Container(
+                height: MediaQuery.of(context).size.height * 0.8,
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                color: scaffoldBGColor,
+                child: ListView.builder(
+                  primary: true,
+                  shrinkWrap: true,
+                  itemCount: users[userIndex]["chat"].length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      height: 55.0,
+                      color: scaffoldBGColor,
+                      child: Row(
+                        mainAxisAlignment:
+                            users[userIndex]["chat"][index]["fromMe"] == true
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
+                        children: [
+                          // Content and Time
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15.0, vertical: 4.0),
+                            margin: const EdgeInsets.symmetric(vertical: 5.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: users[userIndex]["chat"]
+                                          [index]["fromMe"] ==
+                                      true
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  users[userIndex]["chat"][index]["content"],
+                                  style: TextStyle(
+                                    color: textColor,
+                                  ),
+                                ),
+                                Text(
+                                  users[userIndex]["chat"][index]["time"],
+                                  style: TextStyle(
+                                    fontSize: 10.0,
+                                    color: textColorDimmer,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Input Box
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 15.0, vertical: 10.0),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.attachment,
+                          color: textColorDim,
+                        ),
+                        const SizedBox(width: 10.0),
+                        Text(
+                          "Abcd dsdiug iagdi...",
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: textColorDim,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Icon(
+                      Ionicons.paper_plane,
+                      color: textColorDim,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     ];
     List smartRefresherColor = [
       Color(0xff6C63FF),
-      Color(0xff6C63FF),
+      Colors.deepOrangeAccent,
       Colors.lightBlue,
-      Colors.green[400],
-      Color(0xff6C63FF),
-      Colors.cyan[800],
+      Color(0xff01bb1f),
+      Color(0xff0078ff),
+      Colors.cyan[400],
+      Colors.cyan[400],
     ];
     List pagesAppBarBottom = [
       // Home Page
@@ -3948,6 +4393,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               )
             : Container(),
       ),
+      // DM Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(0.0), // here the desired height
+        child: Container(),
+      ),
     ];
     List pagesAppBarIconTitle = [
       {
@@ -3974,6 +4424,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "icon": Ionicons.hardware_chip_outline,
         "title": "Settings",
       },
+      {
+        "icon": Ionicons.chatbubble_ellipses_outline,
+        "title": users[userIndex]["username"],
+      },
     ];
     return Scaffold(
       extendBody: true,
@@ -3998,26 +4452,82 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ? pagesAppBarExpanded[curPage]
                             : 0.0,
                         pinned: true,
-                        title: Row(
-                          children: [
-                            Icon(
-                              pagesAppBarIconTitle[curPage]["icon"],
-                              color: iconColor,
-                            ),
-                            SizedBox(width: 12.0),
-                            Text(
-                              pagesAppBarIconTitle[curPage]["title"],
-                              style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.0,
+                        title: GestureDetector(
+                          onDoubleTap: () {
+                            themeEditorOptionIndex = 1;
+                            themeEditorColorPicker(false);
+                          },
+                          child: Row(
+                            children: [
+                              curPage == 6
+                                  ? IconButton(
+                                      onPressed: () {
+                                        curPage = 4;
+                                        isBottomBarVisible = true;
+                                        setState(() {});
+                                      },
+                                      icon: Icon(
+                                        Icons.arrow_back,
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onLongPress: () {
+                                        themeEditorOptionIndex = 0;
+                                        themeEditorColorPicker(false);
+                                      },
+                                      child: Icon(
+                                        pagesAppBarIconTitle[curPage]["icon"],
+                                        color: iconColor,
+                                      ),
+                                    ),
+                              SizedBox(width: 12.0),
+                              GestureDetector(
+                                onLongPress: () {
+                                  themeEditorOptionIndex = 5;
+                                  themeEditorColorPicker(false);
+                                },
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      pagesAppBarIconTitle[curPage]["title"],
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.0,
+                                      ),
+                                    ),
+                                    curPage == 6
+                                        ? Container(
+                                            width: 6.0,
+                                            height: 6.0,
+                                            margin: const EdgeInsets.only(
+                                                left: 5.0, top: 5.0),
+                                            decoration: BoxDecoration(
+                                              //shape: BoxShape.circle,
+                                              color: users[userIndex]
+                                                          ["online"] ==
+                                                      true
+                                                  ? Colors.lightGreenAccent
+                                                  : Colors.transparent,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         flexibleSpace: enableFlexibleSpace == true
                             ? pagesAppbarFlexibleSpace[curPage]
-                            : FlexibleSpaceBar(),
+                            : GestureDetector(
+                                onLongPress: () {
+                                  themeEditorOptionIndex = 1;
+                                  themeEditorColorPicker(false);
+                                },
+                                child: FlexibleSpaceBar()),
                         bottom: pagesAppBarBottom[curPage],
                         actions: [
                           curPage == 0
@@ -4036,51 +4546,78 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ],
                                 )
                               : Container(),
-                          // Fullscreen
-                          IconButton(
-                            onPressed: () {
-                              if (curPage == 2) {
-                                setFullscreenMusicPlayer();
-                              } else {
-                                setFullscreen();
-                              }
-                            },
-                            icon: Icon(
-                              fullScreenModeMP == false
-                                  ? Icons.fullscreen
-                                  : Icons.fullscreen_exit,
-                              color: iconColor,
-                            ),
-                          ),
-                          // Profile
-                          Container(
-                            width: 45.0,
-                            height: 45.0,
-                            margin: const EdgeInsets.only(right: 10.0),
-                            child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: UserProfileAvatar(
-                                avatarUrl:
-                                    'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
-                                onAvatarTap: () {
-                                  showProfileDialog();
-                                },
-                                notificationCount: 4,
-                                notificationBubbleTextStyle: TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                          curPage == 6
+                              ? Container(
+                                  width: 35.0,
+                                  height: 35.0,
+                                  margin: const EdgeInsets.only(right: 10.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.grey[900],
+                                    //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: FittedBox(
+                                    fit: BoxFit.cover,
+                                    child: Image.network(
+                                      users[userIndex]["dp"],
+                                    ),
+                                  ),
+                                )
+                              :
+                              // Fullscreen and Profile
+                              Row(
+                                  children: [
+                                    // Fullscreen
+                                    IconButton(
+                                      onPressed: () {
+                                        if (curPage == 2) {
+                                          setFullscreenMusicPlayer();
+                                        } else {
+                                          setFullscreen();
+                                        }
+                                      },
+                                      icon: Icon(
+                                        fullScreenModeMP == false
+                                            ? Icons.fullscreen
+                                            : Icons.fullscreen_exit,
+                                        color: iconColor,
+                                      ),
+                                    ),
+                                    // Profile
+                                    Container(
+                                      width: 45.0,
+                                      height: 45.0,
+                                      margin:
+                                          const EdgeInsets.only(right: 10.0),
+                                      child: FittedBox(
+                                        fit: BoxFit.contain,
+                                        child: UserProfileAvatar(
+                                          avatarUrl:
+                                              'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
+                                          onAvatarTap: () {
+                                            showProfileDialog();
+                                          },
+                                          notificationCount: 4,
+                                          notificationBubbleTextStyle:
+                                              TextStyle(
+                                            fontSize: 15.0,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          avatarSplashColor:
+                                              smartRefresherColor[0],
+                                          radius: 20,
+                                          isActivityIndicatorSmall: false,
+                                          avatarBorderData: AvatarBorderData(
+                                            borderColor: Colors.white,
+                                            borderWidth: 1.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                avatarSplashColor: smartRefresherColor[0],
-                                radius: 20,
-                                isActivityIndicatorSmall: false,
-                                avatarBorderData: AvatarBorderData(
-                                  borderColor: Colors.white,
-                                  borderWidth: 1.0,
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       )
                     : SliverToBoxAdapter(
@@ -4166,7 +4703,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     },
                     duration: Duration(milliseconds: 300),
                     startIconColor: iconColor,
-                    endIconColor: Color(0x886C63FF),
+                    endIconColor: Color(0xff6C63FF),
                     clockwise: false,
                   ),
                   selectedColor: bottomNavBarColor,
@@ -4203,7 +4740,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     },
                     duration: Duration(milliseconds: 300),
                     startIconColor: iconColor,
-                    endIconColor: Colors.purple,
+                    endIconColor: Colors.deepOrangeAccent,
                     clockwise: false,
                   ),
                   selectedColor: bottomNavBarColor,
@@ -4277,7 +4814,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     },
                     duration: Duration(milliseconds: 300),
                     startIconColor: iconColor,
-                    endIconColor: Colors.green[500],
+                    endIconColor: Color(0xff01bb1f),
                     clockwise: false,
                   ),
                   selectedColor: bottomNavBarColor,
@@ -4315,7 +4852,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     },
                     duration: Duration(milliseconds: 300),
                     startIconColor: iconColor,
-                    endIconColor: Colors.teal,
+                    endIconColor: Color(0xff229Aff),
                     clockwise: false,
                   ),
                   selectedColor: bottomNavBarColor,
