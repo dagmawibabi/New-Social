@@ -554,10 +554,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Function to get songs from device
   void getSongsOnDevice() async {
-    await askPermissions();
+    //await askPermissions();
     musicFiles = [];
     dynamic files =
-        Directory('/storage/emulated/0/Music').listSync(recursive: false);
+        Directory('/storage/emulated/0/Music').listSync(recursive: true);
     for (FileSystemEntity file in files) {
       if (file.path.endsWith(".mp3") == true ||
           file.path.endsWith(".m4a") == true) {
@@ -565,8 +565,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         musicFilesPlaylist.add(Audio(file.path));
       }
     }
-    files =
-        Directory('/storage/emulated/0/Download').listSync(recursive: false);
+    files = Directory('/storage/emulated/0/Download').listSync(recursive: true);
     for (FileSystemEntity file in files) {
       if (file.path.endsWith(".mp3") == true ||
           file.path.endsWith(".m4a") == true) {
@@ -741,26 +740,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Column(
             children: [
               // Wave
-              Container(
-                height: 3.0,
-                child: WaveWidget(
-                  config: CustomConfig(
-                    gradients: lightModeWaveGradient,
-                    durations: [35000, 19440, 10800, 6000],
-                    heightPercentages: [0.20, 0.23, 0.25, 0.30],
-                    blur: const MaskFilter.blur(BlurStyle.solid, 10),
-                    gradientBegin: Alignment.bottomLeft,
-                    gradientEnd: Alignment.topRight,
-                  ),
-                  duration: 10,
-                  waveAmplitude: 4,
-                  heightPercentange: 0.1,
-                  size: const Size(
-                    double.infinity,
-                    double.infinity,
-                  ),
-                ),
-              ),
+              reduceAnimations == false
+                  ? Container(
+                      height: 3.0,
+                      child: WaveWidget(
+                        config: CustomConfig(
+                          gradients: lightModeWaveGradient,
+                          durations: [35000, 19440, 10800, 6000],
+                          heightPercentages: [0.20, 0.23, 0.25, 0.30],
+                          blur: const MaskFilter.blur(BlurStyle.solid, 10),
+                          gradientBegin: Alignment.bottomLeft,
+                          gradientEnd: Alignment.topRight,
+                        ),
+                        duration: 10,
+                        waveAmplitude: 4,
+                        heightPercentange: 0.1,
+                        size: const Size(
+                          double.infinity,
+                          double.infinity,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 3.0,
+                    ),
 
               // Controlls
               Container(
@@ -898,33 +901,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
 
               // Wave
-              Container(
-                height: 3.0,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20.0),
-                  ),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: WaveWidget(
-                  config: CustomConfig(
-                    gradients: lightModeWaveGradient,
-                    durations: [35000, 19440, 10800, 6000],
-                    heightPercentages: [0.20, 0.23, 0.25, 0.30],
-                    blur: const MaskFilter.blur(BlurStyle.solid, 10),
-                    gradientBegin: Alignment.bottomLeft,
-                    gradientEnd: Alignment.topRight,
-                  ),
-                  duration: 10,
-                  waveAmplitude: 0.1,
-                  heightPercentange: 0.1,
-                  size: const Size(
-                    double.infinity,
-                    double.infinity,
-                  ),
-                ),
-              ),
+              reduceAnimations == false
+                  ? Container(
+                      height: 3.0,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20.0),
+                        ),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: WaveWidget(
+                        config: CustomConfig(
+                          gradients: lightModeWaveGradient,
+                          durations: [35000, 19440, 10800, 6000],
+                          heightPercentages: [0.20, 0.23, 0.25, 0.30],
+                          blur: const MaskFilter.blur(BlurStyle.solid, 10),
+                          gradientBegin: Alignment.bottomLeft,
+                          gradientEnd: Alignment.topRight,
+                        ),
+                        duration: 10,
+                        waveAmplitude: 0.1,
+                        heightPercentange: 0.1,
+                        size: const Size(
+                          double.infinity,
+                          double.infinity,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 3.0,
+                    ),
 
               // Indie Songs
               Expanded(
@@ -1152,7 +1159,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   controller: feedSearch,
                   maxLines: 1,
                   decoration: InputDecoration(
-                    labelText: "Subreddit Name",
+                    labelText: "Subreddit Name (noSpaces)",
                     labelStyle: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -1462,46 +1469,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int downloadingImageIndex = -1;
   bool downloadingImageDone = false;
   void downloadImage(image) async {
-    downloadingImage = true;
-    downloadingImageDone = false;
-    setState(() {});
-    try {
-      // Saved with this method.
-      var imageId = await ImageDownloader.downloadImage(
-        image,
-        destination: AndroidDestinationType.directoryDownloads
-          ..subDirectory(image.toString().substring(18)),
-      );
-      if (imageId == null) {
-        return;
-      }
-
-      // Below is a method of obtaining saved image information.
-      var fileName = await ImageDownloader.findName(imageId);
-      var path = await ImageDownloader.findPath(imageId);
-      var size = await ImageDownloader.findByteSize(imageId);
-      var mimeType = await ImageDownloader.findMimeType(imageId);
-      // Success
-      CherryToast.success(
-        title: "Downloaded Successfully!",
-        titleStyle: TextStyle(fontSize: 16.0),
-        autoDismiss: true,
-        animationDuration: Duration(milliseconds: 200),
-        toastDuration: Duration(milliseconds: 1000),
-      ).show(context);
-    } catch (error) {
-      // Success
-      CherryToast.error(
-        title: "Downloading Failed!",
-        titleStyle: TextStyle(fontSize: 16.0),
-        autoDismiss: true,
-        animationDuration: Duration(milliseconds: 200),
-        toastDuration: Duration(milliseconds: 1000),
-      ).show(context);
-    }
     downloadingImage = false;
-    downloadingImageDone = true;
-    setState(() {});
+    downloadingImageDone = false;
+    if (await Permission.storage.isGranted == true) {
+      downloadingImage = true;
+      downloadingImageDone = false;
+      setState(() {});
+      try {
+        // Saved with this method.
+        var imageId = await ImageDownloader.downloadImage(
+          image,
+          destination: AndroidDestinationType.directoryDownloads
+            ..subDirectory(image.toString().substring(18)),
+        );
+        if (imageId == null) {
+          return;
+        }
+
+        // Below is a method of obtaining saved image information.
+        var fileName = await ImageDownloader.findName(imageId);
+        var path = await ImageDownloader.findPath(imageId);
+        var size = await ImageDownloader.findByteSize(imageId);
+        var mimeType = await ImageDownloader.findMimeType(imageId);
+        // Success
+        CherryToast.success(
+          title: "Downloaded Successfully!",
+          titleStyle: TextStyle(fontSize: 16.0),
+          autoDismiss: true,
+          animationDuration: Duration(milliseconds: 200),
+          toastDuration: Duration(milliseconds: 1000),
+        ).show(context);
+      } catch (error) {
+        // Success
+        CherryToast.error(
+          title: "Downloading Failed!",
+          titleStyle: TextStyle(fontSize: 16.0),
+          autoDismiss: true,
+          animationDuration: Duration(milliseconds: 200),
+          toastDuration: Duration(milliseconds: 1000),
+        ).show(context);
+      }
+      downloadingImage = false;
+      downloadingImageDone = true;
+      setState(() {});
+    } else {
+      await Permission.storage.request();
+    }
+    //downloadingImageIndex = -1;
   }
 
   // refresh Feed
@@ -2145,6 +2159,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool hideBottomNav = false;
 
   //? Settings
+  List presetThemes = [
+    {
+      "primaryColor": Colors.red,
+      "lightTheme": {
+        "iconColor": Colors.red,
+        "textColor": Colors.red,
+        "textColorDim": Colors.red[300]!,
+        "textColorDimmer": Colors.red[100]!,
+      },
+      "darkTheme": {
+        "iconColor": Colors.red,
+        "textColor": Colors.red,
+        "textColorDim": Colors.red[300]!,
+        "textColorDimmer": Colors.red[100]!,
+      }
+    },
+  ];
+  bool reduceAnimations = false;
   int themeEditorOptionIndex = 0;
   List themeEditorOptions = [
     {
@@ -2574,6 +2606,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     PermissionStatus storagePermissionStatus = await Permission.storage.status;
     if (storagePermissionStatus.isGranted == false) {
       await Permission.storage.request();
+    } else {
+      getSongsOnDevice();
     }
   }
 
@@ -3195,6 +3229,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         isDarkMode,
         marqueeMusicTitle,
         scaffoldBGColor,
+        askPermissions,
+        reduceAnimations,
       ),
 
       // Crypto Page
@@ -3423,56 +3459,400 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
               // Theme Editor
-              GestureDetector(
-                onTap: () {
-                  themeEditor();
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+              ExpansionTile(
+                childrenPadding: const EdgeInsets.all(0.0),
+                tilePadding: const EdgeInsets.all(0.0),
+                leading: Icon(
+                  Icons.format_paint_outlined,
+                  color: iconColor,
+                ),
+                subtitle: Text(
+                  "Customize the theme of the app",
+                  style: TextStyle(
+                    color: textColorDimmer,
+                    fontSize: 12.0,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                title: Text(
+                  "Theme Editor",
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: GestureDetector(
+                  onTap: () {
+                    themeEditor();
+                  },
+                  child: Icon(
+                    Icons.brush,
+                    color: iconColor,
+                  ),
+                ),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color: scaffoldBGColor,
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    ),
+                    child: Column(
                       children: [
-                        Icon(
-                          Icons.format_paint_outlined,
-                          color: iconColor,
-                        ),
-                        const SizedBox(width: 10.0),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Theme Editor",
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 2.0),
-                            SizedBox(
-                              width: 250.0,
-                              child: Text(
-                                "Customize the theme of the app",
-                                style: TextStyle(
-                                  color: textColorDimmer,
-                                  fontSize: 12.0,
-                                  overflow: TextOverflow.ellipsis,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.red;
+                                  textColor = Colors.red;
+                                  textColorDim = Colors.red[300]!;
+                                  textColorDimmer = Colors.red[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.deepPurple;
+                                  textColor = Colors.deepPurple;
+                                  textColorDim = Colors.deepPurple[300]!;
+                                  textColorDimmer = Colors.deepPurple[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepPurple,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.lime;
+                                  textColor = Colors.lime;
+                                  textColorDim = Colors.lime[300]!;
+                                  textColorDimmer = Colors.lime[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.lime,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.cyan;
+                                  textColor = Colors.cyan;
+                                  textColorDim = Colors.cyan[300]!;
+                                  textColorDimmer = Colors.cyan[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.cyan,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.amber;
+                                  textColor = Colors.amber;
+                                  textColorDim = Colors.amber[300]!;
+                                  textColorDimmer = Colors.amber[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.indigo;
+                                  textColor = Colors.indigo;
+                                  textColorDim = Colors.indigo[300]!;
+                                  textColorDimmer = Colors.indigo[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.indigo,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.green;
+                                  textColor = Colors.green;
+                                  textColorDim = Colors.green[300]!;
+                                  textColorDimmer = Colors.green[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.yellow;
+                                  textColor = Colors.yellow;
+                                  textColorDim = Colors.yellow[300]!;
+                                  textColorDimmer = Colors.yellow[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.yellow,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.teal;
+                                  textColor = Colors.teal;
+                                  textColorDim = Colors.teal[300]!;
+                                  textColorDimmer = Colors.teal[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.teal,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.lightBlue;
+                                  textColor = Colors.lightBlue;
+                                  textColorDim = Colors.lightBlue[300]!;
+                                  textColorDimmer = Colors.lightBlue[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.lightBlue,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.purple;
+                                  textColor = Colors.purple;
+                                  textColorDim = Colors.purple[300]!;
+                                  textColorDimmer = Colors.purple[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.purple,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.white;
+                                  textColor = Colors.white;
+                                  textColorDim = Colors.white60;
+                                  textColorDimmer = Colors.white38;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.deepOrange;
+                                  textColor = Colors.deepOrange;
+                                  textColorDim = Colors.deepOrange[300]!;
+                                  textColorDimmer = Colors.deepOrange[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepOrange,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.pink;
+                                  textColor = Colors.pink;
+                                  textColorDim = Colors.pink[300]!;
+                                  textColorDimmer = Colors.pink[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.pink,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.blue;
+                                  textColor = Colors.blue;
+                                  textColorDim = Colors.blue[300]!;
+                                  textColorDimmer = Colors.blue[100]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.black;
+                                  textColor = Colors.black;
+                                  textColorDim = Colors.black54;
+                                  textColorDimmer = Colors.black38;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.greenAccent;
+                                  textColor = Colors.greenAccent;
+                                  textColorDim = Colors.greenAccent[400]!;
+                                  textColorDimmer = Colors.greenAccent[700]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.greenAccent,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  iconColor = Colors.yellowAccent;
+                                  textColor = Colors.yellowAccent;
+                                  textColorDim = Colors.yellowAccent[400]!;
+                                  textColorDimmer = Colors.yellowAccent[700]!;
+                                  setState(() {});
+                                },
+                                child: Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.yellowAccent,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: Icon(
-                        Icons.brush,
-                        color: iconColor,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
               // Microinteractions
@@ -3481,7 +3861,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   children: [
                     Text(
-                      "Microinterations",
+                      "Microinteractions",
                       style: TextStyle(
                         color: textColorDimmer.withOpacity(0.3),
                         fontSize: 18.0,
@@ -3539,6 +3919,54 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Reduce Animations
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        reduceAnimations == false
+                            ? Icons.blur_on_rounded
+                            : Icons.blur_off_rounded,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Reduce Animations",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Stops waving and particle animations",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
+                    value: reduceAnimations,
+                    onChanged: (value) {
+                      reduceAnimations = value;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
               // Scroll Music Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -3547,8 +3975,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     children: [
                       Icon(
                         marqueeMusicTitle == false
-                            ? Icons.music_note_outlined
-                            : Icons.music_off_outlined,
+                            ? Icons.music_off_outlined
+                            : Icons.music_note_outlined,
                         color: iconColor,
                       ),
                       const SizedBox(width: 10.0),
@@ -4539,7 +4967,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         feedChoice();
                                       },
                                       icon: Icon(
-                                        Icons.add,
+                                        Icons.search,
                                         color: iconColor,
                                       ),
                                     ),

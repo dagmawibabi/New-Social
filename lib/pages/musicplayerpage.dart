@@ -55,6 +55,8 @@ class MusicPlayerPage {
     isDarkMode,
     marqueeMusicTitle,
     scaffoldBGColor,
+    askPermissions,
+    reduceAnimations,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -69,81 +71,80 @@ class MusicPlayerPage {
                 borderRadius: const BorderRadius.all(Radius.circular(30.0)),
               ),
               // Get Songs Warning and Button
-              child: Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 90.0),
-                    // No Songs Illustration
-                    Image.asset(getRandom(empty_illustrations).toString()),
-                    // No Songs Warning
-                    Text(
-                      "You have no songs imported!",
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 90.0),
+                  // No Songs Illustration
+                  Image.asset(getRandom(empty_illustrations).toString()),
+                  // No Songs Warning
+                  Text(
+                    "You have no songs imported!",
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  // Get Songs Button
+                  GestureDetector(
+                    onTap: () {
+                      askPermissions();
+                      //getSongsOnDevice();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDarkMode == false
+                            ? Colors.grey[900]
+                            : Colors.grey[850],
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 40.0, vertical: 12.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 5.0),
+                          Text(
+                            "Get Songs",
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 5.0),
+                          Icon(
+                            Icons.file_download_outlined,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Fetch directory Warning
+                  const SizedBox(height: 8.0),
+                  SizedBox(
+                    width: 300.0,
+                    child: Text(
+                      "Will fetch songs from your device's Downloads and Music folder",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: textColor,
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        color: textColorDimmer,
+                        //fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10.0),
-                    // Get Songs Button
-                    GestureDetector(
-                      onTap: () {
-                        getSongsOnDevice();
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isDarkMode == false
-                              ? Colors.grey[900]
-                              : Colors.grey[850],
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 40.0, vertical: 12.0),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 12.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            Icon(
-                              Icons.music_note_outlined,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 5.0),
-                            Text(
-                              "Get Songs",
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 5.0),
-                            Icon(
-                              Icons.file_download_outlined,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Fetch directory Warning
-                    const SizedBox(height: 8.0),
-                    SizedBox(
-                      width: 300.0,
-                      child: Text(
-                        "Will fetch songs from your device's Downloads and Music folder",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: textColorDimmer,
-                          //fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             )
           // Music Player, controls and Song list
@@ -571,7 +572,8 @@ class MusicPlayerPage {
                                       ),
                                     ),
                                     // Animated BG
-                                    isSongPlaying == true
+                                    (isSongPlaying == true &&
+                                            reduceAnimations == false)
                                         ? Align(
                                             alignment: Alignment.bottomCenter,
                                             child: Container(
@@ -609,7 +611,8 @@ class MusicPlayerPage {
                                                   ? 350.0
                                                   : 20.0),
                                           clipBehavior: Clip.hardEdge,
-                                          child: isSongPlaying == true
+                                          child: (isSongPlaying == true &&
+                                                  reduceAnimations == false)
                                               ? WaveWidget(
                                                   config: CustomConfig(
                                                     gradients:
