@@ -56,6 +56,8 @@ dependencies:
   animated_background: ^2.0.0
   screenshot: ^1.2.3
   flutter_colorpicker: ^1.0.3
+  location: ^4.3.0
+
 
 
   # The following adds the Cupertino Icons font to your application.

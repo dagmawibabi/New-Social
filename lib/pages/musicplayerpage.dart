@@ -57,6 +57,8 @@ class MusicPlayerPage {
     scaffoldBGColor,
     askPermissions,
     reduceAnimations,
+    repeatSong,
+    repeatSongsMode,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -158,21 +160,24 @@ class MusicPlayerPage {
                 children: [
                   // Background image
                   Container(
-                    decoration: new BoxDecoration(
-                      image: new DecorationImage(
-                        image: new ExactAssetImage(albumArtImage),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: ExactAssetImage(albumArtImage),
                         fit: BoxFit.cover,
+                        colorFilter: isDarkMode == true
+                            ? ColorFilter.srgbToLinearGamma()
+                            : ColorFilter.mode(scaffoldBGColor, BlendMode.dst),
                       ),
                     ),
                     width: MediaQuery.of(context).size.width,
                     height: fullScreenMode == false
                         ? MediaQuery.of(context).size.height - 100
                         : MediaQuery.of(context).size.height,
-                    child: new BackdropFilter(
-                      filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                      child: new Container(
-                        decoration: new BoxDecoration(
-                            color: Colors.white.withOpacity(0.0)),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: Container(
+                        decoration:
+                            BoxDecoration(color: Colors.white.withOpacity(0.0)),
                       ),
                     ),
                   ),
@@ -529,13 +534,22 @@ class MusicPlayerPage {
                                         color:
                                             containerColor, // Colors.grey[200],
                                         borderRadius: const BorderRadius.all(
-                                            Radius.circular(30.0)),
+                                          Radius.circular(30.0),
+                                        ),
+                                        image: DecorationImage(
+                                          image: ExactAssetImage(albumArtImage),
+                                          fit: BoxFit.cover,
+                                          colorFilter:
+                                              ColorFilter.srgbToLinearGamma(),
+                                        ),
                                       ),
                                       clipBehavior: Clip.hardEdge,
-                                      child: Image.asset(
-                                        albumArtImage,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: isDarkMode == false
+                                          ? Image.asset(
+                                              albumArtImage,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Container(),
                                     ),
                                     // Shuffle Images and Fullscreen Button
                                     Align(
@@ -763,9 +777,13 @@ class MusicPlayerPage {
                                     children: [
                                       // Repeat Button
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          repeatSongsMode();
+                                        },
                                         icon: Icon(
-                                          Icons.repeat,
+                                          repeatSong == true
+                                              ? Icons.repeat_one
+                                              : Icons.repeat,
                                           color: iconColor,
                                           size: fullScreenMode == true
                                               ? 30.0
