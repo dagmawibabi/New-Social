@@ -57,6 +57,7 @@ dependencies:
   screenshot: ^1.2.3
   flutter_colorpicker: ^1.0.3
   location: ^4.3.0
+  internet_speed_test: ^1.5.0
 
 
 

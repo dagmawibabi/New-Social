@@ -16,6 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:internet_speed_test/callbacks_enum.dart';
+import 'package:internet_speed_test/internet_speed_test.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart' as loc;
@@ -619,7 +621,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   // Repeat Songgs
-  bool repeatSong = true;
+  bool repeatSong = false;
   void repeatSongsMode() {
     repeatSong = !repeatSong;
     if (repeatSong == true) {
@@ -1423,12 +1425,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Column(
                   children: [
                     Text(
-                      weatherData["location"]["name"] +
-                          "\n" +
-                          weatherData["location"]["country"],
+                      "Latitude: " +
+                          weatherData["location"]["lat"].toString() +
+                          ", Longitude: " +
+                          weatherData["location"]["lon"].toString(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: textColorDimmer,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        getWeather();
+                        Navigator.pop(context);
+                        weatherDetails();
+                      },
+                      child: Text(
+                        weatherData["location"]["name"] +
+                            ", " +
+                            weatherData["location"]["country"],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textColorDimmer,
+                        ),
                       ),
                     ),
                     // Space
@@ -1461,14 +1480,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // q = 48.8567,2.3508 - lat and long
     String latitude = locationData.latitude.toString();
     String longitude = locationData.longitude.toString();
-    /*var url = Uri.parse(
+    var url = Uri.parse(
         "http://api.weatherapi.com/v1/current.json?key=58a9b304b5ed4f82a0e135231220901&q=" +
             latitude +
             "," +
             longitude +
-            "&aqi=yes");*/
-    var url = Uri.parse(
-        "http://api.weatherapi.com/v1/current.json?key=58a9b304b5ed4f82a0e135231220901&q=honolulu&aqi=yes");
+            "&aqi=yes");
     var response = await http.get(url);
     var responseJSON = jsonDecode(response.body);
     weatherData = responseJSON;
@@ -2750,6 +2767,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         );
       },
     );
+  }
+
+  bool isSpeedTesting = false;
+  double downloadRate = 0.0;
+  dynamic downloadUnit = "Mb/s";
+  double uploadRate = 0.0;
+  dynamic uploadUnit = "Mb/s";
+  final internetSpeedTest = InternetSpeedTest();
+  void connectionSpeedTest(int choice) async {
+    isSpeedTesting = true;
+    setState(() {});
+    // Download Test
+    if (choice == 1) {
+      internetSpeedTest.startDownloadTesting(
+        onDone: (double transferRate, SpeedUnit unit) {
+          downloadRate = transferRate;
+          downloadUnit = unit == SpeedUnit.Kbps ? "Kb/s" : "Mb/s";
+          setState(() {});
+        },
+        onProgress: (double percent, double transferRate, SpeedUnit unit) {
+          downloadRate = transferRate;
+          downloadUnit = unit == SpeedUnit.Kbps ? "Kb/s" : "Mb/s";
+          setState(() {});
+        },
+        onError: (String errorMessage, String speedTestError) {
+          print('the download error rate $speedTestError');
+        },
+      );
+    }
+    // Upload Test
+    else {
+      internetSpeedTest.startUploadTesting(
+        onDone: (double transferRate, SpeedUnit unit) {
+          uploadRate = transferRate;
+          uploadUnit = unit == SpeedUnit.Kbps ? "Kb/s" : "Mb/s";
+          setState(() {});
+        },
+        onProgress: (double percent, double transferRate, SpeedUnit unit) {
+          uploadRate = transferRate;
+          uploadUnit = unit == SpeedUnit.Kbps ? "Kb/s" : "Mb/s";
+          setState(() {});
+        },
+        onError: (String errorMessage, String speedTestError) {
+          print('error uploading');
+        },
+      );
+    }
   }
 
   //? GENERAL
@@ -4633,7 +4697,85 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               //Divider(color: textColorDimmer.withOpacity(0.2)),
-              const SizedBox(height: 200.0),
+              const SizedBox(height: 150.0),
+              // App Version and Speed Tester
+              GestureDetector(
+                onLongPress: () {
+                  isSpeedTesting = !isSpeedTesting;
+                  setState(() {});
+                },
+                child: isSpeedTesting == false
+                    ? Text(
+                        "Aurora V1.0.0",
+                        style: TextStyle(
+                          color: textColorDimmer,
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 20.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20.0),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: feedCardShadow.withOpacity(0.1),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onLongPress: () {
+                                isSpeedTesting = !isSpeedTesting;
+                                setState(() {});
+                              },
+                              child: Text(
+                                "Network Speed Test",
+                                style: TextStyle(
+                                  color: Colors.orangeAccent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+
+                            // Upload Test
+                            GestureDetector(
+                              onTap: () {
+                                connectionSpeedTest(2);
+                              },
+                              child: Text(
+                                "Upload Speed - " +
+                                    uploadRate.toString() +
+                                    " " +
+                                    uploadUnit,
+                                style: TextStyle(
+                                  color: Colors.lightBlueAccent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10.0),
+                            // Download Test
+                            GestureDetector(
+                              onTap: () {
+                                connectionSpeedTest(1);
+                              },
+                              child: Text(
+                                "Download Speed - " +
+                                    downloadRate.toString() +
+                                    " " +
+                                    downloadUnit,
+                                style: TextStyle(
+                                  color: Colors.lightBlueAccent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 300.0),
             ],
           ),
         ),
