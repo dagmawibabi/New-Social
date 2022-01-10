@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
-
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:animate_icons/animate_icons.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -24,6 +24,7 @@ import 'package:location/location.dart' as loc;
 import 'package:marquee/marquee.dart';
 import 'package:newsocial/pages/cryptopage.dart';
 import 'package:newsocial/pages/musicplayerpage.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -2510,6 +2511,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int userIndex = 0;
 
   //! New
+  bool grantedStorage = false;
+  bool grantedLocation = false;
   AnimateIconController aIC_feed = AnimateIconController();
   AnimateIconController aIC_discover = AnimateIconController();
   AnimateIconController aIC_musicPlayer = AnimateIconController();
@@ -3030,6 +3033,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else {
       getSongsOnDevice();
     }
+  }
+
+  //?Cache Memory
+  dynamic cacheMemorySize = 0;
+  void getCacheMemorySize() async {
+    var appTempDir = await getTemporaryDirectory();
+    var appTempDirStats = await appTempDir.stat();
+    cacheMemorySize = appTempDirStats.size;
+    setState(() {});
   }
 
   //? INIT STATE
@@ -4702,6 +4714,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               GestureDetector(
                 onLongPress: () {
                   isSpeedTesting = !isSpeedTesting;
+                  getCacheMemorySize();
                   setState(() {});
                 },
                 child: isSpeedTesting == false
@@ -4713,7 +4726,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       )
                     : Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 20.0),
+                            horizontal: 10.0, vertical: 10.0),
+                        margin: const EdgeInsets.only(bottom: 15.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(
                             Radius.circular(20.0),
@@ -4726,49 +4740,233 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         child: Column(
                           children: [
+                            // Title
                             GestureDetector(
                               onLongPress: () {
                                 isSpeedTesting = !isSpeedTesting;
                                 setState(() {});
                               },
                               child: Text(
-                                "Network Speed Test",
+                                "Debug Options",
                                 style: TextStyle(
-                                  color: Colors.orangeAccent,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20.0),
-
-                            // Upload Test
-                            GestureDetector(
-                              onTap: () {
-                                connectionSpeedTest(2);
-                              },
-                              child: Text(
-                                "Upload Speed - " +
-                                    uploadRate.toString() +
-                                    " " +
-                                    uploadUnit,
-                                style: TextStyle(
-                                  color: Colors.lightBlueAccent,
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             const SizedBox(height: 10.0),
-                            // Download Test
-                            GestureDetector(
-                              onTap: () {
-                                connectionSpeedTest(1);
-                              },
-                              child: Text(
-                                "Download Speed - " +
-                                    downloadRate.toString() +
-                                    " " +
-                                    downloadUnit,
-                                style: TextStyle(
-                                  color: Colors.lightBlueAccent,
+                            // Memory
+                            Container(
+                              width: 210.0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 15.0),
+                              margin: const EdgeInsets.only(bottom: 10.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: feedCardShadow.withOpacity(0.1),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      isSpeedTesting = !isSpeedTesting;
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Cache Memory",
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.orangeAccent
+                                            : Colors.deepOrange[800],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20.0),
+                                  // Storage Permissions
+                                  GestureDetector(
+                                    onTap: () async {
+                                      getCacheMemorySize();
+                                      cacheMemorySize = 0;
+                                      await DefaultCacheManager().emptyCache();
+                                      var appDir =
+                                          (await getTemporaryDirectory()).path;
+                                      new Directory(appDir)
+                                          .delete(recursive: true);
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "(" +
+                                          cacheMemorySize.toString() +
+                                          " mb)\nClear Cache Memory",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                ],
+                              ),
+                            ),
+                            // Permission Test
+                            Container(
+                              width: 210.0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 15.0),
+                              margin: const EdgeInsets.only(bottom: 10.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: feedCardShadow.withOpacity(0.1),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      isSpeedTesting = !isSpeedTesting;
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Permissions",
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.orangeAccent
+                                            : Colors.deepOrange[800],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20.0),
+                                  // Storage Permissions
+                                  GestureDetector(
+                                    onTap: () async {
+                                      Permission.storage.request();
+                                      if (await Permission.storage.isGranted ==
+                                          true) {
+                                        grantedStorage = true;
+                                        setState(() {});
+                                      }
+                                    },
+                                    child: Text(
+                                      "Storage Access" +
+                                          (grantedStorage == true
+                                              ? " ✔"
+                                              : " ❌"),
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                  // Location Permissions
+                                  GestureDetector(
+                                    onTap: () async {
+                                      Permission.location.request();
+                                      if (await Permission.location.isGranted ==
+                                          true) {
+                                        grantedLocation = true;
+                                        setState(() {});
+                                      }
+                                    },
+                                    child: Text(
+                                      "Location Access" +
+                                          (grantedLocation == true
+                                              ? " ✔"
+                                              : " ❌"),
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Network Test
+                            Container(
+                              width: 210.0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 15.0),
+                              margin: const EdgeInsets.only(bottom: 0.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: feedCardShadow.withOpacity(0.1),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      isSpeedTesting = !isSpeedTesting;
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Network Speed Test",
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.orangeAccent
+                                            : Colors.deepOrange[800],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20.0),
+
+                                  // Upload Test
+                                  GestureDetector(
+                                    onTap: () {
+                                      connectionSpeedTest(2);
+                                    },
+                                    child: Text(
+                                      "Upload Speed - " +
+                                          uploadRate.toString() +
+                                          " " +
+                                          uploadUnit,
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                  // Download Test
+                                  GestureDetector(
+                                    onTap: () {
+                                      connectionSpeedTest(1);
+                                    },
+                                    child: Text(
+                                      "Download Speed - " +
+                                          downloadRate.toString() +
+                                          " " +
+                                          downloadUnit,
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
