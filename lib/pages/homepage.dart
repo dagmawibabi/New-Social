@@ -612,7 +612,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     refreshController.loadComplete();
     refreshController.refreshCompleted();
     setState(() {});
-    setState(() {});
   }
 
   // Change Album Art
@@ -1469,7 +1468,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int weatherCount = 0;
   bool useMetricMesurementSystem = true;
   void getWeather() async {
-    loc.Location location = await new loc.Location();
+    loc.Location location = await loc.Location();
     if (await Permission.location.status.isGranted == true) {
       locationData = await location.getLocation();
     } else {
@@ -3044,6 +3043,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  // Check Enabled Permissions
+  void checkAllPermissionStatus() async {
+    if (await Permission.storage.status.isGranted == true) {
+      grantedStorage = true;
+    } else {
+      grantedStorage = false;
+    }
+    if (await Permission.location.status.isGranted == true) {
+      grantedLocation = true;
+    } else {
+      grantedLocation = false;
+    }
+    setState(() {});
+  }
+
   //? INIT STATE
   @override
   void initState() {
@@ -3061,6 +3075,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     getDictionaryJSON();
     // Music Player INIT
     checkPermissions();
+    askPermissions();
     albumArtImage = getRandom(albumArts);
     // Crypto INIT
     getCryptoStats();
@@ -4715,6 +4730,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onLongPress: () {
                   isSpeedTesting = !isSpeedTesting;
                   getCacheMemorySize();
+                  checkAllPermissionStatus();
                   setState(() {});
                 },
                 child: isSpeedTesting == false
@@ -4788,7 +4804,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   const SizedBox(height: 20.0),
-                                  // Storage Permissions
+                                  // Clear Cache
                                   GestureDetector(
                                     onTap: () async {
                                       getCacheMemorySize();
@@ -4852,12 +4868,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Storage Permissions
                                   GestureDetector(
                                     onTap: () async {
-                                      Permission.storage.request();
-                                      if (await Permission.storage.isGranted ==
-                                          true) {
-                                        grantedStorage = true;
-                                        setState(() {});
-                                      }
+                                      await Permission.storage.request();
+                                      checkAllPermissionStatus();
+                                      setState(() {});
                                     },
                                     child: Text(
                                       "Storage Access" +
@@ -4875,12 +4888,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Location Permissions
                                   GestureDetector(
                                     onTap: () async {
-                                      Permission.location.request();
-                                      if (await Permission.location.isGranted ==
-                                          true) {
-                                        grantedLocation = true;
-                                        setState(() {});
-                                      }
+                                      await Permission.location.request();
+                                      checkAllPermissionStatus();
+                                      setState(() {});
                                     },
                                     child: Text(
                                       "Location Access" +
