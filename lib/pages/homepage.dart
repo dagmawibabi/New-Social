@@ -816,6 +816,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         )
                       : Container(
                           height: 3.0,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20.0),
+                            ),
+                          ),
                         ),
 
                   // Controlls
