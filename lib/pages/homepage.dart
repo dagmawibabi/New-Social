@@ -1470,7 +1470,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // Weather
   bool gotWeather = false;
   dynamic weatherData = "";
-  int weatherCount = 0;
   bool useMetricMesurementSystem = true;
   void getWeather() async {
     loc.Location location = await loc.Location();
@@ -1479,10 +1478,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else {
       await Permission.location.request();
     }
-    gotWeather = false;
-    weatherCount = 0;
-    //setState(() {});
-    // q = 48.8567,2.3508 - lat and long
     String latitude = locationData.latitude.toString();
     String longitude = locationData.longitude.toString();
     var url = Uri.parse(
@@ -1495,7 +1490,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     var responseJSON = jsonDecode(response.body);
     weatherData = responseJSON;
     gotWeather = true;
-    weatherCount++;
     setState(() {});
   }
 
@@ -2536,9 +2530,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   static Color feedCardShadow = Colors.grey[400]!;
   static Color bottomNavBarColor = Colors.grey[200]!;
   static Color modalBottomSheetColor = Colors.grey[200]!;
+  static List<Color> cardGradient = [
+    Color(0xffb3ffab),
+    Color(0xff12fff7),
+  ];
   bool hideBottomNav = false;
 
   //? Settings
+  bool isNavBarFloating = true;
   bool fullScreenOnScroll = false;
   List presetThemes = [
     {
@@ -2848,6 +2847,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardShadow = Colors.grey[800]!;
       bottomNavBarColor = Colors.grey[900]!;
       modalBottomSheetColor = Colors.grey[900]!;
+      cardGradient = [
+        Color(0x11C85C5C),
+        Color(0x112F86A6),
+        Color(0x11C85C5C),
+      ];
       themeEditorOptions = [
         {
           "icon": Icons.bubble_chart,
@@ -2914,6 +2918,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardShadow = Colors.grey[400]!;
       bottomNavBarColor = Colors.grey[200]!;
       modalBottomSheetColor = Colors.grey[200]!;
+      cardGradient = [
+        Color(0xffb3ffab),
+        Color(0xff12fff7),
+      ];
       themeEditorOptions = [
         {
           "icon": Icons.bubble_chart,
@@ -3034,8 +3042,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     PermissionStatus storagePermissionStatus = await Permission.storage.status;
     if (storagePermissionStatus.isGranted == false) {
       await Permission.storage.request();
+      getSongsOnDevice();
     } else {
       getSongsOnDevice();
+    }
+    // Ask Location Permissions
+    PermissionStatus locationPermissionStatus =
+        await Permission.location.status;
+    if (locationPermissionStatus.isGranted == false) {
+      await Permission.location.request();
+      getWeather();
+    } else {
+      getWeather();
     }
   }
 
@@ -3070,7 +3088,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     //hideBottomNavBar();
     // Weather
-    getWeather();
+    askPermissions();
+    //getWeather();
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
@@ -3079,8 +3098,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Discover INIT
     getDictionaryJSON();
     // Music Player INIT
-    checkPermissions();
-    askPermissions();
+    //checkPermissions();
+    //askPermissions();
     albumArtImage = getRandom(albumArts);
     // Crypto INIT
     getCryptoStats();
@@ -3115,7 +3134,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       isSongPlaying == true ? 210.0 : 170.0,
       60.0,
       20.0,
-      isCryptoPageLoadingError == true ? 200.0 : 300.0,
+      isCryptoPageLoadingError == true ? 200.0 : 0.0, //300.0,
       280.0,
       20.0,
       20.0,
@@ -3194,7 +3213,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
               )
-            : Container(),
+            : Container(
+                padding: const EdgeInsets.only(top: 100.0),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: textColor,
+                  ),
+                ),
+              ),
       ),
       // Discover Page
       FlexibleSpaceBar(),
@@ -3202,7 +3228,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       FlexibleSpaceBar(),
       // Crypto Page
       FlexibleSpaceBar(
-        background: Padding(
+          /*background: Padding(
           padding: const EdgeInsets.only(top: 20.0),
           child: isCryptoPageLoadingError == false
               ? Image.asset(
@@ -3210,8 +3236,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   fit: BoxFit.cover,
                 )
               : Container(),
-        ),
-      ),
+        ),*/
+          ),
       // Chat Page
       FlexibleSpaceBar(
         background: Padding(
@@ -3787,6 +3813,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         error_illustrations,
         feedCardsColor,
         textColor,
+        textColorDim,
+        textColorDimmer,
+        iconColor,
+        cardGradient,
       ),
 
       // Chat Page
@@ -4728,6 +4758,55 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ],
               ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
+              // Scroll Music Title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isNavBarFloating == false
+                            ? Icons.call_to_action
+                            : Icons.call_to_action_outlined,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Floating Nav-Bar",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Sticks/Floats the bottom navigation bar",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
+                    value: isNavBarFloating,
+                    onChanged: (value) {
+                      isNavBarFloating = value;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              Divider(color: textColorDimmer.withOpacity(0.2)),
               //Divider(color: textColorDimmer.withOpacity(0.2)),
               const SizedBox(height: 150.0),
               // App Version and Speed Tester
@@ -6005,6 +6084,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // B O T T O M  N A V  B A R
       bottomNavigationBar: isBottomBarVisible == true
           ? DotNavigationBar(
+              enableFloatingNavBar: isNavBarFloating,
               backgroundColor: bottomNavBarColor,
               boxShadow: [
                 BoxShadow(
@@ -6014,12 +6094,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   blurRadius: 1.0,
                 ),
               ],
-              paddingR: const EdgeInsets.all(2.0),
+              paddingR: const EdgeInsets.all(0.0),
               marginR:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               currentIndex: curPage,
               itemPadding: EdgeInsets.all(0.0),
-              margin: EdgeInsets.all(0.0),
+              margin: EdgeInsets.symmetric(
+                  horizontal: isNavBarFloating == false ? 20.0 : 0.0),
               onTap: (index) {
                 curPage = index;
                 setState(() {});

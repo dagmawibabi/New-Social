@@ -26,6 +26,7 @@ class _MyAppState extends State<MyApp> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
