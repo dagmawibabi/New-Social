@@ -2530,6 +2530,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   static Color feedCardShadow = Colors.grey[400]!;
   static Color bottomNavBarColor = Colors.grey[200]!;
   static Color modalBottomSheetColor = Colors.grey[200]!;
+  static Color selectedTabColor = Colors.deepPurple;
   static List<Color> cardGradient = [
     Color(0xffb3ffab),
     Color(0xff12fff7),
@@ -3121,6 +3122,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    TabController tabBarController = TabController(length: 2, vsync: this);
+    List extensionWidgets = [
+      {
+        "widget": Text(
+          "Heyy Fam!",
+        ),
+      },
+      {
+        "widget": Container(
+          width: 10.0,
+          height: 5.0,
+          color: Colors.blue,
+        ),
+      },
+    ];
     List pageOnRefresh = [
       getHomePageFeedRefresh,
       sampleFuture,
@@ -3129,15 +3145,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       sampleFuture,
       sampleFuture,
       sampleFuture,
+      sampleFuture,
     ];
     List pagesAppBarExpanded = [
-      isSongPlaying == true ? 210.0 : 170.0,
+      isSongPlaying == true ? 210.0 : 200.0,
       60.0,
       20.0,
       isCryptoPageLoadingError == true ? 200.0 : 0.0, //300.0,
       280.0,
       20.0,
       20.0,
+      isSongPlaying == true ? 210.0 : 200.0,
     ];
     List pagesAppbarFlexibleSpace = [
       // Home Page
@@ -3252,6 +3270,88 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       FlexibleSpaceBar(),
       // DMs Page
       FlexibleSpaceBar(),
+      // Home Page
+      FlexibleSpaceBar(
+        background: (gotWeather == true)
+            ? GestureDetector(
+                onTap: () {
+                  weatherDetails();
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  margin: const EdgeInsets.only(bottom: 30.0, top: 120.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 60.0,
+                            child: CachedNetworkImage(
+                                imageUrl: "https:" +
+                                    weatherData["current"]["condition"]["icon"]
+                                        .toString()),
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    weatherData["current"]["condition"]["text"],
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ), /*
+                                const SizedBox(height: 10.0),
+                                Text(
+                                  weatherData["location"]["name"] +
+                                      "\n" +
+                                      weatherData["location"]["country"],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                  ),
+                                ),*/
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: Text(
+                              useMetricMesurementSystem == true
+                                  ? weatherData["current"]["temp_c"]
+                                          .toString() +
+                                      "°C"
+                                  : weatherData["current"]["temp_f"]
+                                          .toString() +
+                                      "°F",
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 19.0,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Container(
+                padding: const EdgeInsets.only(top: 100.0),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: textColor,
+                  ),
+                ),
+              ),
+      ),
     ];
     List pagesBody = [
       // Home Page
@@ -3393,7 +3493,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 },
                                               );
                                               /*viewFeedImages(
-                                          homepageFeed[index]["data"]["url"]);*/
+                                                homepageFeed[index]["data"]["url"]);*/
                                             },
                                             child: PhotoView(
                                               tightMode: true,
@@ -5186,6 +5286,302 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
+
+      // Shop
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            const SizedBox(height: 40.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 110.0,
+                  height: 130.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.watch_later_outlined,
+                        size: 60.0,
+                      ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        "Clock",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Some Detail",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     ];
     List smartRefresherColor = [
       Color(0xff6C63FF),
@@ -5195,12 +5591,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       Color(0xff0078ff),
       Colors.cyan[400],
       Colors.cyan[400],
+      Color(0xff6C63FF),
     ];
     List pagesAppBarBottom = [
       // Home Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 50.0 : 0.0), // here the desired height
+            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
         child: isSongPlaying == true
             ? Container(
                 decoration: BoxDecoration(
@@ -5304,7 +5701,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ],
                 ),
               )
-            : Container(),
+            : Container(
+                child: TabBar(
+                  controller: tabBarController,
+                  indicatorColor: containerColor,
+                  onTap: (value) {
+                    curPage = value;
+                    if (value != 0) {
+                      curPage = 7;
+                    }
+                    setState(() {});
+                  },
+                  tabs: [
+                    Tab(
+                      icon: Icon(
+                        Icons.home_outlined,
+                        color: curPage == 0 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.shop_two_outlined,
+                        color: curPage == 7 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
       // Discover Page
       PreferredSize(
@@ -5826,6 +6249,141 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         preferredSize: Size.fromHeight(0.0), // here the desired height
         child: Container(),
       ),
+      // Shop Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(
+            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
+        child: isSongPlaying == true
+            ? Container(
+                decoration: BoxDecoration(
+                  color: containerColor,
+                  border: Border.all(
+                    color: feedCardShadow.withOpacity(0.3),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
+                          ),
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        // Rewind
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                -MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              backInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_rewind_rounded,
+                              color: iconColor,
+                            ),
+                          ),
+                        ),
+                        // Pause Play
+                        IconButton(
+                          onPressed: () {
+                            pausePlaySong();
+                          },
+                          icon: Icon(
+                            isSongPlaying ? Icons.pause : Icons.play_arrow,
+                            color: iconColor,
+                          ),
+                        ),
+                        // Forward
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              nextInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_forward_rounded,
+                              color: iconColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            : Container(
+                child: TabBar(
+                  controller: tabBarController,
+                  indicatorColor: containerColor,
+                  onTap: (value) {
+                    curPage = value;
+                    if (value != 0) {
+                      curPage = 7;
+                    }
+                    setState(() {});
+                  },
+                  tabs: [
+                    Tab(
+                      icon: Icon(
+                        Icons.home_outlined,
+                        color: curPage == 0 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.shop_two_outlined,
+                        color: curPage == 7 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
     ];
     List pagesAppBarIconTitle = [
       {
@@ -5856,6 +6414,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "icon": Ionicons.chatbubble_ellipses_outline,
         "title": users[userIndex]["username"],
       },
+      {
+        "icon": Ionicons.storefront_outline,
+        "title": "Store",
+      },
     ];
     return Scaffold(
       extendBody: true,
@@ -5868,6 +6430,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           backgroundColor: smartRefresherColor[curPage],
         ),
         child: CustomScrollView(
+          physics: BouncingScrollPhysics(),
           controller: scrollController,
           slivers: [
             // App Bar
