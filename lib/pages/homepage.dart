@@ -2826,6 +2826,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //? GENERAL
   bool enableFlexibleSpace = true;
 
+  Future<bool> backButton() async {
+    if (curPage == 6) {
+      curPage = 4;
+      isBottomBarVisible = true;
+      setState(() {});
+    } else if (curPage == 7) {
+      curPage = 0;
+      setState(() {});
+    } else {
+      print("here");
+    }
+    return false;
+  }
+
   // Sample Future Function Placeholder
   Future<void> sampleFuture() async {
     await Future.delayed(Duration(seconds: 3));
@@ -3056,6 +3070,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     } else {
       getWeather();
     }
+    // Ask Camera Permissions
+    PermissionStatus cameraPermissionStatus = await Permission.camera.status;
+    if (cameraPermissionStatus.isGranted == false) {
+      await Permission.camera.request();
+    }
   }
 
   //?Cache Memory
@@ -3122,19 +3141,80 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print(curPage);
     TabController tabBarController = TabController(length: 2, vsync: this);
-    List extensionWidgets = [
+    List extensionApps = [
       {
-        "widget": Text(
-          "Heyy Fam!",
-        ),
+        "icon": Icons.menu_book_outlined,
+        "title": "Reader",
+        "subtitle": "PDF Reader",
+        "app": "qrScannerPage",
       },
       {
-        "widget": Container(
-          width: 10.0,
-          height: 5.0,
-          color: Colors.blue,
-        ),
+        "icon": Icons.qr_code_scanner_rounded,
+        "title": "QR Scanner",
+        "subtitle": "QR Code Scanner",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.flash_on,
+        "title": "Flash Light",
+        "subtitle": "Light",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.assistant_outlined,
+        "title": "AI Assistant",
+        "subtitle": "Personal Assistant",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.menu_book_outlined,
+        "title": "Reader",
+        "subtitle": "PDF Reader",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.qr_code_scanner_rounded,
+        "title": "QR Scanner",
+        "subtitle": "QR Code Scanner",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.flash_on,
+        "title": "Flash Light",
+        "subtitle": "Light",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.assistant_outlined,
+        "title": "AI Assistant",
+        "subtitle": "Personal Assistant",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.menu_book_outlined,
+        "title": "Reader",
+        "subtitle": "PDF Reader",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.qr_code_scanner_rounded,
+        "title": "QR Scanner",
+        "subtitle": "QR Code Scanner",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.flash_on,
+        "title": "Flash Light",
+        "subtitle": "Light",
+        "app": "qrScannerPage",
+      },
+      {
+        "icon": Icons.assistant_outlined,
+        "title": "AI Assistant",
+        "subtitle": "Personal Assistant",
+        "app": "qrScannerPage",
       },
     ];
     List pageOnRefresh = [
@@ -5289,297 +5369,87 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       // Shop
       SliverToBoxAdapter(
-        child: Column(
-          children: [
-            const SizedBox(height: 40.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+        child: Container(
+          height: 500.0,
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 100,
+              childAspectRatio: 1 / 1.2,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 12,
             ),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
+            itemCount: extensionApps.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, extensionApps[index]["app"]);
+                },
+                child: Container(
                   width: 110.0,
                   height: 130.0,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0, vertical: 4.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 2.0),
                   decoration: BoxDecoration(
-                    color: Colors.grey,
+                    color: feedCardsColor,
                     borderRadius: BorderRadius.all(
                       Radius.circular(20.0),
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[800]!,
+                        blurRadius: 2.0,
+                      ),
+                    ],
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
+                        extensionApps[index]["icon"],
+                        size: 40.0,
+                        color: iconColor,
                       ),
                       const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
+                      SizedBox(
+                        width: 100.0,
+                        height: 28.0,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            extensionApps[index]["title"],
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              color: textColor,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ),
-                      Text(
-                        "Some Detail",
+                      SizedBox(
+                        width: 100.0,
+                        height: 20.0,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            extensionApps[index]["subtitle"],
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 110.0,
-                  height: 130.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        size: 60.0,
-                      ),
-                      const SizedBox(height: 10.0),
-                      Text(
-                        "Clock",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Some Detail",
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+              );
+            },
+          ),
         ),
       ),
     ];
@@ -6419,482 +6289,485 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "title": "Store",
       },
     ];
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: scaffoldBGColor,
-      // B O D Y
-      body: SmartRefresher(
-        controller: refreshController,
-        onRefresh: pageOnRefresh[curPage],
-        header: WaterDropMaterialHeader(
-          backgroundColor: smartRefresherColor[curPage],
-        ),
-        child: CustomScrollView(
-          physics: BouncingScrollPhysics(),
-          controller: scrollController,
-          slivers: [
-            // App Bar
-            fullScreenMode == false
-                ? fullScreenModeMP == false
-                    ? SliverAppBar(
-                        backgroundColor: appBarBGColor,
-                        foregroundColor: Colors.black,
-                        expandedHeight: enableFlexibleSpace == true
-                            ? pagesAppBarExpanded[curPage]
-                            : 0.0,
-                        pinned: true,
-                        title: GestureDetector(
-                          onDoubleTap: () {
-                            themeEditorOptionIndex = 1;
-                            themeEditorColorPicker(false);
-                          },
-                          child: Row(
-                            children: [
-                              curPage == 6
-                                  ? IconButton(
-                                      onPressed: () {
-                                        curPage = 4;
-                                        isBottomBarVisible = true;
-                                        setState(() {});
-                                      },
-                                      icon: Icon(
-                                        Icons.arrow_back,
+    return WillPopScope(
+      onWillPop: backButton,
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: scaffoldBGColor,
+        // B O D Y
+        body: SmartRefresher(
+          controller: refreshController,
+          onRefresh: pageOnRefresh[curPage],
+          header: WaterDropMaterialHeader(
+            backgroundColor: smartRefresherColor[curPage],
+          ),
+          child: CustomScrollView(
+            physics: BouncingScrollPhysics(),
+            controller: scrollController,
+            slivers: [
+              // App Bar
+              fullScreenMode == false
+                  ? fullScreenModeMP == false
+                      ? SliverAppBar(
+                          backgroundColor: appBarBGColor,
+                          foregroundColor: Colors.black,
+                          expandedHeight: enableFlexibleSpace == true
+                              ? pagesAppBarExpanded[curPage]
+                              : 0.0,
+                          pinned: true,
+                          title: GestureDetector(
+                            onDoubleTap: () {
+                              themeEditorOptionIndex = 1;
+                              themeEditorColorPicker(false);
+                            },
+                            child: Row(
+                              children: [
+                                curPage == 6
+                                    ? IconButton(
+                                        onPressed: () {
+                                          curPage = 4;
+                                          isBottomBarVisible = true;
+                                          setState(() {});
+                                        },
+                                        icon: Icon(
+                                          Icons.arrow_back,
+                                        ),
+                                      )
+                                    : GestureDetector(
+                                        onLongPress: () {
+                                          themeEditorOptionIndex = 0;
+                                          themeEditorColorPicker(false);
+                                        },
+                                        child: Icon(
+                                          pagesAppBarIconTitle[curPage]["icon"],
+                                          color: iconColor,
+                                        ),
                                       ),
-                                    )
-                                  : GestureDetector(
-                                      onLongPress: () {
-                                        themeEditorOptionIndex = 0;
-                                        themeEditorColorPicker(false);
-                                      },
-                                      child: Icon(
-                                        pagesAppBarIconTitle[curPage]["icon"],
-                                        color: iconColor,
+                                SizedBox(width: 12.0),
+                                GestureDetector(
+                                  onLongPress: () {
+                                    themeEditorOptionIndex = 5;
+                                    themeEditorColorPicker(false);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        pagesAppBarIconTitle[curPage]["title"],
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.0,
+                                        ),
                                       ),
-                                    ),
-                              SizedBox(width: 12.0),
-                              GestureDetector(
-                                onLongPress: () {
-                                  themeEditorOptionIndex = 5;
-                                  themeEditorColorPicker(false);
-                                },
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      pagesAppBarIconTitle[curPage]["title"],
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.0,
-                                      ),
-                                    ),
-                                    curPage == 6
-                                        ? Container(
-                                            width: 6.0,
-                                            height: 6.0,
-                                            margin: const EdgeInsets.only(
-                                                left: 5.0, top: 5.0),
-                                            decoration: BoxDecoration(
-                                              //shape: BoxShape.circle,
-                                              color: users[userIndex]
-                                                          ["online"] ==
-                                                      true
-                                                  ? Colors.lightGreenAccent
-                                                  : Colors.transparent,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.0)),
-                                            ),
-                                          )
-                                        : Container(),
-                                  ],
+                                      curPage == 6
+                                          ? Container(
+                                              width: 6.0,
+                                              height: 6.0,
+                                              margin: const EdgeInsets.only(
+                                                  left: 5.0, top: 5.0),
+                                              decoration: BoxDecoration(
+                                                //shape: BoxShape.circle,
+                                                color: users[userIndex]
+                                                            ["online"] ==
+                                                        true
+                                                    ? Colors.lightGreenAccent
+                                                    : Colors.transparent,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20.0)),
+                                              ),
+                                            )
+                                          : Container(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        flexibleSpace: enableFlexibleSpace == true
-                            ? pagesAppbarFlexibleSpace[curPage]
-                            : GestureDetector(
-                                onLongPress: () {
-                                  themeEditorOptionIndex = 1;
-                                  themeEditorColorPicker(false);
-                                },
-                                child: FlexibleSpaceBar()),
-                        bottom: pagesAppBarBottom[curPage],
-                        actions: [
-                          curPage == 0
-                              ? Row(
-                                  children: [
-                                    // Search Subreddit
-                                    IconButton(
-                                      onPressed: () {
-                                        feedChoice();
-                                      },
-                                      icon: Icon(
-                                        Icons.search,
-                                        color: iconColor,
+                          flexibleSpace: enableFlexibleSpace == true
+                              ? pagesAppbarFlexibleSpace[curPage]
+                              : GestureDetector(
+                                  onLongPress: () {
+                                    themeEditorOptionIndex = 1;
+                                    themeEditorColorPicker(false);
+                                  },
+                                  child: FlexibleSpaceBar()),
+                          bottom: pagesAppBarBottom[curPage],
+                          actions: [
+                            curPage == 0
+                                ? Row(
+                                    children: [
+                                      // Search Subreddit
+                                      IconButton(
+                                        onPressed: () {
+                                          feedChoice();
+                                        },
+                                        icon: Icon(
+                                          Icons.search,
+                                          color: iconColor,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Container(),
+                            curPage == 6
+                                ? Container(
+                                    width: 35.0,
+                                    height: 35.0,
+                                    margin: const EdgeInsets.only(right: 10.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey[900],
+                                      //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Image.network(
+                                        users[userIndex]["dp"],
                                       ),
                                     ),
-                                  ],
-                                )
-                              : Container(),
-                          curPage == 6
-                              ? Container(
-                                  width: 35.0,
-                                  height: 35.0,
-                                  margin: const EdgeInsets.only(right: 10.0),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.grey[900],
-                                    //borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: FittedBox(
-                                    fit: BoxFit.cover,
-                                    child: Image.network(
-                                      users[userIndex]["dp"],
-                                    ),
-                                  ),
-                                )
-                              :
-                              // Fullscreen and Profile
-                              Row(
-                                  children: [
-                                    // Fullscreen
-                                    IconButton(
-                                      onPressed: () {
-                                        if (curPage == 2) {
-                                          setFullscreenMusicPlayer();
-                                        } else {
-                                          setFullscreen();
-                                        }
-                                      },
-                                      icon: Icon(
-                                        fullScreenModeMP == false
-                                            ? Icons.fullscreen
-                                            : Icons.fullscreen_exit,
-                                        color: iconColor,
+                                  )
+                                :
+                                // Fullscreen and Profile
+                                Row(
+                                    children: [
+                                      // Fullscreen
+                                      IconButton(
+                                        onPressed: () {
+                                          if (curPage == 2) {
+                                            setFullscreenMusicPlayer();
+                                          } else {
+                                            setFullscreen();
+                                          }
+                                        },
+                                        icon: Icon(
+                                          fullScreenModeMP == false
+                                              ? Icons.fullscreen
+                                              : Icons.fullscreen_exit,
+                                          color: iconColor,
+                                        ),
                                       ),
-                                    ),
-                                    // Profile
-                                    Container(
-                                      width: 45.0,
-                                      height: 45.0,
-                                      margin:
-                                          const EdgeInsets.only(right: 10.0),
-                                      child: FittedBox(
-                                        fit: BoxFit.contain,
-                                        child: UserProfileAvatar(
-                                          avatarUrl:
-                                              'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
-                                          onAvatarTap: () {
-                                            showProfileDialog();
-                                          },
-                                          notificationCount: 4,
-                                          notificationBubbleTextStyle:
-                                              TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          avatarSplashColor:
-                                              smartRefresherColor[0],
-                                          radius: 20,
-                                          isActivityIndicatorSmall: false,
-                                          avatarBorderData: AvatarBorderData(
-                                            borderColor: Colors.white,
-                                            borderWidth: 1.0,
+                                      // Profile
+                                      Container(
+                                        width: 45.0,
+                                        height: 45.0,
+                                        margin:
+                                            const EdgeInsets.only(right: 10.0),
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: UserProfileAvatar(
+                                            avatarUrl:
+                                                'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
+                                            onAvatarTap: () {
+                                              showProfileDialog();
+                                            },
+                                            notificationCount: 4,
+                                            notificationBubbleTextStyle:
+                                                TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            avatarSplashColor:
+                                                smartRefresherColor[0],
+                                            radius: 20,
+                                            isActivityIndicatorSmall: false,
+                                            avatarBorderData: AvatarBorderData(
+                                              borderColor: Colors.white,
+                                              borderWidth: 1.0,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                          ],
+                        )
+                      : SliverToBoxAdapter(
+                          child: Container(
+                            height: 99.0,
+                            color: containerColor,
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 55.0, bottom: 4.0),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.fullscreen_exit,
+                                  color: iconColor.withOpacity(0.2),
                                 ),
-                        ],
-                      )
-                    : SliverToBoxAdapter(
-                        child: Container(
-                          height: 99.0,
-                          color: containerColor,
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(right: 55.0, bottom: 4.0),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.fullscreen_exit,
-                                color: iconColor.withOpacity(0.2),
+                                onPressed: () {
+                                  setFullscreenMusicPlayer();
+                                },
                               ),
-                              onPressed: () {
-                                setFullscreenMusicPlayer();
-                              },
                             ),
                           ),
-                        ),
-                      )
-                : SliverToBoxAdapter(
-                    child: Container(
-                      color: fullScreenMode == true
-                          ? Colors.grey[300]!
-                          : Colors.grey[200]!,
+                        )
+                  : SliverToBoxAdapter(
+                      child: Container(
+                        color: fullScreenMode == true
+                            ? Colors.grey[300]!
+                            : Colors.grey[200]!,
+                      ),
                     ),
-                  ),
 
-            // Body + Content
-            pagesBody[curPage],
-          ],
+              // Body + Content
+              pagesBody[curPage],
+            ],
+          ),
         ),
+        // B O T T O M  N A V  B A R
+        bottomNavigationBar: isBottomBarVisible == true
+            ? DotNavigationBar(
+                enableFloatingNavBar: isNavBarFloating,
+                backgroundColor: bottomNavBarColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[500]!,
+                    //offset: Offset(1.0, 1.0),
+                    //spreadRadius: 0.8,
+                    blurRadius: 1.0,
+                  ),
+                ],
+                paddingR: const EdgeInsets.all(0.0),
+                marginR: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 20.0),
+                currentIndex: curPage,
+                itemPadding: EdgeInsets.all(0.0),
+                margin: EdgeInsets.symmetric(
+                    horizontal: isNavBarFloating == false ? 20.0 : 0.0),
+                onTap: (index) {
+                  curPage = index;
+                  setState(() {});
+                },
+                items: [
+                  // Home
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.planet_outline,
+                      endIcon: Ionicons.sparkles_outline,
+                      size: 22.0,
+                      controller: aIC_feed,
+                      onStartIconPress: () {
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 0;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Color(0xff6C63FF),
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+                  /* DotNavigationBarItem(
+                    icon: const Icon(Ionicons.planet_outline),
+                    selectedColor: Color(0xff6C63FF),
+                  ),*/
+
+                  // Search / Discover
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.compass_outline,
+                      endIcon: Ionicons.compass_outline,
+                      size: 24.0,
+                      controller: aIC_discover,
+                      onStartIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 1;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Colors.deepOrangeAccent,
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+                  /*DotNavigationBarItem(
+                    icon: const Icon(Ionicons.compass_outline),
+                    selectedColor: Colors.purple,
+                  ),*/
+
+                  // Music
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.play_outline,
+                      endIcon: Ionicons.musical_notes_outline,
+                      size: 24.0,
+                      controller: aIC_musicPlayer,
+                      onStartIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 2;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Colors.lightBlue,
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+                  /*DotNavigationBarItem(
+                    icon: const Icon(Ionicons.play_outline),
+                    selectedColor: Colors.lightBlue,
+                  ),*/
+
+                  // Crypto
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.wallet_outline,
+                      endIcon: Ionicons.cash_outline,
+                      size: 24.0,
+                      controller: aIC_wallet,
+                      onStartIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 3;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_chat.animateToStart();
+                        aIC_settings.animateToStart();
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Color(0xff01bb1f),
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+                  /*DotNavigationBarItem(
+                    icon: const Icon(Ionicons.wallet_outline),
+                    selectedColor: Colors.green[500],
+                  ),*/
+
+                  // chat
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.paper_plane_outline,
+                      endIcon: Ionicons.chatbubble_ellipses_outline,
+                      size: 24.0,
+                      controller: aIC_chat,
+                      onStartIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 4;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_settings.animateToStart();
+                        curPage = 4;
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Color(0xff229Aff),
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+                  /*DotNavigationBarItem(
+                    icon: const Icon(Ionicons.paper_plane_outline),
+                    selectedColor: Colors.teal,
+                  ),*/
+
+                  // Settings
+                  DotNavigationBarItem(
+                    icon: AnimateIcons(
+                      startIcon: Ionicons.hardware_chip_outline,
+                      endIcon: Ionicons.hardware_chip_outline,
+                      size: 24.0,
+                      controller: aIC_settings,
+                      onStartIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        curPage = 5;
+                        setState(() {});
+                        return true;
+                      },
+                      onEndIconPress: () {
+                        aIC_feed.animateToStart();
+                        aIC_discover.animateToStart();
+                        aIC_musicPlayer.animateToStart();
+                        aIC_wallet.animateToStart();
+                        aIC_chat.animateToStart();
+                        return true;
+                      },
+                      duration: Duration(milliseconds: 300),
+                      startIconColor: iconColor,
+                      endIconColor: Colors.cyan,
+                      clockwise: false,
+                    ),
+                    selectedColor: bottomNavBarColor,
+                  ),
+
+                  /*DotNavigationBarItem(
+                    icon: const Icon(Ionicons.hardware_chip_outline),
+                    selectedColor: Colors.teal,
+                  ),*/
+                ],
+              )
+            : Container(),
       ),
-      // B O T T O M  N A V  B A R
-      bottomNavigationBar: isBottomBarVisible == true
-          ? DotNavigationBar(
-              enableFloatingNavBar: isNavBarFloating,
-              backgroundColor: bottomNavBarColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[500]!,
-                  //offset: Offset(1.0, 1.0),
-                  //spreadRadius: 0.8,
-                  blurRadius: 1.0,
-                ),
-              ],
-              paddingR: const EdgeInsets.all(0.0),
-              marginR:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-              currentIndex: curPage,
-              itemPadding: EdgeInsets.all(0.0),
-              margin: EdgeInsets.symmetric(
-                  horizontal: isNavBarFloating == false ? 20.0 : 0.0),
-              onTap: (index) {
-                curPage = index;
-                setState(() {});
-              },
-              items: [
-                // Home
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.planet_outline,
-                    endIcon: Ionicons.sparkles_outline,
-                    size: 22.0,
-                    controller: aIC_feed,
-                    onStartIconPress: () {
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 0;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Color(0xff6C63FF),
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-                /* DotNavigationBarItem(
-                  icon: const Icon(Ionicons.planet_outline),
-                  selectedColor: Color(0xff6C63FF),
-                ),*/
-
-                // Search / Discover
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.compass_outline,
-                    endIcon: Ionicons.compass_outline,
-                    size: 24.0,
-                    controller: aIC_discover,
-                    onStartIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 1;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Colors.deepOrangeAccent,
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-                /*DotNavigationBarItem(
-                  icon: const Icon(Ionicons.compass_outline),
-                  selectedColor: Colors.purple,
-                ),*/
-
-                // Music
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.play_outline,
-                    endIcon: Ionicons.musical_notes_outline,
-                    size: 24.0,
-                    controller: aIC_musicPlayer,
-                    onStartIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 2;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Colors.lightBlue,
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-                /*DotNavigationBarItem(
-                  icon: const Icon(Ionicons.play_outline),
-                  selectedColor: Colors.lightBlue,
-                ),*/
-
-                // Crypto
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.wallet_outline,
-                    endIcon: Ionicons.cash_outline,
-                    size: 24.0,
-                    controller: aIC_wallet,
-                    onStartIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 3;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_chat.animateToStart();
-                      aIC_settings.animateToStart();
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Color(0xff01bb1f),
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-                /*DotNavigationBarItem(
-                  icon: const Icon(Ionicons.wallet_outline),
-                  selectedColor: Colors.green[500],
-                ),*/
-
-                // chat
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.paper_plane_outline,
-                    endIcon: Ionicons.chatbubble_ellipses_outline,
-                    size: 24.0,
-                    controller: aIC_chat,
-                    onStartIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 4;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_settings.animateToStart();
-                      curPage = 4;
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Color(0xff229Aff),
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-                /*DotNavigationBarItem(
-                  icon: const Icon(Ionicons.paper_plane_outline),
-                  selectedColor: Colors.teal,
-                ),*/
-
-                // Settings
-                DotNavigationBarItem(
-                  icon: AnimateIcons(
-                    startIcon: Ionicons.hardware_chip_outline,
-                    endIcon: Ionicons.hardware_chip_outline,
-                    size: 24.0,
-                    controller: aIC_settings,
-                    onStartIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      curPage = 5;
-                      setState(() {});
-                      return true;
-                    },
-                    onEndIconPress: () {
-                      aIC_feed.animateToStart();
-                      aIC_discover.animateToStart();
-                      aIC_musicPlayer.animateToStart();
-                      aIC_wallet.animateToStart();
-                      aIC_chat.animateToStart();
-                      return true;
-                    },
-                    duration: Duration(milliseconds: 300),
-                    startIconColor: iconColor,
-                    endIconColor: Colors.cyan,
-                    clockwise: false,
-                  ),
-                  selectedColor: bottomNavBarColor,
-                ),
-
-                /*DotNavigationBarItem(
-                  icon: const Icon(Ionicons.hardware_chip_outline),
-                  selectedColor: Colors.teal,
-                ),*/
-              ],
-            )
-          : Container(),
     );
   }
 }

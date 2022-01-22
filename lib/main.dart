@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
+import 'package:newsocial/pages/extensionApps/qrScanner.dart';
 import 'package:newsocial/pages/homepage.dart';
 import 'package:newsocial/pages/loadingPage.dart';
 import 'package:newsocial/pages/videoViewerPage.dart';
@@ -35,6 +36,7 @@ class _MyAppState extends State<MyApp> {
         "homePage": (context) => HomePage(),
         "contentViewerPage": (context) => ContentViewerPage(),
         "VideoViewerPage": (content) => VideoViewerPage(),
+        "qrScannerPage": (content) => QRScannerPage(),
       },
       theme: ThemeData(
         fontFamily: "BlenderProBook",
