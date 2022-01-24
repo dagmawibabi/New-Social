@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
 import 'package:newsocial/pages/extensionApps/qrScanner.dart';
 import 'package:newsocial/pages/homepage.dart';
 import 'package:newsocial/pages/loadingPage.dart';
 import 'package:newsocial/pages/videoViewerPage.dart';
+import 'package:newsocial/dbModel/model.dart';
 
-void main() {
+void main() async {
+  /*WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(SettingsAdapter());
+  await Hive.openBox<Settings>("settings");*/
+
   runApp(MyApp());
 }
 

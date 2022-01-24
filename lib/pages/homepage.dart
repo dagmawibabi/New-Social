@@ -15,6 +15,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:hive/hive.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:internet_speed_test/callbacks_enum.dart';
 import 'package:internet_speed_test/internet_speed_test.dart';
@@ -3137,6 +3138,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
     _controller.dispose();
     assetsAudioPlayer.dispose();
+    /*Hive.close();*/
   }
 
   @override
