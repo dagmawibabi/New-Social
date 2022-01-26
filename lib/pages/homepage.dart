@@ -511,7 +511,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AssetsAudioPlayer assetsAudioPlayer = AssetsAudioPlayer();
   bool isSongPlaying = false;
   int curSongIndex = 0;
-  dynamic albumArtImage = "";
+  static dynamic albumArtImage = "";
   List albumArts = [
     "assets/images/album_arts/albumArt2.png",
     "assets/images/album_arts/albumArt3.png",
@@ -2513,6 +2513,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //! New
   bool grantedStorage = false;
   bool grantedLocation = false;
+  bool grantedCamera = false;
   AnimateIconController aIC_feed = AnimateIconController();
   AnimateIconController aIC_discover = AnimateIconController();
   AnimateIconController aIC_musicPlayer = AnimateIconController();
@@ -3084,7 +3085,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   QRViewController? qrController;
   void onQRViewCreated(String image) {
     albumArtImage = image;
-    setState(() {});
+    //setState(() {});
     /*setState(() {
       this.qrController = qrController;
     });
@@ -3094,6 +3095,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       });
     });
     print(qrResult!.code);*/
+  }
+
+  static void setAlbumArtFromQR(String? pic) {
+    albumArtImage = pic;
+  }
+
+  bool isScanningQR = false;
+  Widget qrScanner = QRView(
+    key: GlobalKey(debugLabel: 'QR'),
+    onQRViewCreated: (QRViewController controller) {
+      Barcode? qrResult;
+      controller.scannedDataStream.listen(
+        (scanData) {
+          qrResult = scanData;
+          albumArtImage = qrResult!.code;
+          SnackBar(content: Text(albumArtImage));
+          print(qrResult!.code);
+        },
+      );
+      //setAlbumArtFromQR(qrResult!.code);
+      //albumArtImage = qrResult!.code;
+    },
+    overlay: QrScannerOverlayShape(
+      borderColor: Colors.red,
+      borderRadius: 10,
+      borderLength: 20,
+      borderWidth: 10,
+      cutOutSize: 260.0,
+    ),
+  );
+
+  void scanAlbumArt() {
+    isScanningQR = !isScanningQR;
+    setState(() {});
   }
 
   //?Cache Memory
@@ -3116,6 +3151,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       grantedLocation = true;
     } else {
       grantedLocation = false;
+    }
+    if (await Permission.camera.status.isGranted == true) {
+      grantedCamera = true;
+    } else {
+      grantedCamera = false;
     }
     setState(() {});
   }
@@ -3140,6 +3180,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     //checkPermissions();
     //askPermissions();
     albumArtImage = getRandom(albumArts);
+
     // Crypto INIT
     getCryptoStats();
     cryptoAppBarImageIndex = random.nextInt(2);
@@ -4000,9 +4041,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         reduceAnimations,
         repeatSong,
         repeatSongsMode,
-        true,
+        isScanningQR,
         onQRViewCreated,
         qrResult,
+        qrScanner,
+        scanAlbumArt,
+        albumArts,
       ),
 
       // Crypto Page
@@ -5152,6 +5196,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   const SizedBox(height: 20.0),
+                                  // Camera Permissions
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await Permission.camera.request();
+                                      checkAllPermissionStatus();
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Camera Access" +
+                                          (grantedCamera == true ? " ✔" : " ❌"),
+                                      style: TextStyle(
+                                        color: isDarkMode == true
+                                            ? Colors.lightBlueAccent
+                                            : Colors.blue[600],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0),
                                   // Storage Permissions
                                   GestureDetector(
                                     onTap: () async {
@@ -5191,6 +5253,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(height: 10.0),
                                 ],
                               ),
                             ),

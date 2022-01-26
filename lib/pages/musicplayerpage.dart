@@ -64,6 +64,9 @@ class MusicPlayerPage {
     isScanningQR,
     onQRViewCreated,
     qrResult,
+    qrScanner,
+    scanAlbumArt,
+    albumArts,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -550,10 +553,16 @@ class MusicPlayerPage {
                                       ),
                                       clipBehavior: Clip.hardEdge,
                                       child: isDarkMode == false
-                                          ? Image.asset(
-                                              albumArtImage,
-                                              fit: BoxFit.cover,
-                                            )
+                                          ? (albumArts.indexOf(albumArtImage) !=
+                                                  -1
+                                              ? Image.asset(
+                                                  albumArtImage,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  albumArtImage,
+                                                  fit: BoxFit.cover,
+                                                ))
                                           : Container(),
                                     ),
                                     // Shuffle Images and Fullscreen Button
@@ -567,54 +576,58 @@ class MusicPlayerPage {
                                               MainAxisAlignment.end,
                                           children: [
                                             isScanningQR == true
-                                                ? Center(
-                                                    child: Container(
-                                                      height: 310.0,
-                                                      width: 300.0,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                          Radius.circular(20.0),
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 14.0),
+                                                    child: Stack(
+                                                      children: [
+                                                        Container(
+                                                          height: 310.0,
+                                                          width: 300.0,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  20.0),
+                                                            ),
+                                                          ),
+                                                          clipBehavior:
+                                                              Clip.hardEdge,
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 14.0),
+                                                          child: qrScanner,
                                                         ),
-                                                      ),
-                                                      clipBehavior:
-                                                          Clip.hardEdge,
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              right: 14.0),
-                                                      child: QRView(
-                                                        key: GlobalKey(
-                                                            debugLabel: 'QR'),
-                                                        onQRViewCreated:
-                                                            (QRViewController
-                                                                controller) {
-                                                          Barcode? qrResult;
-                                                          controller
-                                                              .scannedDataStream
-                                                              .listen(
-                                                                  (scanData) {
-                                                            qrResult = scanData;
-                                                            print(
-                                                                qrResult!.code);
-                                                          });
-                                                          albumArtImage =
-                                                              qrResult!.code;
-                                                          /* qrResult!.code == null
-                                                              ? () {}
-                                                              : onQRViewCreated(
-                                                                  qrResult!
-                                                                      .code);*/
-                                                        },
-                                                        overlay:
-                                                            QrScannerOverlayShape(
-                                                          borderColor:
-                                                              Colors.red,
-                                                          borderRadius: 10,
-                                                          borderLength: 20,
-                                                          borderWidth: 10,
-                                                          cutOutSize: 260.0,
+                                                        Container(
+                                                          width: 300.0,
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  scanAlbumArt();
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .qr_code_scanner_outlined,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
+                                                      ],
                                                     ),
                                                   )
                                                 : Row(
@@ -630,7 +643,7 @@ class MusicPlayerPage {
                                                       ),
                                                       IconButton(
                                                         onPressed: () {
-                                                          //scanQRCode();
+                                                          scanAlbumArt();
                                                         },
                                                         icon: Icon(
                                                           Icons
