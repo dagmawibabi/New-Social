@@ -6,10 +6,12 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:path/path.dart' as p;
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 class MusicPlayerPage {
+  static bool isScanningQR = false;
   static double forwardRewindSpeed = 5.0;
   static List animatedBGBehaviours = [
     SpaceBehaviour(
@@ -59,6 +61,9 @@ class MusicPlayerPage {
     reduceAnimations,
     repeatSong,
     repeatSongsMode,
+    isScanningQR,
+    onQRViewCreated,
+    qrResult,
   ) {
     return SliverToBoxAdapter(
       child: gotSongs == false
@@ -561,26 +566,93 @@ class MusicPlayerPage {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                changeAlbumArt();
-                                              },
-                                              icon: Icon(
-                                                Icons.shuffle,
-                                                color: iconColor,
-                                              ),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                setFullscreen();
-                                              },
-                                              icon: Icon(
-                                                fullScreenMode == true
-                                                    ? Icons.fullscreen_exit
-                                                    : Icons.fullscreen,
-                                                color: iconColor,
-                                              ),
-                                            ),
+                                            isScanningQR == true
+                                                ? Center(
+                                                    child: Container(
+                                                      height: 310.0,
+                                                      width: 300.0,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(20.0),
+                                                        ),
+                                                      ),
+                                                      clipBehavior:
+                                                          Clip.hardEdge,
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              right: 14.0),
+                                                      child: QRView(
+                                                        key: GlobalKey(
+                                                            debugLabel: 'QR'),
+                                                        onQRViewCreated:
+                                                            (QRViewController
+                                                                controller) {
+                                                          Barcode? qrResult;
+                                                          controller
+                                                              .scannedDataStream
+                                                              .listen(
+                                                                  (scanData) {
+                                                            qrResult = scanData;
+                                                            print(
+                                                                qrResult!.code);
+                                                          });
+                                                          albumArtImage =
+                                                              qrResult!.code;
+                                                          /* qrResult!.code == null
+                                                              ? () {}
+                                                              : onQRViewCreated(
+                                                                  qrResult!
+                                                                      .code);*/
+                                                        },
+                                                        overlay:
+                                                            QrScannerOverlayShape(
+                                                          borderColor:
+                                                              Colors.red,
+                                                          borderRadius: 10,
+                                                          borderLength: 20,
+                                                          borderWidth: 10,
+                                                          cutOutSize: 260.0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          changeAlbumArt();
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.shuffle,
+                                                          color: iconColor,
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          //scanQRCode();
+                                                        },
+                                                        icon: Icon(
+                                                          Icons
+                                                              .qr_code_scanner_outlined,
+                                                          color: iconColor,
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          setFullscreen();
+                                                        },
+                                                        icon: Icon(
+                                                          fullScreenMode == true
+                                                              ? Icons
+                                                                  .fullscreen_exit
+                                                              : Icons
+                                                                  .fullscreen,
+                                                          color: iconColor,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                           ],
                                         ),
                                       ),

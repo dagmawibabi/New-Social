@@ -29,6 +29,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:user_profile_avatar/user_profile_avatar.dart';
@@ -3078,6 +3079,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  //? QR Code Results
+  Barcode? qrResult;
+  QRViewController? qrController;
+  void onQRViewCreated(String image) {
+    albumArtImage = image;
+    setState(() {});
+    /*setState(() {
+      this.qrController = qrController;
+    });
+    qrController.scannedDataStream.listen((scanData) {
+      setState(() {
+        qrResult = scanData;
+      });
+    });
+    print(qrResult!.code);*/
+  }
+
   //?Cache Memory
   dynamic cacheMemorySize = 0;
   void getCacheMemorySize() async {
@@ -3982,6 +4000,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         reduceAnimations,
         repeatSong,
         repeatSongsMode,
+        true,
+        onQRViewCreated,
+        qrResult,
       ),
 
       // Crypto Page
@@ -6268,7 +6289,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
       {
         "icon": Ionicons.play_outline,
-        "title": "Music",
+        "title": qrResult == null ? "Music" : qrResult!.code.toString(),
       },
       {
         "icon": Ionicons.wallet_outline,
