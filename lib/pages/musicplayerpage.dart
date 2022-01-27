@@ -607,8 +607,6 @@ class MusicPlayerPage {
                                                         ),
                                                         Container(
                                                           width: 300.0,
-                                                          color: Colors.black
-                                                              .withOpacity(0.2),
                                                           margin:
                                                               const EdgeInsets
                                                                       .only(
