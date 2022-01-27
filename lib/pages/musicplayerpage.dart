@@ -4,6 +4,7 @@ import 'package:animated_background/animated_background.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:marquee/marquee.dart';
 import 'package:path/path.dart' as p;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -170,7 +171,9 @@ class MusicPlayerPage {
                   Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: ExactAssetImage(albumArtImage),
+                        image: (albumArts.indexOf(albumArtImage) == -1
+                            ? NetworkImage(albumArtImage) as ImageProvider
+                            : ExactAssetImage(albumArtImage)),
                         fit: BoxFit.cover,
                         colorFilter: isDarkMode == true
                             ? ColorFilter.srgbToLinearGamma()
@@ -604,6 +607,8 @@ class MusicPlayerPage {
                                                         ),
                                                         Container(
                                                           width: 300.0,
+                                                          color: Colors.black
+                                                              .withOpacity(0.2),
                                                           margin:
                                                               const EdgeInsets
                                                                       .only(
@@ -619,9 +624,9 @@ class MusicPlayerPage {
                                                                 },
                                                                 icon: Icon(
                                                                   Icons
-                                                                      .qr_code_scanner_outlined,
+                                                                      .done_all,
                                                                   color: Colors
-                                                                      .white,
+                                                                      .lightBlueAccent,
                                                                 ),
                                                               ),
                                                             ],

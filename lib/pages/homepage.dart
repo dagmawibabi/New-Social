@@ -778,7 +778,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               Radius.circular(20.0),
             ),
             image: DecorationImage(
-              image: ExactAssetImage(albumArtImage),
+              image: (albumArts.indexOf(albumArtImage) == -1
+                  ? NetworkImage(albumArtImage) as ImageProvider
+                  : ExactAssetImage(albumArtImage)),
               fit: BoxFit.cover,
               opacity: 0.3,
               filterQuality: FilterQuality.high,
