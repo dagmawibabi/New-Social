@@ -3112,8 +3112,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         (scanData) {
           qrResult = scanData;
           albumArtImage = qrResult!.code;
-          SnackBar(content: Text(albumArtImage));
-          print(qrResult!.code);
+          //SnackBar(content: Text(albumArtImage));
+          //print(qrResult!.code);
         },
       );
       //setAlbumArtFromQR(qrResult!.code);
@@ -3232,9 +3232,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "app": "qrScannerPage",
       },
       {
-        "icon": Icons.menu_book_outlined,
-        "title": "Reader",
-        "subtitle": "PDF Reader",
+        "icon": Icons.call,
+        "title": "USSD",
+        "subtitle": "USSD Reader",
         "app": "qrScannerPage",
       },
       {
