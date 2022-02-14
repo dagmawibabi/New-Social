@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -3162,7 +3163,61 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  //? Chat
+  List globalChat = [];
+  List fetchedChat = [];
+  bool gettingGlobalChat = true;
+  bool initGlobalChat = true;
+  TextEditingController messageController = TextEditingController();
+  final ScrollController chatScrollController = ScrollController();
+
+  // Get Global Chat Messages
+  void getGlobalChat() async {
+    initGlobalChat = false;
+    Timer.periodic(
+      Duration(seconds: 1),
+      (value) async {
+        dynamic url = Uri.parse(
+            "https://glacial-everglades-59975.herokuapp.com/api/receiveGlobalMessage");
+        dynamic chats = await http.get(url);
+        //print(chats.body);
+        fetchedChat = [];
+        fetchedChat = jsonDecode(chats.body);
+        if (initGlobalChat == true) {
+          globalChat = [];
+          globalChat = jsonDecode(chats.body);
+          gettingGlobalChat = true;
+        } else {
+          if (globalChat.length != fetchedChat.length) {
+            globalChat = [];
+            globalChat = jsonDecode(chats.body);
+            setState(() {});
+          }
+        }
+
+        gettingGlobalChat = false;
+      },
+    );
+  }
+
+  // Send to Global Chat
+  void sendGlobalChat(message) async {
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/sendGlobalMessage/" +
+            masterUser.toString() +
+            "/" +
+            message.toString());
+    await http.get(url);
+    //chatScrollController.jumpTo(chatScrollController.position.maxScrollExtent);
+    chatScrollController.animateTo(
+      chatScrollController.position.maxScrollExtent + 100,
+      duration: Duration(seconds: 2),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
   //? INIT STATE
+  String masterUser = "dag";
   @override
   void initState() {
     // TODO: implement initState
@@ -4070,121 +4125,70 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       // Chat Page
       SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          return Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  userIndex = index;
-                  userText = users[index]["chat"];
-                  curPage = 6;
-                  isBottomBarVisible = false;
-                  setState(() {});
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 15.0, vertical: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          // DP and Status
-                          Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              Container(
-                                width: 35.0,
-                                height: 35.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.grey[900],
-                                  //borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                                child: FittedBox(
-                                  fit: BoxFit.fitWidth,
-                                  child: Image.network(
-                                    users[index]["dp"],
-                                  ),
-                                ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return Container(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      getGlobalChat();
+                      curPage = 6;
+                      isBottomBarVisible = false;
+                      setState(() {});
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 35.0,
+                              width: 35.0,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
                               ),
-                              Container(
-                                width: 6.0,
-                                height: 6.0,
-                                margin: const EdgeInsets.only(right: 2.5),
-                                decoration: BoxDecoration(
-                                  //shape: BoxShape.circle,
-                                  color: users[index]["online"] == true
-                                      ? Colors.lightGreenAccent
-                                      : Colors.transparent,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0)),
-                                ),
+                              clipBehavior: Clip.hardEdge,
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Image.network(users[3]["dp"]),
                               ),
-                            ],
-                          ),
-                          const SizedBox(width: 12.0),
-                          // Username and text preview
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                users[index]["username"],
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "abcd eftg sbkdak adad ...",
-                                style: TextStyle(
-                                  color: textColorDimmer.withOpacity(0.5),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // OnlineOffline
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          // Seen Icon
-                          Icon(
-                            Ionicons.checkmark,
-                            color: iconColor.withOpacity(0.9),
-                            size: 19.0,
-                          ),
-                          const SizedBox(height: 5.0),
-                          // Date
-                          Text(
-                            "Dec 27",
-                            style: TextStyle(
-                              color: textColorDimmer.withOpacity(0.5),
-                              fontSize: 10.0,
                             ),
+                            SizedBox(width: 8.0),
+                            Text(
+                              "Global Chat",
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        //
+                        IconButton(
+                          onPressed: () {
+                            getGlobalChat();
+                            curPage = 6;
+                            isBottomBarVisible = false;
+                            setState(() {});
+                          },
+                          icon: Icon(
+                            Icons.send,
+                            color: iconColor,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
-              // Divider
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Divider(
-                  color: textColorDimmer.withOpacity(0.3),
-                ),
-              ),
-              index == users.length - 1
-                  ? const SizedBox(height: 200.0)
-                  : Container(),
-            ],
-          );
-        }, childCount: users.length),
+            );
+          },
+          childCount: 1,
+        ),
       ),
 
       // Settings Page
@@ -5344,72 +5348,163 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // DMs
       SliverToBoxAdapter(
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.89,
+          height: MediaQuery.of(context).size.height,
           color: scaffoldBGColor,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // Text list
-              Container(
-                height: MediaQuery.of(context).size.height * 0.8,
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                color: scaffoldBGColor,
-                child: ListView.builder(
-                  primary: true,
-                  shrinkWrap: true,
-                  itemCount: users[userIndex]["chat"].length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: 55.0,
-                      color: scaffoldBGColor,
-                      child: Row(
-                        mainAxisAlignment:
-                            users[userIndex]["chat"][index]["fromMe"] == true
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                        children: [
-                          // Content and Time
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 4.0),
-                            margin: const EdgeInsets.symmetric(vertical: 5.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20.0),
-                              ),
-                              border: Border.all(
-                                color: Colors.black,
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: users[userIndex]["chat"]
-                                          [index]["fromMe"] ==
-                                      true
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  users[userIndex]["chat"][index]["content"],
-                                  style: TextStyle(
-                                    color: textColor,
-                                  ),
+              gettingGlobalChat == false
+                  ? Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: (albumArts.indexOf(albumArtImage) == -1
+                              ? NetworkImage(albumArtImage) as ImageProvider
+                              : ExactAssetImage(albumArtImage)),
+                          opacity: 0.3,
+                          fit: BoxFit.cover,
+                          colorFilter: isDarkMode == true
+                              ? ColorFilter.srgbToLinearGamma()
+                              : ColorFilter.mode(
+                                  scaffoldBGColor,
+                                  BlendMode.dst,
                                 ),
-                                Text(
-                                  users[userIndex]["chat"][index]["time"],
-                                  style: TextStyle(
-                                    fontSize: 10.0,
-                                    color: textColorDimmer,
-                                  ),
+                        ),
+                        //color: scaffoldBGColor,
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ListView.builder(
+                        controller: chatScrollController,
+                        primary: false,
+                        shrinkWrap: true,
+                        itemCount: globalChat.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            //height: 80.0,
+                            //color: scaffoldBGColor,
+                            child: Row(
+                              mainAxisAlignment:
+                                  (globalChat[index]["sender"] == masterUser) ==
+                                          true
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                              children: [
+                                // Content and Time
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    (globalChat[index]["sender"] !=
+                                                masterUser) ==
+                                            true
+                                        ? Container(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: Image.network(
+                                                    users[0]["dp"])),
+                                          )
+                                        : Container(),
+                                    (globalChat[index]["sender"] !=
+                                                masterUser) ==
+                                            true
+                                        ? SizedBox(width: 10.0)
+                                        : Container(),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0, vertical: 4.0),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        border: Border.all(
+                                          color: Colors.black,
+                                        ),
+                                        color: Colors.black.withOpacity(0.5),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: (globalChat[index]
+                                                        ["sender"] ==
+                                                    masterUser) ==
+                                                true
+                                            ? CrossAxisAlignment.end
+                                            : CrossAxisAlignment.start,
+                                        children: [
+                                          // Sender
+                                          Text(
+                                            globalChat[index]["sender"],
+                                            style: TextStyle(
+                                              color: (globalChat[index]
+                                                              ["sender"] ==
+                                                          masterUser) ==
+                                                      true
+                                                  ? Colors.cyan
+                                                  : getRandom(Colors.accents),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2.0),
+                                          // Message
+                                          Text(
+                                            globalChat[index]["message"],
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 20.0,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4.0),
+                                          // Time Sent
+                                          Text(
+                                            globalChat[index]["time"]
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontSize: 10.0,
+                                              color: textColorDimmer
+                                                  .withOpacity(0.6),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    (globalChat[index]["sender"] ==
+                                                masterUser) ==
+                                            true
+                                        ? SizedBox(width: 10.0)
+                                        : Container(),
+                                    (globalChat[index]["sender"] ==
+                                                masterUser) ==
+                                            true
+                                        ? Container(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: Image.network(
+                                                    users[0]["dp"])),
+                                          )
+                                        : Container(),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
               // Input Box
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -5427,25 +5522,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Attach button and input box
                     Row(
                       children: [
+                        // Attach Butoon
                         Icon(
                           Icons.attachment,
                           color: textColorDim,
                         ),
                         const SizedBox(width: 10.0),
-                        Text(
-                          "Abcd dsdiug iagdi...",
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            color: textColorDim,
+                        // Message input box
+                        Container(
+                          height: 20.0,
+                          width: 200.0,
+                          child: TextField(
+                            controller: messageController,
+                            style: TextStyle(
+                              color: textColor,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    Icon(
-                      Ionicons.paper_plane,
-                      color: textColorDim,
+                    // Send Button
+                    IconButton(
+                      onPressed: () {
+                        sendGlobalChat(messageController.text);
+                        messageController.clear();
+                      },
+                      icon: Icon(
+                        Ionicons.paper_plane,
+                        color: textColorDim,
+                      ),
                     ),
                   ],
                 ),
@@ -6370,7 +6478,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
       {
         "icon": Ionicons.chatbubble_ellipses_outline,
-        "title": users[userIndex]["username"],
+        "title": "Global Chat",
       },
       {
         "icon": Ionicons.storefront_outline,
@@ -6419,6 +6527,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         },
                                         icon: Icon(
                                           Icons.arrow_back,
+                                          color: iconColor,
                                         ),
                                       )
                                     : GestureDetector(
@@ -6511,7 +6620,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     child: FittedBox(
                                       fit: BoxFit.cover,
                                       child: Image.network(
-                                        users[userIndex]["dp"],
+                                        users[3]["dp"],
                                       ),
                                     ),
                                   )

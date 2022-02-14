@@ -1,0 +1,113 @@
+Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  userIndex = index;
+                  userText = users[index]["chat"];
+                  curPage = 6;
+                  isBottomBarVisible = false;
+                  setState(() {});
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 15.0, vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          // DP and Status
+                          Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              Container(
+                                width: 35.0,
+                                height: 35.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey[900],
+                                  //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Image.network(
+                                    users[index]["dp"],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 6.0,
+                                height: 6.0,
+                                margin: const EdgeInsets.only(right: 2.5),
+                                decoration: BoxDecoration(
+                                  //shape: BoxShape.circle,
+                                  color: users[index]["online"] == true
+                                      ? Colors.lightGreenAccent
+                                      : Colors.transparent,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12.0),
+                          // Username and text preview
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                users[index]["username"],
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 17.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "abcd eftg sbkdak adad ...",
+                                style: TextStyle(
+                                  color: textColorDimmer.withOpacity(0.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // OnlineOffline
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          // Seen Icon
+                          Icon(
+                            Ionicons.checkmark,
+                            color: iconColor.withOpacity(0.9),
+                            size: 19.0,
+                          ),
+                          const SizedBox(height: 5.0),
+                          // Date
+                          Text(
+                            "Dec 27",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.5),
+                              fontSize: 10.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Divider
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Divider(
+                  color: textColorDimmer.withOpacity(0.3),
+                ),
+              ),
+              index == users.length - 1
+                  ? const SizedBox(height: 200.0)
+                  : Container(),
+            ],
+          );
