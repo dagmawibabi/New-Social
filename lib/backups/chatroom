@@ -1,0 +1,222 @@
+SliverToBoxAdapter(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          color: scaffoldBGColor,
+          child: Column(
+            children: [
+              gettingGlobalChat == false
+                  ? Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: (albumArts.indexOf(albumArtImage) == -1
+                              ? NetworkImage(albumArtImage) as ImageProvider
+                              : ExactAssetImage(albumArtImage)),
+                          opacity: 0.3,
+                          fit: BoxFit.cover,
+                          colorFilter: isDarkMode == true
+                              ? ColorFilter.srgbToLinearGamma()
+                              : ColorFilter.mode(
+                                  scaffoldBGColor,
+                                  BlendMode.dst,
+                                ),
+                        ),
+                        //color: scaffoldBGColor,
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ListView.builder(
+                        controller: chatScrollController,
+                        primary: false,
+                        shrinkWrap: true,
+                        itemCount: globalChat.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            //height: 80.0,
+                            //color: scaffoldBGColor,
+                            child: Row(
+                              mainAxisAlignment:
+                                  (globalChat[index]["sender"] == masterUser) ==
+                                          true
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                              children: [
+                                // Content and Time
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // DP
+                                    (globalChat[index]["sender"] !=
+                                                masterUser) ==
+                                            true
+                                        ? Container(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: Image.network(
+                                                    users[0]["dp"])),
+                                          )
+                                        : Container(),
+                                    // Space
+                                    (globalChat[index]["sender"] !=
+                                                masterUser) ==
+                                            true
+                                        ? SizedBox(width: 10.0)
+                                        : Container(),
+                                    // Sender Message Time Sent
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: 250.0, minWidth: 70.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0, vertical: 4.0),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        border: Border.all(
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        color: containerColor.withOpacity(0.8),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: (globalChat[index]
+                                                        ["sender"] ==
+                                                    masterUser) ==
+                                                true
+                                            ? CrossAxisAlignment.end
+                                            : CrossAxisAlignment.start,
+                                        children: [
+                                          // Sender
+                                          Text(
+                                            globalChat[index]["sender"],
+                                            style: TextStyle(
+                                              color: (globalChat[index]
+                                                              ["sender"] ==
+                                                          masterUser) ==
+                                                      true
+                                                  ? Colors.cyan
+                                                  : getRandom(Colors.accents),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2.0),
+                                          // Message
+                                          Text(
+                                            globalChat[index]["message"],
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 20.0,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4.0),
+                                          // Time Sent
+                                          Text(
+                                            globalChat[index]["time"]
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontSize: 10.0,
+                                              color: textColorDimmer
+                                                  .withOpacity(0.6),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    (globalChat[index]["sender"] ==
+                                                masterUser) ==
+                                            true
+                                        ? SizedBox(width: 10.0)
+                                        : Container(),
+                                    // DP
+                                    (globalChat[index]["sender"] ==
+                                                masterUser) ==
+                                            true
+                                        ? Container(
+                                            height: 30.0,
+                                            width: 30.0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: Image.network(
+                                                    users[0]["dp"])),
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
+              // Input Box
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 15.0, vertical: 10.0),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Attach button and input box
+                    Row(
+                      children: [
+                        // Attach Butoon
+                        Icon(
+                          Icons.attachment,
+                          color: textColorDim,
+                        ),
+                        const SizedBox(width: 10.0),
+                        // Message input box
+                        Container(
+                          height: 20.0,
+                          width: 200.0,
+                          child: TextField(
+                            controller: messageController,
+                            style: TextStyle(
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Send Button
+                    IconButton(
+                      onPressed: () {
+                        sendGlobalChat(messageController.text);
+                        messageController.clear();
+                      },
+                      icon: Icon(
+                        Ionicons.paper_plane,
+                        color: textColorDim,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),

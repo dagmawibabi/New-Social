@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:newsocial/pages/chatRoom.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
 import 'package:newsocial/pages/extensionApps/qrScanner.dart';
 import 'package:newsocial/pages/homepage.dart';
@@ -44,6 +45,7 @@ class _MyAppState extends State<MyApp> {
         "homePage": (context) => HomePage(),
         "contentViewerPage": (context) => ContentViewerPage(),
         "VideoViewerPage": (content) => VideoViewerPage(),
+        "chatRoom": (content) => ChatRoom(),
         "qrScannerPage": (content) => QRScannerPage(),
       },
       theme: ThemeData(
