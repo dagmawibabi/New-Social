@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:marquee/marquee.dart';
 import 'package:newsocial/pages/musicplayerpage.dart';
 
@@ -18,7 +20,7 @@ class _ChatRoomState extends State<ChatRoom> {
   bool initGlobalChat = false;
   List fetchedChat = [];
   List globalChat = [];
-  bool gettingGlobalChat = true;
+  bool gettingGlobalChat = false;
   void getGlobalChat() async {
     initGlobalChat = false;
     Timer.periodic(
@@ -71,16 +73,88 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
+  // Edit Global Message
+  final focus = FocusNode();
+  bool isEditing = false;
+  void editGlobalMessage(message, time, newMessage) async {
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/updateGlobalMessage/" +
+            masterUser.toString() +
+            "/" +
+            message.toString() +
+            "/" +
+            time.toString() +
+            "/" +
+            newMessage.toString());
+    await http.get(url);
+    selectedIndex = -1;
+    selectedMessage = "";
+    selectedTime = "";
+    isDeleting = false;
+    isEditing = false;
+    messageController.clear();
+    globalChat = [];
+  }
+
+  // Delete Global Message
+  bool isDeleting = false;
+  int selectedIndex = -1;
+  String selectedMessage = "";
+  String selectedTime = "";
+  void deleteGlobalMessage(message, time) async {
+    print("in container delete function");
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/deleteGlobalMessage/" +
+            masterUser.toString() +
+            "/" +
+            message.toString() +
+            "/" +
+            time.toString());
+    await http.get(url);
+    selectedIndex = -1;
+    selectedMessage = "";
+    selectedTime = "";
+    isDeleting = false;
+  }
+
+  // Random
+  Random random = new Random();
+  dynamic getRandom(List lists) {
+    int randomIndex = random.nextInt(lists.length - 1);
+    return lists[randomIndex];
+  }
+
+  // Check if it's just emoji
+  String characterList =
+      "abcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_=+{[}]|\\:;\"\'<,>.?/~`";
+  bool isEmojiOnly(String message) {
+    for (String chars in message.characters) {
+      if (characterList.characters.contains(chars) == true) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  //! Controls
+  bool firstCall = true;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getGlobalChat();
   }
 
   @override
   Widget build(BuildContext context) {
     dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
+
+    if (firstCall == true) {
+      globalChat = receivedData["globalChat"];
+      getGlobalChat();
+      firstCall = false;
+    }
+
     bool isDarkMode = receivedData["isDarkMode"];
     bool isSongPlaying = receivedData["isSongPlaying"];
     bool marqueeMusicTitle = receivedData["marqueeMusicTitle"];
@@ -229,6 +303,63 @@ class _ChatRoomState extends State<ChatRoom> {
                 )
               : Container(),
         ),
+        actions: [
+          (selectedIndex != -1)
+              ? Row(
+                  children: [
+                    // Cancel Btn
+                    IconButton(
+                      onPressed: () {
+                        isDeleting = false;
+                        isEditing = false;
+                        selectedIndex = -1;
+                        selectedMessage = "";
+                        selectedTime = "";
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        Icons.remove,
+                        color: iconColor,
+                      ),
+                    ),
+                    // Edit Btn
+                    Padding(
+                      padding: const EdgeInsets.only(right: 0.0),
+                      child: IconButton(
+                        onPressed: () {
+                          isEditing = true;
+                          messageController.clear();
+                          messageController.text = selectedMessage;
+                          FocusScope.of(context).requestFocus(focus);
+                        },
+                        icon: Icon(
+                          Ionicons.pencil_sharp,
+                          color: iconColor,
+                        ),
+                      ),
+                    ),
+                    // Delete Btn
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: IconButton(
+                        onPressed: () {
+                          isDeleting = true;
+                          setState(() {});
+                          deleteGlobalMessage(
+                            selectedMessage,
+                            selectedTime,
+                          );
+                        },
+                        icon: Icon(
+                          Icons.delete_forever_outlined,
+                          color: iconColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Container()
+        ],
       ),
       body: ListView(
         reverse: true,
@@ -300,11 +431,16 @@ class _ChatRoomState extends State<ChatRoom> {
                                         },
                                         child: Container(
                                           width: 40.0,
-                                          //height: 50.0,
+                                          height: 40.0,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(20.0),
-                                              //topRight: Radius.circular(20.0),
+                                              topRight: isEmojiOnly(
+                                                          globalChat[index]
+                                                              ["sender"]) ==
+                                                      true
+                                                  ? Radius.circular(0.0)
+                                                  : Radius.circular(0.0),
                                               bottomLeft: Radius.circular(20.0),
                                               bottomRight:
                                                   Radius.circular(20.0),
@@ -313,87 +449,340 @@ class _ChatRoomState extends State<ChatRoom> {
                                           padding:
                                               const EdgeInsets.only(top: 1.0),
                                           clipBehavior: Clip.hardEdge,
-                                          child: Image.network(globalChat[index]
-                                                      ["dp"] !=
-                                                  ""
-                                              ? globalChat[index]["dp"]
-                                              : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg"),
+                                          child: FittedBox(
+                                            fit: BoxFit.cover,
+                                            child: Image.network(globalChat[
+                                                        index]["dp"] !=
+                                                    ""
+                                                ? globalChat[index]["dp"]
+                                                : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg"),
+                                          ),
                                         ),
                                       )
                                     : Container(),
                                 // Message Container
-                                Container(
-                                  constraints: BoxConstraints(
-                                      maxWidth: 250.0, minWidth: 80.0),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0, vertical: 5.0),
-                                  margin: const EdgeInsets.only(
-                                      bottom: 3.0, left: 1.5, right: 1.5),
-                                  decoration: BoxDecoration(
-                                    color: containerColor.withOpacity(0.96),
-                                    border: Border.all(
-                                        color:
-                                            textColorDimmer.withOpacity(0.5)),
-                                    borderRadius: globalChat[index]["sender"] ==
-                                            masterUser
-                                        ? BorderRadius.only(
-                                            topLeft: Radius.circular(20.0),
-                                            //topRight: Radius.circular(20.0),
-                                            bottomLeft: Radius.circular(20.0),
-                                            bottomRight: Radius.circular(20.0),
-                                          )
-                                        : BorderRadius.only(
-                                            //topLeft: Radius.circular(20.0),
-                                            topRight: Radius.circular(20.0),
-                                            bottomLeft: Radius.circular(20.0),
-                                            bottomRight: Radius.circular(20.0),
-                                          ),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: globalChat[index]
-                                                ["sender"] ==
-                                            masterUser
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                    children: [
-                                      // Sender
-                                      Text(
-                                        globalChat[index]["sender"],
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: textColor,
-                                        ),
-                                      ),
-                                      // Message Content
-                                      /*Text(
-                                        //globalChat[index]["message"],
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          color: textColor,
-                                        ),
-                                        softWrap: true,
+                                GestureDetector(
+                                  onTap: () {
+                                    selectedIndex = -1;
+                                    selectedMessage = "";
+                                    selectedTime = "";
+                                    setState(() {});
+                                  },
+                                  onLongPress: () {
+                                    if (globalChat[index]["sender"] ==
+                                        masterUser) {
+                                      selectedIndex = index;
+                                      selectedMessage =
+                                          globalChat[index]["message"];
+                                      selectedTime = globalChat[index]["time"];
 
-                                      ),*/
-                                      SelectableText(
-                                        globalChat[index]["message"],
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          color: textColor,
+                                      setState(() {});
+                                    }
+                                  },
+                                  child: isEmojiOnly(
+                                              globalChat[index]["message"]) ==
+                                          true
+                                      // Emoji Only
+                                      ? Container(
+                                          constraints: BoxConstraints(
+                                              maxWidth: 250.0, minWidth: 80.0),
+                                          margin: const EdgeInsets.only(
+                                              bottom: 3.0,
+                                              left: 1.5,
+                                              right: 1.5),
+                                          decoration: BoxDecoration(
+                                            color: index == selectedIndex
+                                                ? (isDeleting == true
+                                                    ? (isDarkMode == true
+                                                        ? Colors.red[900]!
+                                                        : Colors.redAccent)
+                                                    : (isEditing == true
+                                                        ? (isDarkMode
+                                                            ? Colors.teal
+                                                            : Colors.tealAccent)
+                                                        : (isDarkMode
+                                                            ? Colors.blue[800]!
+                                                            : Colors
+                                                                .lightBlueAccent)))
+                                                : containerColor
+                                                    .withOpacity(0.0),
+                                            border: Border.all(
+                                                color: (index == selectedIndex)
+                                                    ? textColorDimmer
+                                                        .withOpacity(0.5)
+                                                    : Colors.transparent),
+                                            borderRadius: globalChat[index]
+                                                        ["sender"] ==
+                                                    masterUser
+                                                ? BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(20.0),
+                                                    //topRight: Radius.circular(20.0),
+                                                    bottomLeft:
+                                                        Radius.circular(20.0),
+                                                    bottomRight:
+                                                        Radius.circular(20.0),
+                                                  )
+                                                : BorderRadius.only(
+                                                    //topLeft: Radius.circular(20.0),
+                                                    topRight:
+                                                        Radius.circular(20.0),
+                                                    bottomLeft:
+                                                        Radius.circular(20.0),
+                                                    bottomRight:
+                                                        Radius.circular(20.0),
+                                                  ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                globalChat[index]["sender"] ==
+                                                        masterUser
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                            children: [
+                                              // Sender
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0,
+                                                        vertical: 5.0),
+                                                decoration: BoxDecoration(
+                                                  color: index == selectedIndex
+                                                      ? (isDeleting == true
+                                                          ? (isDarkMode
+                                                              ? Colors.red[900]!
+                                                              : Colors
+                                                                  .redAccent)
+                                                          : (isEditing == true
+                                                              ? (isDarkMode
+                                                                  ? Colors.teal
+                                                                  : Colors
+                                                                      .tealAccent)
+                                                              : (isDarkMode
+                                                                  ? Colors.blue[
+                                                                      800]!
+                                                                  : Colors
+                                                                      .lightBlueAccent)))
+                                                      : containerColor
+                                                          .withOpacity(0.96),
+                                                  border: Border.all(
+                                                      color: (selectedIndex ==
+                                                              index)
+                                                          ? Colors.transparent
+                                                          : textColorDimmer
+                                                              .withOpacity(
+                                                                  0.5)),
+                                                  borderRadius: globalChat[
+                                                                  index]
+                                                              ["sender"] ==
+                                                          masterUser
+                                                      ? BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                          //topRight: Radius.circular(20.0),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                        )
+                                                      : BorderRadius.only(
+                                                          //topLeft: Radius.circular(20.0),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20.0),
+                                                        ),
+                                                ),
+                                                child: Text(
+                                                  globalChat[index]["sender"],
+                                                  textAlign: globalChat[index]
+                                                              ["sender"] ==
+                                                          masterUser
+                                                      ? TextAlign.right
+                                                      : TextAlign.left,
+                                                  style: TextStyle(
+                                                    fontSize: 15.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              // Content
+                                              Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10.0,
+                                                    bottom: 20.0,
+                                                    right: 10.0,
+                                                    left: 10.0),
+                                                constraints: BoxConstraints(
+                                                    maxWidth: 250.0,
+                                                    minWidth: 80.0),
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 3.0,
+                                                    left: 1.5,
+                                                    right: 1.5),
+                                                child: (selectedIndex == index)
+                                                    ? SelectableText(
+                                                        isEditing == true
+                                                            ? messageController
+                                                                .text
+                                                            : globalChat[index]
+                                                                ["message"],
+                                                        style: TextStyle(
+                                                          fontSize: 50.0,
+                                                          color: textColor,
+                                                        ),
+                                                      )
+                                                    : Text(
+                                                        globalChat[index]
+                                                            ["message"],
+                                                        textAlign: globalChat[
+                                                                        index][
+                                                                    "sender"] ==
+                                                                masterUser
+                                                            ? TextAlign.right
+                                                            : TextAlign.left,
+                                                        style: TextStyle(
+                                                          fontSize: 50.0,
+                                                          color: textColor,
+                                                        ),
+                                                      ),
+                                              ),
+                                              // Time
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0,
+                                                        vertical: 5.0),
+                                                child: Text(
+                                                  globalChat[index]["time"],
+                                                  style: TextStyle(
+                                                    fontSize: 10.0,
+                                                    color: isDarkMode
+                                                        ? textColor
+                                                        : textColorDimmer
+                                                            .withOpacity(1),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+
+                                      // Normal Texts
+                                      : Container(
+                                          constraints: BoxConstraints(
+                                              maxWidth: 250.0, minWidth: 80.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15.0, vertical: 5.0),
+                                          margin: const EdgeInsets.only(
+                                              bottom: 3.0,
+                                              left: 1.5,
+                                              right: 1.5),
+                                          decoration: BoxDecoration(
+                                            color: index == selectedIndex
+                                                ? (isDeleting == true
+                                                    ? (isDarkMode
+                                                        ? Colors.red[900]!
+                                                        : Colors.redAccent)
+                                                    : (isEditing == true
+                                                        ? (isDarkMode
+                                                            ? Colors.teal[800]!
+                                                            : Colors.tealAccent)
+                                                        : (isDarkMode
+                                                            ? Colors.blue[800]!
+                                                            : Colors
+                                                                .lightBlueAccent)))
+                                                : containerColor
+                                                    .withOpacity(0.96),
+                                            border: Border.all(
+                                                color: textColorDimmer
+                                                    .withOpacity(0.5)),
+                                            borderRadius: globalChat[index]
+                                                        ["sender"] ==
+                                                    masterUser
+                                                ? BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(20.0),
+                                                    //topRight: Radius.circular(20.0),
+                                                    bottomLeft:
+                                                        Radius.circular(20.0),
+                                                    bottomRight:
+                                                        Radius.circular(20.0),
+                                                  )
+                                                : BorderRadius.only(
+                                                    //topLeft: Radius.circular(20.0),
+                                                    topRight:
+                                                        Radius.circular(20.0),
+                                                    bottomLeft:
+                                                        Radius.circular(20.0),
+                                                    bottomRight:
+                                                        Radius.circular(20.0),
+                                                  ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                globalChat[index]["sender"] ==
+                                                        masterUser
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                            children: [
+                                              // Sender
+                                              Text(
+                                                globalChat[index]["sender"],
+                                                style: TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: textColor,
+                                                ),
+                                              ),
+                                              SizedBox(height: 2.0),
+                                              // Message Content
+                                              (selectedIndex == index)
+                                                  ? SelectableText(
+                                                      isEditing == true
+                                                          ? messageController
+                                                              .text
+                                                          : globalChat[index]
+                                                              ["message"],
+                                                      style: TextStyle(
+                                                        fontSize: 18.0,
+                                                        color: textColor,
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      globalChat[index]
+                                                          ["message"],
+                                                      style: TextStyle(
+                                                        fontSize: 18.0,
+                                                        color: textColor,
+                                                      ),
+                                                      softWrap: true,
+                                                    ),
+                                              SizedBox(height: 2.0),
+                                              // Time
+                                              Text(
+                                                globalChat[index]["time"],
+                                                style: TextStyle(
+                                                  fontSize: 10.0,
+                                                  color:
+                                                      (selectedIndex == index)
+                                                          ? textColor
+                                                          : textColorDimmer
+                                                              .withOpacity(0.8),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 2.0),
-                                      // Time
-                                      Text(
-                                        globalChat[index]["time"],
-                                        style: TextStyle(
-                                          fontSize: 10.0,
-                                          color:
-                                              textColorDimmer.withOpacity(0.8),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
                                 // Profile Pic -- Master User
                                 globalChat[index]["sender"] == masterUser
@@ -423,9 +812,15 @@ class _ChatRoomState extends State<ChatRoom> {
                                         },
                                         child: Container(
                                           width: 40.0,
+                                          height: 40.0,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.only(
-                                              //topLeft: Radius.circular(20.0),
+                                              topLeft: isEmojiOnly(
+                                                          globalChat[index]
+                                                              ["message"]) ==
+                                                      true
+                                                  ? Radius.circular(0.0)
+                                                  : Radius.circular(0.0),
                                               topRight: Radius.circular(20.0),
                                               bottomLeft: Radius.circular(20.0),
                                               bottomRight:
@@ -435,11 +830,14 @@ class _ChatRoomState extends State<ChatRoom> {
                                           padding:
                                               const EdgeInsets.only(top: 1.0),
                                           clipBehavior: Clip.hardEdge,
-                                          child: Image.network(globalChat[index]
-                                                      ["dp"] !=
-                                                  ""
-                                              ? globalChat[index]["dp"]
-                                              : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg"),
+                                          child: FittedBox(
+                                            fit: BoxFit.cover,
+                                            child: Image.network(globalChat[
+                                                        index]["dp"] !=
+                                                    ""
+                                                ? globalChat[index]["dp"]
+                                                : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg"),
+                                          ),
                                         ),
                                       )
                                     : Container()
@@ -483,7 +881,13 @@ class _ChatRoomState extends State<ChatRoom> {
                           borderRadius: BorderRadius.all(Radius.circular(20.0)),
                         ),
                         child: TextField(
+                          focusNode: focus,
                           controller: messageController,
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                          minLines: 1,
+                          maxLines: 25,
                           style: TextStyle(
                             color: textColor,
                           ),
@@ -499,8 +903,13 @@ class _ChatRoomState extends State<ChatRoom> {
                     ),
                     IconButton(
                       onPressed: () {
-                        sendGlobalChat(messageController.text);
-                        messageController.clear();
+                        if (isEditing == true) {
+                          editGlobalMessage(selectedMessage, selectedTime,
+                              messageController.text);
+                        } else {
+                          sendGlobalChat(messageController.text);
+                          messageController.clear();
+                        }
                       },
                       icon: Icon(
                         Icons.send,

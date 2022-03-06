@@ -1905,12 +1905,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Profile
   TextEditingController usernameTextController = TextEditingController();
+  bool doneEnteringUsername = false;
   void showProfileDialog() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          contentPadding: const EdgeInsets.all(40.0),
+          //contentPadding: const EdgeInsets.all(40.0),
+          backgroundColor: containerColor,
           content: Container(
             height: MediaQuery.of(context).size.height * 0.52,
             width: MediaQuery.of(context).size.width,
@@ -1918,12 +1920,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 // Profile Pic
                 WidgetCircularAnimator(
-                  size: 140.0,
-                  innerColor: Colors.purpleAccent, // getRandom(Colors.accents),
-                  outerColor: Colors.purpleAccent, // getRandom(Colors.accents),
+                  size: 180.0,
+                  innerColor: getRandom(
+                      isDarkMode == true ? Colors.accents : Colors.primaries),
+                  outerColor: getRandom(
+                      isDarkMode == true ? Colors.accents : Colors.primaries),
                   child: Container(
-                    width: 20.0,
-                    height: 20.0,
+                    width: 30.0,
+                    height: 30.0,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey[900],
@@ -1933,36 +1937,74 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: FittedBox(
                       fit: BoxFit.fitWidth,
                       child: Image.network(
-                        "https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg",
+                        "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 15.0),
+                const SizedBox(height: 20.0),
                 // Username
                 Text(
                   masterUser,
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
+                    color: getRandom(
+                        isDarkMode == true ? Colors.accents : Colors.primaries),
                   ),
                 ),
                 SizedBox(height: 20.0),
                 // Input box to change Username
                 TextField(
                   controller: usernameTextController,
-                  decoration: InputDecoration(
-                    hintText: "enter username",
+                  style: TextStyle(
+                    color: textColor,
                   ),
+                  decoration: InputDecoration(
+                      hintText: "enter username",
+                      hintStyle: TextStyle(
+                        color: textColor,
+                      )),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    masterUser = usernameTextController.text;
-                    Navigator.pop(context);
-                    showProfileDialog();
-                  },
-                  child: Text(
-                    "Change Username",
+                SizedBox(height: 5.0),
+                // Change Username Btn
+                doneEnteringUsername == false
+                    ? ElevatedButton(
+                        onPressed: () {
+                          if (usernameTextController.text.toLowerCase() !=
+                              "user0") {
+                            masterUser = usernameTextController.text;
+                            doneEnteringUsername = true;
+                            Navigator.pop(context);
+                            showProfileDialog();
+                          }
+                        },
+                        child: Text(
+                          "Change Username",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          doneEnteringUsername = false;
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Done!",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                SizedBox(height: 30.0),
+                // Info
+                Text(
+                  "Enter username and start\n chatting globally!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor,
                   ),
                 ),
               ],
@@ -3194,7 +3236,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void getGlobalChat() async {
     initGlobalChat = false;
     Timer.periodic(
-      Duration(seconds: 1),
+      Duration(seconds: 5),
       (value) async {
         dynamic url = Uri.parse(
             "https://glacial-everglades-59975.herokuapp.com/api/receiveGlobalMessage");
@@ -3261,6 +3303,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     cryptoAppBarImageIndex = random.nextInt(2);
     chatAppBarImageIndex = random.nextInt(chat_illustrations.length - 1);
     abc = this;
+
+    // Get Chats
+    getGlobalChat();
   }
 
   //? Dispose
@@ -4152,10 +4197,48 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   GestureDetector(
                     onTap: () {
                       getGlobalChat();
-                      Navigator.pushNamed(context, "chatRoom");
-                      /*curPage = 6;
+                      if (masterUser == "User0") {
+                        showProfileDialog();
+                      } else {
+                        Navigator.pushNamed(
+                          context,
+                          "chatRoom",
+                          arguments: {
+                            "appBarTitle": "Global Chat",
+                            "isDarkMode": isDarkMode,
+                            "isSongPlaying": isSongPlaying,
+                            "containerColor": containerColor,
+                            "feedCardShadow": feedCardShadow,
+                            "musicListBottomSheet": musicListBottomSheet,
+                            "iconColor": iconColor,
+                            "marqueeMusicTitle": marqueeMusicTitle,
+                            "curSong": curSong,
+                            "textColor": textColor,
+                            "assetsAudioPlayer": assetsAudioPlayer,
+                            "backInPlaylist": backInPlaylist,
+                            "nextInPlaylist": nextInPlaylist,
+                            "pausePlaySong": pausePlaySong,
+                            "masterUser": masterUser,
+                            "textColorDim": textColorDim,
+                            "textColorDimmer": textColorDimmer,
+                            "scaffoldBGColor": scaffoldBGColor,
+                            "albumArtImage": albumArtImage,
+                            "albumArts": albumArts,
+                            "globalChat": globalChat,
+
+                            /* 
+                                    dynamic assetsAudioPlayer = receivedData["assetsAudioPlayer"];
+                                    Function backInPlaylist = receivedData["backInPlaylist"];
+                                    Function nextInPlaylist = receivedData["nextInPlaylist"];
+                                    Function pausePlaySong = receivedData["pausePlaySong"];
+
+                                */
+                          },
+                        );
+                        /*curPage = 6;
                       isBottomBarVisible = false;*/
-                      setState(() {});
+                        setState(() {});
+                      }
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -4190,44 +4273,48 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         IconButton(
                           onPressed: () {
                             getGlobalChat();
-                            Navigator.pushNamed(
-                              context,
-                              "chatRoom",
-                              arguments: {
-                                "appBarTitle": "Global Chat",
-                                "isDarkMode": isDarkMode,
-                                "isSongPlaying": isSongPlaying,
-                                "containerColor": containerColor,
-                                "feedCardShadow": feedCardShadow,
-                                "musicListBottomSheet": musicListBottomSheet,
-                                "iconColor": iconColor,
-                                "marqueeMusicTitle": marqueeMusicTitle,
-                                "curSong": curSong,
-                                "textColor": textColor,
-                                "assetsAudioPlayer": assetsAudioPlayer,
-                                "backInPlaylist": backInPlaylist,
-                                "nextInPlaylist": nextInPlaylist,
-                                "pausePlaySong": pausePlaySong,
-                                "masterUser": masterUser,
-                                "textColorDim": textColorDim,
-                                "textColorDimmer": textColorDimmer,
-                                "scaffoldBGColor": scaffoldBGColor,
-                                "albumArtImage": albumArtImage,
-                                "albumArts": albumArts,
+                            if (masterUser == "User0") {
+                              showProfileDialog();
+                            } else {
+                              Navigator.pushNamed(
+                                context,
+                                "chatRoom",
+                                arguments: {
+                                  "appBarTitle": "Global Chat",
+                                  "isDarkMode": isDarkMode,
+                                  "isSongPlaying": isSongPlaying,
+                                  "containerColor": containerColor,
+                                  "feedCardShadow": feedCardShadow,
+                                  "musicListBottomSheet": musicListBottomSheet,
+                                  "iconColor": iconColor,
+                                  "marqueeMusicTitle": marqueeMusicTitle,
+                                  "curSong": curSong,
+                                  "textColor": textColor,
+                                  "assetsAudioPlayer": assetsAudioPlayer,
+                                  "backInPlaylist": backInPlaylist,
+                                  "nextInPlaylist": nextInPlaylist,
+                                  "pausePlaySong": pausePlaySong,
+                                  "masterUser": masterUser,
+                                  "textColorDim": textColorDim,
+                                  "textColorDimmer": textColorDimmer,
+                                  "scaffoldBGColor": scaffoldBGColor,
+                                  "albumArtImage": albumArtImage,
+                                  "albumArts": albumArts,
+                                  "globalChat": globalChat,
 
-                                /* 
+                                  /* 
                                     dynamic assetsAudioPlayer = receivedData["assetsAudioPlayer"];
                                     Function backInPlaylist = receivedData["backInPlaylist"];
                                     Function nextInPlaylist = receivedData["nextInPlaylist"];
                                     Function pausePlaySong = receivedData["pausePlaySong"];
 
                                 */
-                              },
-                            );
-
-                            /*curPage = 6;
-                            isBottomBarVisible = false;*/
-                            setState(() {});
+                                },
+                              );
+                              /*curPage = 6;
+                              isBottomBarVisible = false;*/
+                              setState(() {});
+                            }
                           },
                           icon: Icon(
                             Icons.send,
@@ -6497,15 +6584,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       ),
                                       // Profile
                                       Container(
-                                        width: 45.0,
-                                        height: 45.0,
+                                        width: 50.0,
+                                        height: 50.0,
                                         margin:
                                             const EdgeInsets.only(right: 10.0),
                                         child: FittedBox(
                                           fit: BoxFit.contain,
                                           child: UserProfileAvatar(
                                             avatarUrl:
-                                                'https://i.pinimg.com/564x/4d/37/19/4d37191ca552a28308a1bd1b047402f1.jpg',
+                                                "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
                                             onAvatarTap: () {
                                               showProfileDialog();
                                             },
@@ -6517,7 +6604,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               fontWeight: FontWeight.bold,
                                             ),
                                             avatarSplashColor:
-                                                smartRefresherColor[0],
+                                                smartRefresherColor[curPage],
                                             radius: 20,
                                             isActivityIndicatorSmall: false,
                                             avatarBorderData: AvatarBorderData(
@@ -6751,6 +6838,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         aIC_wallet.animateToStart();
                         aIC_settings.animateToStart();
                         curPage = 4;
+                        if (masterUser == "User0") {
+                          showProfileDialog();
+                        }
                         setState(() {});
                         return true;
                       },
@@ -6761,6 +6851,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         aIC_wallet.animateToStart();
                         aIC_settings.animateToStart();
                         curPage = 4;
+                        if (masterUser == "User0") {
+                          showProfileDialog();
+                        }
                         return true;
                       },
                       duration: Duration(milliseconds: 300),
