@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:marquee/marquee.dart';
 import 'package:path/path.dart' as p;
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 

@@ -3278,19 +3278,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   //? INIT STATE
   String masterUser = "User0";
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  bool initStateX = true;
+  void initiate() {
     //hideBottomNavBar();
     // Weather
-    askPermissions();
-    //getWeather();
+    askPermissions(); // Makes it slower
+    // getWeather();
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
     chosenSubredditTime = getRandom(feedTimeValues);
-    getHomePageFeed(chosenSubreddit, chosenSubredditSort, chosenSubredditTime);
+    getHomePageFeed(chosenSubreddit, chosenSubredditSort,
+        chosenSubredditTime); // second slower
     // Discover INIT
     getDictionaryJSON();
     // Music Player INIT
@@ -3308,6 +3307,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     getGlobalChat();
   }
 
+  @override
+  /*void initState() {
+    // TODO: implement initState
+    super.initState();
+    //initiate();
+  }*/
+
   //? Dispose
   bool playVideo = false;
   int playVideoIndex = -1;
@@ -3322,6 +3328,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (initStateX == true) {
+      initiate();
+      initStateX = false;
+    }
     print(curPage);
     TabController tabBarController = TabController(length: 2, vsync: this);
     List extensionApps = [

@@ -34,7 +34,7 @@ class _LoadingPageState extends State<LoadingPage>
   void loadingDelay() {
     Timer.periodic(Duration(seconds: 3), (time) {
       time.cancel();
-      Navigator.popAndPushNamed(context, "homePage");
+      Navigator.popAndPushNamed(context, "onboardingPage");
     });
   }
 
