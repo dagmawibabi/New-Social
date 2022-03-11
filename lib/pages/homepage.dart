@@ -1907,109 +1907,76 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   TextEditingController usernameTextController = TextEditingController();
   bool doneEnteringUsername = false;
   void showProfileDialog() {
-    showDialog(
+    showProfileBottomSheet();
+  }
+
+  void showProfileBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: modalBottomSheetColor,
       context: context,
       builder: (context) {
-        return AlertDialog(
-          //contentPadding: const EdgeInsets.all(40.0),
-          backgroundColor: containerColor,
-          content: Container(
-            height: MediaQuery.of(context).size.height * 0.52,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: [
-                // Profile Pic
-                WidgetCircularAnimator(
-                  size: 180.0,
-                  innerColor: getRandom(
-                      isDarkMode == true ? Colors.accents : Colors.primaries),
-                  outerColor: getRandom(
-                      isDarkMode == true ? Colors.accents : Colors.primaries),
-                  child: Container(
-                    width: 30.0,
-                    height: 30.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[900],
-                      //borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Image.network(
-                        "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                // Username
-                Text(
-                  masterUser,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: getRandom(
-                        isDarkMode == true ? Colors.accents : Colors.primaries),
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                // Input box to change Username
-                TextField(
-                  controller: usernameTextController,
-                  style: TextStyle(
-                    color: textColor,
-                  ),
-                  decoration: InputDecoration(
-                      hintText: "enter username",
-                      hintStyle: TextStyle(
-                        color: textColor,
-                      )),
-                ),
-                SizedBox(height: 5.0),
-                // Change Username Btn
-                doneEnteringUsername == false
-                    ? ElevatedButton(
-                        onPressed: () {
-                          if (usernameTextController.text.toLowerCase() !=
-                              "user0") {
-                            masterUser = usernameTextController.text;
-                            doneEnteringUsername = true;
-                            Navigator.pop(context);
-                            showProfileDialog();
-                          }
-                        },
-                        child: Text(
-                          "Change Username",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    : ElevatedButton(
-                        onPressed: () {
-                          doneEnteringUsername = false;
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "Done!",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                SizedBox(height: 30.0),
-                // Info
-                Text(
-                  "Enter username and start\n chatting globally!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textColor,
-                  ),
-                ),
-              ],
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Username
+            Text(
+              masterUser,
+              style: TextStyle(
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold,
+                color: getRandom(
+                    isDarkMode == true ? Colors.accents : Colors.primaries),
+              ),
             ),
-          ),
+            SizedBox(height: 25.0),
+
+            // Profile Pic
+            WidgetCircularAnimator(
+              size: 220.0,
+              innerColor: getRandom(
+                  isDarkMode == true ? Colors.accents : Colors.primaries),
+              outerColor: getRandom(
+                  isDarkMode == true ? Colors.accents : Colors.primaries),
+              child: Container(
+                width: 30.0,
+                height: 30.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[900],
+                  //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Image.network(
+                    "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+
+            // Logout
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "onboardingPage");
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.logout),
+                  SizedBox(width: 8.0),
+                  Text(
+                    "Logout",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         );
       },
     );
@@ -3329,6 +3296,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (initStateX == true) {
+      dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
+      print(isDarkMode);
+      isDarkMode = receivedData["isDarkMode"];
+      setDarkMode();
+      setState(() {});
+      print(isDarkMode);
+      masterUser = (receivedData["masterUser"] != "" &&
+              receivedData["masterUser"] != " " &&
+              receivedData["masterUser"] != null)
+          ? receivedData["masterUser"]
+          : "User0";
       initiate();
       initStateX = false;
     }
@@ -6453,6 +6431,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               fullScreenMode == false
                   ? fullScreenModeMP == false
                       ? SliverAppBar(
+                          automaticallyImplyLeading: false,
                           backgroundColor: appBarBGColor,
                           foregroundColor: Colors.black,
                           expandedHeight: enableFlexibleSpace == true

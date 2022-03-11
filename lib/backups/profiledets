@@ -1,0 +1,123 @@
+showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          //contentPadding: const EdgeInsets.all(40.0),
+          backgroundColor: containerColor,
+          content: Container(
+            //height: MediaQuery.of(context).size.height * 0.72,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                // Logout btn
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(
+                            context, "onboardingPage");
+                      },
+                      icon: Icon(
+                        Icons.logout,
+                        color: iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+                // Profile Pic
+                WidgetCircularAnimator(
+                  size: 180.0,
+                  innerColor: getRandom(
+                      isDarkMode == true ? Colors.accents : Colors.primaries),
+                  outerColor: getRandom(
+                      isDarkMode == true ? Colors.accents : Colors.primaries),
+                  child: Container(
+                    width: 30.0,
+                    height: 30.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[900],
+                      //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Image.network(
+                        "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                // Username
+                Text(
+                  masterUser,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: getRandom(
+                        isDarkMode == true ? Colors.accents : Colors.primaries),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                // Input box to change Username
+                TextField(
+                  controller: usernameTextController,
+                  style: TextStyle(
+                    color: textColor,
+                  ),
+                  decoration: InputDecoration(
+                      hintText: "enter username",
+                      hintStyle: TextStyle(
+                        color: textColor,
+                      )),
+                ),
+                SizedBox(height: 5.0),
+                // Change Username Btn
+                doneEnteringUsername == false
+                    ? ElevatedButton(
+                        onPressed: () {
+                          if (usernameTextController.text.toLowerCase() !=
+                              "user0") {
+                            masterUser = usernameTextController.text;
+                            doneEnteringUsername = true;
+                            Navigator.pop(context);
+                            showProfileDialog();
+                          }
+                        },
+                        child: Text(
+                          "Change Username",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          doneEnteringUsername = false;
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Done!",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                SizedBox(height: 30.0),
+                // Info
+                Text(
+                  "Enter username and start\n chatting globally!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  
