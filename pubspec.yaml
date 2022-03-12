@@ -66,6 +66,7 @@ dependencies:
   hive_flutter: ^1.1.0
   onboarding: ^2.1.0
   nice_intro: ^0.1.6
+  loading_animation_widget: ^1.1.0+3
 
 
 

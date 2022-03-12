@@ -1912,71 +1912,94 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void showProfileBottomSheet() {
     showModalBottomSheet(
-      backgroundColor: modalBottomSheetColor,
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (context) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Username
-            Text(
-              masterUser,
-              style: TextStyle(
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
-                color: getRandom(
-                    isDarkMode == true ? Colors.accents : Colors.primaries),
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            color: modalBottomSheetColor,
+            image: DecorationImage(
+              image: CachedNetworkImageProvider(
+                curUser["dp"],
               ),
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.high,
+              colorFilter: ColorFilter.srgbToLinearGamma(),
             ),
-            SizedBox(height: 25.0),
-
-            // Profile Pic
-            WidgetCircularAnimator(
-              size: 220.0,
-              innerColor: getRandom(
-                  isDarkMode == true ? Colors.accents : Colors.primaries),
-              outerColor: getRandom(
-                  isDarkMode == true ? Colors.accents : Colors.primaries),
-              child: Container(
-                width: 30.0,
-                height: 30.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[900],
-                  //borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Image.network(
-                    "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
-                  ),
-                ),
-              ),
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 70.0,
+              sigmaY: 70.0,
+              tileMode: TileMode.mirror,
             ),
-            const SizedBox(height: 20.0),
-
-            // Logout
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "onboardingPage");
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(Icons.logout),
-                  SizedBox(width: 8.0),
+                  // Username
                   Text(
-                    "Logout",
+                    masterUser,
                     style: TextStyle(
+                      fontSize: 25.0,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
+                      color: textColor,
                     ),
                   ),
+                  SizedBox(height: 25.0),
+
+                  // Profile Pic
+                  WidgetCircularAnimator(
+                    size: 220.0,
+                    innerColor: getRandom(
+                        isDarkMode == true ? Colors.accents : Colors.primaries),
+                    outerColor: getRandom(
+                        isDarkMode == true ? Colors.accents : Colors.primaries),
+                    child: Container(
+                      width: 30.0,
+                      height: 30.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey[900],
+                        //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Image.network(
+                          curUser["dp"],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+
+                  // Logout
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, "onboardingPage");
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.logout),
+                        SizedBox(width: 8.0),
+                        Text(
+                          "Logout",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
-            )
-          ],
+            ),
+          ),
         );
       },
     );
@@ -3245,6 +3268,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   //? INIT STATE
   String masterUser = "User0";
+  dynamic curUser = {};
   bool initStateX = true;
   void initiate() {
     //hideBottomNavBar();
@@ -3299,6 +3323,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
       print(isDarkMode);
       isDarkMode = receivedData["isDarkMode"];
+      curUser = receivedData["currentUser"];
       setDarkMode();
       setState(() {});
       print(isDarkMode);
@@ -4192,6 +4217,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           context,
                           "chatRoom",
                           arguments: {
+                            "curUser": curUser,
                             "appBarTitle": "Global Chat",
                             "isDarkMode": isDarkMode,
                             "isSongPlaying": isSongPlaying,
@@ -4213,7 +4239,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             "albumArtImage": albumArtImage,
                             "albumArts": albumArts,
                             "globalChat": globalChat,
-
                             /* 
                                     dynamic assetsAudioPlayer = receivedData["assetsAudioPlayer"];
                                     Function backInPlaylist = receivedData["backInPlaylist"];
@@ -4268,6 +4293,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 context,
                                 "chatRoom",
                                 arguments: {
+                                  "curUser": curUser,
                                   "appBarTitle": "Global Chat",
                                   "isDarkMode": isDarkMode,
                                   "isSongPlaying": isSongPlaying,
@@ -6580,8 +6606,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         child: FittedBox(
                                           fit: BoxFit.contain,
                                           child: UserProfileAvatar(
-                                            avatarUrl:
-                                                "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
+                                            avatarUrl: curUser["dp"],
                                             onAvatarTap: () {
                                               showProfileDialog();
                                             },

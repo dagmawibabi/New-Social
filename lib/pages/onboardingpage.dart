@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:location/location.dart';
 import 'package:onboarding/onboarding.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key? key}) : super(key: key);
@@ -14,6 +18,8 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
+  // User Model
+  dynamic user = {};
   bool isDarkMode = false;
   bool isLoginForm = false;
   TextEditingController usernameController = TextEditingController();
@@ -55,6 +61,101 @@ class _OnboardingPageState extends State<OnboardingPage> {
         checkPermissions();
         setState(() {});
         break;
+    }
+  }
+
+  // Create new user
+  bool isUsernameTaken = false;
+  bool isLoading = false;
+  void createNewUser(String username, String password) async {
+    // Status
+    isLoading = true;
+    setState(() {});
+
+    // Check if username exists
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/getAllUsers");
+    dynamic userNames = await http.get(url);
+    dynamic userNamesJSON = jsonDecode(userNames.body);
+    for (var users in userNamesJSON) {
+      print(users);
+      if (users["username"].toString().toLowerCase() ==
+          username.toLowerCase()) {
+        isUsernameTaken = true;
+        isLoading = false;
+        setState(() {});
+      }
+    }
+    /* Password Validation should happen here */
+    if (isUsernameTaken == false) {
+      dynamic url = Uri.parse(
+          "https://glacial-everglades-59975.herokuapp.com/api/createNewUser/" +
+              username.toString() +
+              "/" +
+              password.toString());
+      await http.get(url);
+      Navigator.pushReplacementNamed(
+        context,
+        "homePage",
+        arguments: {
+          "currentUser": user,
+          "masterUser": usernameController.text,
+          "isDarkMode": isDarkMode,
+        },
+      );
+    }
+  }
+
+  // Login old user
+  bool isUsernameCorrect = true;
+  bool isPasswordCorrect = true;
+  void loginUser(String username, String password) async {
+    // Reset
+    isUsernameCorrect = true;
+    isPasswordCorrect = true;
+    // Status
+    isLoading = true;
+    setState(() {});
+    // Check if username exists
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/getAllUsers");
+    dynamic userNames = await http.get(url);
+    dynamic userNamesJSON = jsonDecode(userNames.body);
+    isUsernameCorrect = false;
+    for (var users in userNamesJSON) {
+      if (users["username"].toString().toLowerCase() ==
+          username.toLowerCase()) {
+        isUsernameCorrect = true;
+      }
+    }
+    if (isUsernameCorrect == true) {
+      dynamic url = Uri.parse(
+          "https://glacial-everglades-59975.herokuapp.com/api/login/" +
+              username +
+              "/" +
+              password);
+      dynamic responseOBJ = await http.get(url);
+      try {
+        dynamic responseJSON = jsonDecode(responseOBJ.body);
+        user = responseJSON;
+        Navigator.pushReplacementNamed(
+          context,
+          "homePage",
+          arguments: {
+            "currentUser": user,
+            "masterUser": usernameController.text,
+            "isDarkMode": isDarkMode,
+          },
+        );
+      } catch (e) {
+        isPasswordCorrect = false;
+        isLoading = false;
+        setState(() {});
+      }
+    } else {
+      isUsernameCorrect = false;
+      isLoading = false;
+      setState(() {});
     }
   }
 
@@ -485,10 +586,49 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               fontSize: 18.0,
                             ),
                           ),
+                          // Username taken
+                          isUsernameTaken == true
+                              ? Column(
+                                  children: [
+                                    SizedBox(height: 5.0),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Username is taken",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5.0),
+                                  ],
+                                )
+                              : Container(),
+                          // Username doesn't exist
+                          isUsernameCorrect == false
+                              ? Column(
+                                  children: [
+                                    SizedBox(height: 5.0),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Username doesn't exist",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5.0),
+                                  ],
+                                )
+                              : Container(),
                           // Password Input
                           TextField(
                             controller: passwordController,
                             maxLines: 1,
+                            obscureText: isLoginForm ? true : false,
                             decoration: InputDecoration(
                               labelText: "Password",
                               labelStyle: TextStyle(
@@ -505,51 +645,81 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               fontSize: 18.0,
                             ),
                           ),
+                          // Password is incorrect
+                          isPasswordCorrect == false
+                              ? Column(
+                                  children: [
+                                    SizedBox(height: 5.0),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Password is incorrect",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5.0),
+                                  ],
+                                )
+                              : Container(),
+                          // Password Hint
+                          SizedBox(height: 8.0),
+                          Text(
+                            "Should be at least 6 characters long, contains numbers and symbols",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                            ),
+                          ),
                           Spacer(),
+                          // Create or login giant btn
                           Container(
                             width: double.infinity,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                fixedSize: MaterialStateProperty.all(
-                                  Size(250.0, 45.0),
-                                ),
-                                backgroundColor: MaterialStateProperty.all(
-                                  isLoginForm
-                                      ? Colors.blue
-                                      : Colors.greenAccent,
-                                ),
-                              ),
-                              child: Text(
-                                isLoginForm ? "Login" : "Create Account",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 19.0,
-                                  color:
-                                      isLoginForm ? Colors.white : Colors.black,
-                                ),
-                              ),
-                              onPressed: () {
-                                if (isLoginForm == true) {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    "homePage",
-                                    arguments: {
-                                      "masterUser": usernameController.text,
-                                      "isDarkMode": isDarkMode,
+                            child: isLoading
+                                ? Container(
+                                    child: Center(
+                                      child: LoadingAnimationWidget
+                                          .staggeredDotsWave(
+                                        color: isLoginForm
+                                            ? Colors.blueAccent
+                                            : Colors.greenAccent,
+                                        size: 35.0,
+                                      ),
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    style: ButtonStyle(
+                                      fixedSize: MaterialStateProperty.all(
+                                        Size(250.0, 45.0),
+                                      ),
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                        isLoginForm
+                                            ? Colors.blue
+                                            : Colors.greenAccent,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      isLoginForm ? "Login" : "Create Account",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 19.0,
+                                        color: isLoginForm
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      if (isLoginForm == true) {
+                                        loginUser(usernameController.text,
+                                            passwordController.text);
+                                      } else {
+                                        createNewUser(usernameController.text,
+                                            passwordController.text);
+                                      }
                                     },
-                                  );
-                                } else {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    "homePage",
-                                    arguments: {
-                                      "masterUser": usernameController.text,
-                                      "isDarkMode": isDarkMode,
-                                    },
-                                  );
-                                }
-                              },
-                            ),
+                                  ),
                           ),
                           TextButton(
                             onPressed: () {

@@ -138,6 +138,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
   //! Controls
   bool firstCall = true;
+  dynamic curUser = {};
 
   @override
   void initState() {
@@ -151,6 +152,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
     if (firstCall == true) {
       globalChat = receivedData["globalChat"];
+      curUser = receivedData["curUser"];
       getGlobalChat();
       firstCall = false;
     }
@@ -792,15 +794,11 @@ class _ChatRoomState extends State<ChatRoom> {
                                             context,
                                             "contentViewerPage",
                                             arguments: {
-                                              "image": globalChat[index]
-                                                          ["dp"] !=
-                                                      ""
-                                                  ? globalChat[index]["dp"]
+                                              "image": curUser["dp"] != ""
+                                                  ? curUser["dp"]
                                                   : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
-                                              "shareLink": globalChat[index]
-                                                          ["dp"] !=
-                                                      ""
-                                                  ? globalChat[index]["dp"]
+                                              "shareLink": curUser["dp"] != ""
+                                                  ? curUser["dp"]
                                                   : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg",
                                               "downloadingImage": false,
                                               "downloadingImageIndex": 0,
@@ -832,10 +830,10 @@ class _ChatRoomState extends State<ChatRoom> {
                                           clipBehavior: Clip.hardEdge,
                                           child: FittedBox(
                                             fit: BoxFit.cover,
-                                            child: Image.network(globalChat[
-                                                        index]["dp"] !=
+                                            child: Image.network(curUser[
+                                                        "dp"] !=
                                                     ""
-                                                ? globalChat[index]["dp"]
+                                                ? curUser["dp"]
                                                 : "https://i.pinimg.com/564x/86/4d/3f/864d3f2beebcd48f4cf57052031de4a0.jpg"),
                                           ),
                                         ),
