@@ -180,21 +180,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
         background: Colors.grey[900]!,
         proceedButtonStyle: ProceedButtonStyle(
           proceedButtonRoute: (context) {
-            if (allPermissionState == true) {
-              return Navigator.pushReplacementNamed(
-                context,
-                "homePage",
-                arguments: {
-                  "masterUser": usernameController.text,
-                  "isDarkMode": isDarkMode,
-                },
-              );
-            }
+            isLoginForm = !isLoginForm;
+            setState(() {});
           },
           proceedpButtonText: Text(
-            !allPermissionState ? "Disabled" : "Done",
+            !allPermissionState ? "Disabled" : "Sign Up | Login",
             style: TextStyle(
-              fontSize: 16.0,
+              fontSize: !allPermissionState ? 16.0 : 13.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -515,10 +507,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Spacer(),
-                      Image.asset(
-                          "assets/images/onboarding_illustrations/5.png"),
+                      Image.asset("assets/images/error_illustrations/3.png"),
                       //Spacer(),
-                      SizedBox(height: 10.0),
+                      SizedBox(height: 20.0),
                       Container(
                         width: double.infinity,
                         child: Text(
