@@ -94,6 +94,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
               "/" +
               password.toString());
       await http.get(url);
+      dynamic url2 = Uri.parse(
+          "https://glacial-everglades-59975.herokuapp.com/api/login/" +
+              username +
+              "/" +
+              password);
+      dynamic responseOBJ = await http.get(url2);
+      dynamic responseJSON = jsonDecode(responseOBJ.body);
+      user = responseJSON;
       Navigator.pushReplacementNamed(
         context,
         "homePage",
@@ -195,11 +203,43 @@ class _OnboardingPageState extends State<OnboardingPage> {
           indicatorDesign: IndicatorDesign.line(
             lineDesign: LineDesign(
               lineType: DesignType.line_nonuniform,
-              lineSpacer: 25.0,
+              lineSpacer: 22.0,
+              lineWidth: 16.0,
             ),
           ),
         ),
         pages: [
+          // Page 0 - Welcome
+          PageModel(
+            widget: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Spacer(),
+                Image.asset(
+                  "assets/images/content_illustrations/5.png",
+                ),
+                //Spacer(),
+                Container(
+                  width: double.infinity,
+                  child: Text(
+                    "Welcome to Aurora",
+                    style: pageTitleStyle,
+                  ),
+                ),
+                SizedBox(height: 10.0),
+                Container(
+                  width: double.infinity,
+                  child: Text(
+                    "An All-in-One multi-purpose social media! \nWith an aesthetically pleasing, minimal and simple interface.",
+                    style: pageInfoStyle,
+                  ),
+                ),
+                Spacer(),
+                Spacer(),
+              ],
+            ),
+          ),
+
           // Page 1 - Feed and weather
           PageModel(
             widget: Column(
