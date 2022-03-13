@@ -67,7 +67,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // Create new user
   bool isUsernameTaken = false;
   bool isLoading = false;
+  bool isUsernameCorrect = true;
+  bool isPasswordCorrect = true;
   void createNewUser(String username, String password) async {
+    // reset
+    isUsernameTaken = false;
+    isUsernameCorrect = true;
+    isPasswordCorrect = true;
     // Status
     isLoading = true;
     setState(() {});
@@ -115,10 +121,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   // Login old user
-  bool isUsernameCorrect = true;
-  bool isPasswordCorrect = true;
   void loginUser(String username, String password) async {
     // Reset
+    // reset
+    isUsernameTaken = false;
     isUsernameCorrect = true;
     isPasswordCorrect = true;
     // Status
