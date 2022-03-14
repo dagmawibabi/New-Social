@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:newsocial/pages/chatRoom.dart';
 import 'package:newsocial/pages/contentViewerPage.dart';
+import 'package:newsocial/pages/cryptodetailpage.dart';
 import 'package:newsocial/pages/extensionApps/qrScanner.dart';
 import 'package:newsocial/pages/homepage.dart';
 import 'package:newsocial/pages/loadingPage.dart';
@@ -49,6 +50,7 @@ class _MyAppState extends State<MyApp> {
         "VideoViewerPage": (content) => VideoViewerPage(),
         "chatRoom": (content) => ChatRoom(),
         "qrScannerPage": (content) => QRScannerPage(),
+        "cryptoDetailPage": (context) => CryptoDetailPage(),
       },
       theme: ThemeData(
         fontFamily: "BlenderProBook",

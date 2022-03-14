@@ -4197,6 +4197,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         textColorDimmer,
         iconColor,
         cardGradient,
+        isDarkMode,
+        containerColor,
+        feedCardShadow,
+        scaffoldBGColor,
       ),
 
       // Chat Page

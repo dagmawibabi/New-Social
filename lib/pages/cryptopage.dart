@@ -20,126 +20,145 @@ class CryptoPage {
     textColorDimmer,
     iconColor,
     cardGradient,
+    isDarkMode,
+    containerColor,
+    feedCardShadow,
+    scaffoldBGColor,
   ) {
     return SliverList(
       delegate: isCryptoPageLoading == false
           ? SliverChildBuilderDelegate(
               (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    showCryptoDetail(context, index);
-                  },
-                  child: Card(
-                    elevation: 0.2,
-                    color: feedCardColor, //Colors.grey[200],
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 2.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        children: [
-                          index == 0
-                              ? Column(
-                                  children: [
-                                    // Card
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 80.0),
-                                      margin:
-                                          const EdgeInsets.only(bottom: 20.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0),
-                                        ),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: cardGradient,
-                                        ),
+                return Card(
+                  elevation: 0.2,
+                  color: feedCardColor, //Colors.grey[200],
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 2.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        index == 0
+                            ? Column(
+                                children: [
+                                  // Card
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 80.0),
+                                    margin: const EdgeInsets.only(bottom: 20.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0),
                                       ),
-                                      child: Center(
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "Total Balance",
-                                              style: TextStyle(
-                                                fontSize: 16.0,
-                                                color: textColorDimmer,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10.0),
-                                            Text(
-                                              "\$46,423.36",
-                                              style: TextStyle(
-                                                fontSize: 30.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: cardGradient,
                                       ),
                                     ),
-                                    // Transaction Buttons
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        // Send
-                                        GestureDetector(
-                                          onTap: () {
-                                            cryptoActionFunction();
-                                          },
-                                          child: cryptoTransactionButton(
-                                            cryptoActionIcon: cryptoActionIcon,
-                                            textColorDimmer: textColor,
-                                            iconColor: iconColor,
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Total Balance",
+                                            style: TextStyle(
+                                              fontSize: 16.0,
+                                              color: textColorDimmer,
+                                            ),
                                           ),
-                                        ),
-                                        // Receive
-                                        GestureDetector(
-                                          onTap: () {
-                                            cryptoActionFunction();
-                                          },
-                                          child: cryptoTransactionButton(
-                                            cryptoActionIcon:
-                                                Icons.file_download_outlined,
-                                            textColorDimmer: textColor,
-                                            iconColor: iconColor,
+                                          const SizedBox(height: 10.0),
+                                          Text(
+                                            "\$46,423.36",
+                                            style: TextStyle(
+                                              fontSize: 30.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: textColor,
+                                            ),
                                           ),
-                                        ),
-                                        // Swap
-                                        GestureDetector(
-                                          onTap: () {
-                                            cryptoActionFunction();
-                                          },
-                                          child: cryptoTransactionButton(
-                                            cryptoActionIcon: Icons
-                                                .wifi_protected_setup_rounded,
-                                            textColorDimmer: textColor,
-                                            iconColor: iconColor,
-                                          ),
-                                        ),
-                                        // Send
-                                        GestureDetector(
-                                          onTap: () {
-                                            cryptoActionFunction();
-                                          },
-                                          child: cryptoTransactionButton(
-                                            cryptoActionIcon:
-                                                Icons.qr_code_scanner_outlined,
-                                            textColorDimmer: textColor,
-                                            iconColor: iconColor,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                )
-                              : Container(),
-                          Row(
+                                  ),
+                                  // Transaction Buttons
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      // Send
+                                      GestureDetector(
+                                        onTap: () {
+                                          cryptoActionFunction();
+                                        },
+                                        child: cryptoTransactionButton(
+                                          cryptoActionIcon: cryptoActionIcon,
+                                          textColorDimmer: textColor,
+                                          iconColor: iconColor,
+                                        ),
+                                      ),
+                                      // Receive
+                                      GestureDetector(
+                                        onTap: () {
+                                          cryptoActionFunction();
+                                        },
+                                        child: cryptoTransactionButton(
+                                          cryptoActionIcon:
+                                              Icons.file_download_outlined,
+                                          textColorDimmer: textColor,
+                                          iconColor: iconColor,
+                                        ),
+                                      ),
+                                      // Swap
+                                      GestureDetector(
+                                        onTap: () {
+                                          cryptoActionFunction();
+                                        },
+                                        child: cryptoTransactionButton(
+                                          cryptoActionIcon: Icons
+                                              .wifi_protected_setup_rounded,
+                                          textColorDimmer: textColor,
+                                          iconColor: iconColor,
+                                        ),
+                                      ),
+                                      // Send
+                                      GestureDetector(
+                                        onTap: () {
+                                          cryptoActionFunction();
+                                        },
+                                        child: cryptoTransactionButton(
+                                          cryptoActionIcon:
+                                              Icons.qr_code_scanner_outlined,
+                                          textColorDimmer: textColor,
+                                          iconColor: iconColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Container(),
+                        GestureDetector(
+                          onTap: () {
+                            //showCryptoDetail(context, index);
+                            Navigator.pushNamed(
+                              context,
+                              "cryptoDetailPage",
+                              arguments: {
+                                "index": index,
+                                "cryptoStats": cryptoStats,
+                                "isDarkMode": isDarkMode,
+                                "containerColor": containerColor,
+                                "feedCardShadow": feedCardShadow,
+                                "scaffoldBGColor": scaffoldBGColor,
+                                "iconColor": iconColor,
+                                "textColor": textColor,
+                                "textColorDim": textColorDim,
+                                "textColorDimmer": textColorDimmer,
+                              },
+                            );
+                          },
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Crypto Image, Name and Symbol
@@ -258,8 +277,8 @@ class CryptoPage {
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );
