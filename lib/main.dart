@@ -9,6 +9,7 @@ import 'package:newsocial/pages/extensionApps/qrScanner.dart';
 import 'package:newsocial/pages/homepage.dart';
 import 'package:newsocial/pages/loadingPage.dart';
 import 'package:newsocial/pages/onboardingpage.dart';
+import 'package:newsocial/pages/postContentPage.dart';
 import 'package:newsocial/pages/videoViewerPage.dart';
 import 'package:newsocial/dbModel/model.dart';
 
@@ -47,10 +48,11 @@ class _MyAppState extends State<MyApp> {
         "onboardingPage": (context) => OnboardingPage(),
         "homePage": (context) => HomePage(),
         "contentViewerPage": (context) => ContentViewerPage(),
-        "VideoViewerPage": (content) => VideoViewerPage(),
+        "videoViewerPage": (content) => VideoViewerPage(),
         "chatRoom": (content) => ChatRoom(),
         "qrScannerPage": (content) => QRScannerPage(),
         "cryptoDetailPage": (context) => CryptoDetailPage(),
+        "postContentPage": (context) => PostContentPage(),
       },
       theme: ThemeData(
         fontFamily: "BlenderProBook",

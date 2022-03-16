@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   // State Controllers
-  int curPage = 0;
+  int curPage = 7;
 
   //? HOME PAGE
   // Home Page Variables
@@ -1141,6 +1141,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
+  //? Custom Feed
+// Get Content
+  bool isCustomFeedLoading = true;
+  List customFeed = [];
+  bool isFirstTimeCF = true;
+  void getCustomFeed() async {
+    isCustomFeedLoading = true;
+    setState(() {});
+    Timer.periodic(Duration(seconds: 1), (timer) async {
+      var url = await Uri.parse(
+          "https://glacial-everglades-59975.herokuapp.com/api/getPosts/" +
+              curUser["username"] +
+              "/" +
+              curUser["password"]);
+      var response = await http.get(url);
+      var responseJSON = jsonDecode(response.body);
+      List customFeed0 = responseJSON;
+      if (isFirstTimeCF) {
+        dynamic customFeed1 = customFeed0.reversed;
+        customFeed = customFeed1.toList();
+        isFirstTimeCF = false;
+        isCustomFeedLoading = false;
+        setState(() {});
+      } else {
+        if (customFeed.length != customFeed0.length) {
+          dynamic customFeed1 = customFeed0.reversed;
+          customFeed = customFeed1.toList();
+          isCustomFeedLoading = false;
+          setState(() {});
+        }
+      }
+    });
+  }
+
   //? Home Page
   List subredditList = [
     "wholesomeMemes",
@@ -1478,11 +1512,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool useMetricMesurementSystem = true;
   void getWeather() async {
     loc.Location location = await loc.Location();
-    if (await Permission.location.status.isGranted == true) {
+    /*if (await Permission.location.status.isGranted == true) {
       locationData = await location.getLocation();
     } else {
       await Permission.location.request();
-    }
+    }*/
+    locationData = await location.getLocation();
+
     String latitude = locationData.latitude.toString();
     String longitude = locationData.longitude.toString();
     var url = Uri.parse(
@@ -2565,6 +2601,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int userIndex = 0;
 
   //! New
+  bool useFABPost = false;
   bool grantedStorage = false;
   bool grantedLocation = false;
   bool grantedCamera = false;
@@ -3051,6 +3088,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Fullscreen Mode
   void setFullscreen() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     fullScreenMode = !fullScreenMode;
     fullScreenModeMP = false;
     if (fullScreenMode == true) {
@@ -3273,8 +3311,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initiate() {
     //hideBottomNavBar();
     // Weather
-    askPermissions(); // Makes it slower
-    // getWeather();
+    //askPermissions(); // Makes it slower
+    getWeather();
+    getCustomFeed();
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
@@ -3321,22 +3360,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (initStateX == true) {
       dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
-      print(isDarkMode);
-      isDarkMode = receivedData["isDarkMode"];
-      curUser = receivedData["currentUser"];
+      /* //? For Debugging
+      curUser = {
+        "username": "DagmawiBabi",
+        "password": "JYMTW2m!",
+        "dp":
+            "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
+      };
+      masterUser = "DagmawiBabi";*/
+      isDarkMode = (receivedData["isDarkMode"] != "" &&
+              receivedData["isDarkMode"] != " " &&
+              receivedData["isDarkMode"] != null)
+          ? receivedData["isDarkMode"]
+          : false;
+      curUser = (receivedData["currentUser"] != "" &&
+              receivedData["currentUser"] != " " &&
+              receivedData["currentUser"] != null)
+          ? receivedData["currentUser"]
+          : "DagmawiBabi";
       setDarkMode();
       setState(() {});
-      print(isDarkMode);
       masterUser = (receivedData["masterUser"] != "" &&
               receivedData["masterUser"] != " " &&
               receivedData["masterUser"] != null)
           ? receivedData["masterUser"]
-          : "User0";
+          : "DagmawiBabi";
       initiate();
       initStateX = false;
     }
     print(curPage);
-    TabController tabBarController = TabController(length: 2, vsync: this);
+    TabController tabBarController = TabController(length: 3, vsync: this);
     List extensionApps = [
       {
         "icon": Icons.menu_book_outlined,
@@ -3420,6 +3473,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       sampleFuture,
       sampleFuture,
       sampleFuture,
+      sampleFuture,
     ];
     List pagesAppBarExpanded = [
       isSongPlaying == true ? 210.0 : 200.0,
@@ -3429,6 +3483,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       280.0,
       20.0,
       20.0,
+      isSongPlaying == true ? 210.0 : 200.0,
       isSongPlaying == true ? 210.0 : 200.0,
     ];
     List pagesAppBarFlexibleSpace = [
@@ -3544,7 +3599,89 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       FlexibleSpaceBar(),
       // DMs Page
       FlexibleSpaceBar(),
-      // Home Page
+      // Reddit Page
+      FlexibleSpaceBar(
+        background: (gotWeather == true)
+            ? GestureDetector(
+                onTap: () {
+                  weatherDetails();
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  margin: const EdgeInsets.only(bottom: 30.0, top: 120.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 60.0,
+                            child: CachedNetworkImage(
+                                imageUrl: "https:" +
+                                    weatherData["current"]["condition"]["icon"]
+                                        .toString()),
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    weatherData["current"]["condition"]["text"],
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ), /*
+                                const SizedBox(height: 10.0),
+                                Text(
+                                  weatherData["location"]["name"] +
+                                      "\n" +
+                                      weatherData["location"]["country"],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                  ),
+                                ),*/
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: Text(
+                              useMetricMesurementSystem == true
+                                  ? weatherData["current"]["temp_c"]
+                                          .toString() +
+                                      "°C"
+                                  : weatherData["current"]["temp_f"]
+                                          .toString() +
+                                      "°F",
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 19.0,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Container(
+                padding: const EdgeInsets.only(top: 100.0),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: textColor,
+                  ),
+                ),
+              ),
+      ),
+      // Shop Page
       FlexibleSpaceBar(
         background: (gotWeather == true)
             ? GestureDetector(
@@ -3628,7 +3765,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     ];
     List pagesBody = [
-      // Home Page
+      // Home Page - 0
       isFeedLoading == false
           ? SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -3678,11 +3815,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   },
                                   child: Container(
                                     width: MediaQuery.of(context).size.width,
-                                    margin: const EdgeInsets.all(6.0),
-                                    padding: const EdgeInsets.all(14.0),
+                                    margin: EdgeInsets.all(
+                                        fullScreenMode ? 0.0 : 6.0),
+                                    padding: EdgeInsets.all(
+                                        fullScreenMode ? 0.0 : 14.0),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0),
+                                        Radius.circular(
+                                            fullScreenMode ? 0.0 : 20.0),
                                       ),
                                       color: feedCardsColor,
                                       boxShadow: [
@@ -3697,50 +3837,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           CrossAxisAlignment.start,
                                       children: [
                                         // Author of content
-                                        GestureDetector(
-                                          onLongPress: () {
-                                            themeEditorOptionIndex = 5;
-                                            themeEditorColorPicker(false);
-                                          },
-                                          child: Text(
-                                            homepageFeed[index]["data"]
-                                                    ["author"]
-                                                .toString()
-                                                .toUpperCase(),
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 20.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
+                                        fullScreenMode
+                                            ? Container()
+                                            : GestureDetector(
+                                                onLongPress: fullScreenMode
+                                                    ? () {}
+                                                    : () {
+                                                        themeEditorOptionIndex =
+                                                            5;
+                                                        themeEditorColorPicker(
+                                                            false);
+                                                      },
+                                                child: Text(
+                                                  homepageFeed[index]["data"]
+                                                          ["author"]
+                                                      .toString()
+                                                      .toUpperCase(),
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
                                         const SizedBox(height: 4.0),
                                         // Title of content
-                                        GestureDetector(
-                                          onLongPress: () {
-                                            themeEditorOptionIndex = 6;
-                                            themeEditorColorPicker(false);
-                                          },
-                                          child: Text(
-                                            homepageFeed[index]["data"]
-                                                ["title"],
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                              color: textColorDim,
-                                            ),
-                                          ),
-                                        ),
+                                        fullScreenMode
+                                            ? Container()
+                                            : GestureDetector(
+                                                onLongPress: fullScreenMode
+                                                    ? () {}
+                                                    : () {
+                                                        themeEditorOptionIndex =
+                                                            6;
+                                                        themeEditorColorPicker(
+                                                            false);
+                                                      },
+                                                child: Text(
+                                                  homepageFeed[index]["data"]
+                                                      ["title"],
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    color: textColorDim,
+                                                  ),
+                                                ),
+                                              ),
                                         // Image of content
                                         Container(
                                           //width: double.infinity,
                                           //height: 300.0,
-                                          margin:
-                                              const EdgeInsets.only(top: 10.0),
+                                          margin: EdgeInsets.only(
+                                              top: fullScreenMode ? 0.0 : 10.0),
                                           decoration: BoxDecoration(
                                             color: containerColor,
                                             borderRadius: BorderRadius.all(
-                                              Radius.circular(20.0),
+                                              Radius.circular(
+                                                  fullScreenMode ? 0.0 : 20.0),
                                             ),
                                           ),
                                           clipBehavior: Clip.hardEdge,
@@ -3782,85 +3935,136 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 4.0),
+                                        SizedBox(
+                                            height: fullScreenMode ? 0.0 : 4.0),
                                         // Subreddit title, Share and Download Buttons
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            // Subreddit title
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 6.0),
-                                              child: Row(
+                                        fullScreenMode
+                                            ? Container()
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
-                                                  GestureDetector(
-                                                    onLongPress: () {
-                                                      themeEditorOptionIndex =
-                                                          0;
-                                                      themeEditorColorPicker(
-                                                          false);
-                                                    },
-                                                    child: Icon(
-                                                      Ionicons.planet_outline,
-                                                      size: 20.0,
-                                                      color: iconColor,
-                                                    ),
-                                                  ),
+                                                  // Subreddit title
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
                                                             left: 6.0),
-                                                    child: Text(
-                                                      homepageFeed[index]
-                                                                  ["data"]
-                                                              ["subreddit"]
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        fontSize: 18.0,
-                                                        color: textColor,
-                                                        //fontWeight: FontWeight.bold,
+                                                    child: Row(
+                                                      children: [
+                                                        GestureDetector(
+                                                          onLongPress: () {
+                                                            themeEditorOptionIndex =
+                                                                0;
+                                                            themeEditorColorPicker(
+                                                                false);
+                                                          },
+                                                          child: Icon(
+                                                            Ionicons
+                                                                .planet_outline,
+                                                            size: 20.0,
+                                                            color: iconColor,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  left: 6.0),
+                                                          child: Text(
+                                                            homepageFeed[index]
+                                                                        ["data"]
+                                                                    [
+                                                                    "subreddit"]
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              fontSize: 18.0,
+                                                              color: textColor,
+                                                              //fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Share and Download Buttons
+                                                  Row(
+                                                    children: [
+                                                      // Share Button
+                                                      GestureDetector(
+                                                        onLongPress: () {
+                                                          themeEditorOptionIndex =
+                                                              0;
+                                                          themeEditorColorPicker(
+                                                              false);
+                                                        },
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            String shareLink =
+                                                                homepageFeed[
+                                                                            index]
+                                                                        ["data"]
+                                                                    ["url"];
+                                                            Share.share(
+                                                                'Check this out @ Aurora \n ${shareLink}');
+                                                          },
+                                                          icon: Icon(
+                                                            Icons
+                                                                .share_outlined,
+                                                            color: iconColor,
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // Share and Download Buttons
-                                            Row(
-                                              children: [
-                                                // Share Button
-                                                GestureDetector(
-                                                  onLongPress: () {
-                                                    themeEditorOptionIndex = 0;
-                                                    themeEditorColorPicker(
-                                                        false);
-                                                  },
-                                                  child: IconButton(
-                                                    onPressed: () {
-                                                      String shareLink =
-                                                          homepageFeed[index]
-                                                              ["data"]["url"];
-                                                      Share.share(
-                                                          'Check this out @ Aurora \n ${shareLink}');
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.share_outlined,
-                                                      color: iconColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                                // Download Button
-                                                downloadingImageIndex == index
-                                                    ? (downloadingImage == false
-                                                        ? GestureDetector(
-                                                            onLongPress: () {
-                                                              themeEditorOptionIndex =
-                                                                  0;
-                                                              themeEditorColorPicker(
-                                                                  false);
-                                                            },
-                                                            child: IconButton(
+                                                      // Download Button
+                                                      downloadingImageIndex ==
+                                                              index
+                                                          ? (downloadingImage ==
+                                                                  false
+                                                              ? GestureDetector(
+                                                                  onLongPress:
+                                                                      () {
+                                                                    themeEditorOptionIndex =
+                                                                        0;
+                                                                    themeEditorColorPicker(
+                                                                        false);
+                                                                  },
+                                                                  child:
+                                                                      IconButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      downloadingImageIndex =
+                                                                          index;
+                                                                      downloadImage(homepageFeed[index]
+                                                                              [
+                                                                              "data"]
+                                                                          [
+                                                                          "url"]);
+                                                                    },
+                                                                    icon: Icon(
+                                                                      downloadingImageDone ==
+                                                                              true
+                                                                          ? Icons
+                                                                              .done
+                                                                          : Ionicons
+                                                                              .download_outline,
+                                                                      color: downloadingImageDone ==
+                                                                              true
+                                                                          ? Colors
+                                                                              .green
+                                                                          : iconColor,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              : Container(
+                                                                  width: 25.0,
+                                                                  height: 25.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    color:
+                                                                        iconColor,
+                                                                  ),
+                                                                ))
+                                                          : IconButton(
                                                               onPressed:
                                                                   () async {
                                                                 downloadingImageIndex =
@@ -3873,47 +4077,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                         "url"]);
                                                               },
                                                               icon: Icon(
-                                                                downloadingImageDone ==
-                                                                        true
-                                                                    ? Icons.done
-                                                                    : Ionicons
-                                                                        .download_outline,
-                                                                color: downloadingImageDone ==
-                                                                        true
-                                                                    ? Colors
-                                                                        .green
-                                                                    : iconColor,
+                                                                Ionicons
+                                                                    .download_outline,
+                                                                color:
+                                                                    iconColor,
                                                               ),
                                                             ),
-                                                          )
-                                                        : Container(
-                                                            width: 25.0,
-                                                            height: 25.0,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              color: iconColor,
-                                                            ),
-                                                          ))
-                                                    : IconButton(
-                                                        onPressed: () async {
-                                                          downloadingImageIndex =
-                                                              index;
-                                                          downloadImage(
-                                                              homepageFeed[
-                                                                          index]
-                                                                      ["data"]
-                                                                  ["url"]);
-                                                        },
-                                                        icon: Icon(
-                                                          Ionicons
-                                                              .download_outline,
-                                                          color: iconColor,
-                                                        ),
-                                                      )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                     ),
                                   ),
@@ -3946,7 +4119,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
 
-      // Discover Page
+      // Discover Page - 1
       isDiscoverLoading == true
           ? SliverToBoxAdapter(
               child: Container(
@@ -4134,7 +4307,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
 
-      // Music Page
+      // Music Page - 2
       MusicPlayerPage.musicPlayer(
         context,
         flipCardController,
@@ -4182,7 +4355,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         albumArts,
       ),
 
-      // Crypto Page
+      // Crypto Page - 3
       CryptoPage.cryptoPage(
         isCryptoPageLoading,
         showCryptoDetail,
@@ -4203,7 +4376,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         scaffoldBGColor,
       ),
 
-      // Chat Page
+      // Chat Page - 4
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
@@ -4350,7 +4523,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
 
-      // Settings Page
+      // Settings Page - 5
       SliverToBoxAdapter(
         child: Container(
           margin: const EdgeInsets.only(top: 20.0),
@@ -4839,10 +5012,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              //Divider(color: textColorDimmer.withOpacity(0.2)),
+              //Divider(color: textColorDimmer.withOpacity(0.2))
               // Weather
               Padding(
-                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: Row(
                   children: [
                     Text(
@@ -4904,9 +5077,72 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               //Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Microinteractions
+              // Layout
               Padding(
-                padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
+                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Layout",
+                      style: TextStyle(
+                        color: textColorDimmer.withOpacity(0.3),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Enable FAB Post Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        useFABPost == true
+                            ? Ionicons.remove_circle_outline
+                            : Ionicons.add_circle_outline,
+                        color: iconColor,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Enable FAB To Post",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            "Use a floating action button for ease of posting",
+                            style: TextStyle(
+                              color: textColorDimmer,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Switch(
+                    activeColor: iconColor,
+                    inactiveThumbColor: iconColor.withOpacity(0.2),
+                    value: useFABPost,
+                    onChanged: (value) {
+                      useFABPost = value;
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              // Micro-Interactions
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
                 child: Row(
                   children: [
                     Text(
@@ -5220,8 +5456,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               Divider(color: textColorDimmer.withOpacity(0.2)),
               //Divider(color: textColorDimmer.withOpacity(0.2)),
-              const SizedBox(height: 150.0),
               // App Version and Speed Tester
+              const SizedBox(height: 150.0),
               GestureDetector(
                 onLongPress: () {
                   isSpeedTesting = !isSpeedTesting;
@@ -5504,7 +5740,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
 
-      // DMs
+      // DMs - 6
       SliverToBoxAdapter(
         child: SingleChildScrollView(
           child: Column(
@@ -5519,7 +5755,271 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
 
-      // Shop
+      // Post - 7
+      !isCustomFeedLoading
+          ? SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  // Feed Card
+                  return GestureDetector(
+                    onLongPress: () {
+                      themeEditorOptionIndex = 4;
+                      themeEditorColorPicker(false);
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
+                      padding: EdgeInsets.only(
+                          top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(fullScreenMode ? 0.0 : 20.0),
+                        ),
+                        color: feedCardsColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: feedCardShadow,
+                            blurRadius: 4.0,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Author, time and date
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Author of content
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 0.0, bottom: 15.0),
+                                child: Row(
+                                  children: [
+                                    // Author
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        themeEditorOptionIndex = 0;
+                                        themeEditorColorPicker(false);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20.0)),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: CachedNetworkImage(
+                                          imageUrl: curUser["dp"],
+                                          width: 40.0,
+                                        ),
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          child: Text(
+                                            curUser["username"].toString(),
+                                            style: TextStyle(
+                                              fontSize: 18.0,
+                                              color: textColor,
+                                              //fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          child: Text(
+                                            customFeed[index]["time"]
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: textColorDim,
+                                              //fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Date
+                              Text(
+                                customFeed[index]["date"].toString(),
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  color: textColorDim,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Title
+                          GestureDetector(
+                            onLongPress: fullScreenMode
+                                ? () {}
+                                : () {
+                                    themeEditorOptionIndex = 5;
+                                    themeEditorColorPicker(false);
+                                  },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 0.0),
+                              child: Text(
+                                customFeed[index]["title"]
+                                    .toString()
+                                    .toUpperCase(),
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 19.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          // Body of content
+                          GestureDetector(
+                            onLongPress: fullScreenMode
+                                ? () {}
+                                : () {
+                                    themeEditorOptionIndex = 6;
+                                    themeEditorColorPicker(false);
+                                  },
+                            child: Text(
+                              customFeed[index]["body"],
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: textColorDim,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 14.0),
+                          Divider(),
+                          SizedBox(height: 0.0),
+                          // Subreddit title, Share and Download Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Ionicons.heart,
+                                  color: Colors.pinkAccent,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.comment_outlined,
+                                  color: iconColor,
+                                ),
+                              ),
+                              // Share and Download Buttons
+                              Row(
+                                children: [
+                                  // Share Button
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      themeEditorOptionIndex = 0;
+                                      themeEditorColorPicker(false);
+                                    },
+                                    child: IconButton(
+                                      onPressed: () {
+                                        String shareLink = customFeed[index]
+                                                ["title"] +
+                                            "\n" +
+                                            customFeed[index]["body"];
+                                        Share.share(
+                                            'Check this out @ Aurora \n\n${shareLink}');
+                                      },
+                                      icon: Icon(
+                                        Icons.share_outlined,
+                                        color: iconColor,
+                                      ),
+                                    ),
+                                  ),
+                                  // Download Button
+                                  /*downloadingImageIndex == index
+                                            ? (downloadingImage == false
+                                                ? GestureDetector(
+                                                    onLongPress: () {
+                                                      themeEditorOptionIndex =
+                                                          0;
+                                                      themeEditorColorPicker(
+                                                          false);
+                                                    },
+                                                    child: IconButton(
+                                                      onPressed: () async {},
+                                                      icon: Icon(
+                                                        downloadingImageDone ==
+                                                                true
+                                                            ? Icons.done
+                                                            : Ionicons
+                                                                .download_outline,
+                                                        color:
+                                                            downloadingImageDone ==
+                                                                    true
+                                                                ? Colors.green
+                                                                : iconColor,
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 25.0,
+                                                    height: 25.0,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color: iconColor,
+                                                    ),
+                                                  ))
+                                            : IconButton(
+                                                onPressed: () async {},
+                                                icon: Icon(
+                                                  Ionicons.download_outline,
+                                                  color: iconColor,
+                                                ),
+                                              ),
+                                      */
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                childCount: customFeed.length,
+              ),
+            )
+          : SliverToBoxAdapter(
+              child: Container(
+                height: MediaQuery.of(context).size.height - 150.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 50.0),
+                    Image.asset(
+                      getRandom(content_illustrations),
+                    ),
+                    const SizedBox(height: 40.0),
+                    CircularProgressIndicator(
+                      color: iconColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+      // Shop - 8
       SliverToBoxAdapter(
         child: Container(
           height: 500.0,
@@ -5613,6 +6113,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       Color(0xff0078ff),
       Colors.cyan[400],
       Colors.cyan[400],
+      Color(0xff6C63FF),
       Color(0xff6C63FF),
     ];
     List pagesAppBarBottom = [
@@ -5728,9 +6229,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   controller: tabBarController,
                   indicatorColor: containerColor,
                   onTap: (value) {
+                    print(value);
+                    print("VALUEEEEEEEEEEEEEEE");
                     curPage = value;
-                    if (value != 0) {
+                    if (value == 0) {
                       curPage = 7;
+                    }
+                    if (value == 1) {
+                      curPage = 0;
+                    }
+                    if (value == 2) {
+                      curPage = 8;
                     }
                     setState(() {});
                   },
@@ -5738,13 +6247,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     Tab(
                       icon: Icon(
                         Icons.home_outlined,
+                        color: curPage == 7 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Ionicons.logo_reddit,
                         color: curPage == 0 ? selectedTabColor : iconColor,
                       ),
                     ),
                     Tab(
                       icon: Icon(
                         Icons.shop_two_outlined,
-                        color: curPage == 7 ? selectedTabColor : iconColor,
+                        color: curPage == 8 ? selectedTabColor : iconColor,
                       ),
                     ),
                   ],
@@ -6271,6 +6786,155 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         preferredSize: Size.fromHeight(0.0), // here the desired height
         child: Container(),
       ),
+      // Reddit Page
+      PreferredSize(
+        preferredSize: Size.fromHeight(
+            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
+        child: isSongPlaying == true
+            ? Container(
+                decoration: BoxDecoration(
+                  color: containerColor,
+                  border: Border.all(
+                    color: feedCardShadow.withOpacity(0.3),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        musicListBottomSheet(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.music_note_outlined,
+                            color: iconColor,
+                          ),
+                          const SizedBox(width: 8.0),
+                          SizedBox(
+                            width: 180.0,
+                            height: 20.0,
+                            child: marqueeMusicTitle == true
+                                ? Marquee(
+                                    text: curSong,
+                                    blankSpace: 40.0,
+                                    pauseAfterRound:
+                                        Duration(milliseconds: 1500),
+                                    velocity: 10.0,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  )
+                                : Text(
+                                    curSong,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: textColor,
+                                    ),
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        // Rewind
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                -MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              backInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_rewind_rounded,
+                              color: iconColor,
+                            ),
+                          ),
+                        ),
+                        // Pause Play
+                        IconButton(
+                          onPressed: () {
+                            pausePlaySong();
+                          },
+                          icon: Icon(
+                            isSongPlaying ? Icons.pause : Icons.play_arrow,
+                            color: iconColor,
+                          ),
+                        ),
+                        // Forward
+                        GestureDetector(
+                          onLongPressDown: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(
+                                MusicPlayerPage.forwardRewindSpeed);
+                          },
+                          onLongPressEnd: (longPressDownDetails) {
+                            assetsAudioPlayer.forwardOrRewind(0.0);
+                          },
+                          child: IconButton(
+                            onPressed: () {
+                              nextInPlaylist();
+                            },
+                            icon: Icon(
+                              Icons.fast_forward_rounded,
+                              color: iconColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            : Container(
+                child: TabBar(
+                  controller: tabBarController,
+                  indicatorColor: containerColor,
+                  onTap: (value) {
+                    print(value);
+                    print("VALUEEEEEEEEEEEEEEE");
+                    curPage = value;
+                    if (value == 0) {
+                      curPage = 7;
+                    }
+                    if (value == 1) {
+                      curPage = 0;
+                    }
+                    if (value == 2) {
+                      curPage = 8;
+                    }
+                    setState(() {});
+                  },
+                  tabs: [
+                    Tab(
+                      icon: Icon(
+                        Icons.home_outlined,
+                        color: curPage == 7 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Ionicons.logo_reddit,
+                        color: curPage == 0 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.shop_two_outlined,
+                        color: curPage == 8 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
       // Shop Page
       PreferredSize(
         preferredSize: Size.fromHeight(
@@ -6383,9 +7047,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   controller: tabBarController,
                   indicatorColor: containerColor,
                   onTap: (value) {
+                    print(value);
+                    print("VALUEEEEEEEEEEEEEEE");
                     curPage = value;
-                    if (value != 0) {
+                    if (value == 0) {
                       curPage = 7;
+                    }
+                    if (value == 1) {
+                      curPage = 0;
+                    }
+                    if (value == 2) {
+                      curPage = 8;
                     }
                     setState(() {});
                   },
@@ -6393,13 +7065,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     Tab(
                       icon: Icon(
                         Icons.home_outlined,
+                        color: curPage == 7 ? selectedTabColor : iconColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Ionicons.logo_reddit,
                         color: curPage == 0 ? selectedTabColor : iconColor,
                       ),
                     ),
                     Tab(
                       icon: Icon(
                         Icons.shop_two_outlined,
-                        color: curPage == 7 ? selectedTabColor : iconColor,
+                        color: curPage == 8 ? selectedTabColor : iconColor,
                       ),
                     ),
                   ],
@@ -6409,8 +7087,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ];
     List pagesAppBarIconTitle = [
       {
-        "icon": Ionicons.planet_outline,
-        "title": "Aurora",
+        "icon": Ionicons.logo_reddit,
+        "title": "Reddit",
       },
       {
         "icon": Ionicons.compass_outline,
@@ -6435,6 +7113,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       {
         "icon": Ionicons.chatbubble_ellipses_outline,
         "title": "Global Chat",
+      },
+      {
+        "icon": Ionicons.planet_outline,
+        "title": "Aurora",
       },
       {
         "icon": Ionicons.storefront_outline,
@@ -6547,19 +7229,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   child: FlexibleSpaceBar()),
                           bottom: pagesAppBarBottom[curPage],
                           actions: [
-                            curPage == 0
+                            // Search Subreddit
+                            (curPage == 0 || curPage == 7)
+                                ? IconButton(
+                                    onPressed: () {
+                                      feedChoice();
+                                    },
+                                    icon: Icon(
+                                      Icons.search,
+                                      color: iconColor,
+                                    ),
+                                  )
+                                : Container(),
+                            (curPage == 7)
                                 ? Row(
                                     children: [
-                                      // Search Subreddit
-                                      IconButton(
-                                        onPressed: () {
-                                          feedChoice();
-                                        },
-                                        icon: Icon(
-                                          Icons.search,
-                                          color: iconColor,
-                                        ),
-                                      ),
+                                      // Post Button
+                                      !useFABPost
+                                          ? IconButton(
+                                              onPressed: () {
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  "postContentPage",
+                                                  arguments: {
+                                                    "curUser": curUser,
+                                                  },
+                                                );
+                                              },
+                                              icon: Icon(
+                                                Icons.post_add,
+                                                color: iconColor,
+                                              ),
+                                            )
+                                          : Container(),
+                                      // Space
+                                      SizedBox(width: 5.0),
                                     ],
                                   )
                                 : Container(),
@@ -6586,21 +7290,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 Row(
                                     children: [
                                       // Fullscreen
-                                      IconButton(
-                                        onPressed: () {
-                                          if (curPage == 2) {
-                                            setFullscreenMusicPlayer();
-                                          } else {
-                                            setFullscreen();
-                                          }
-                                        },
-                                        icon: Icon(
-                                          fullScreenModeMP == false
-                                              ? Icons.fullscreen
-                                              : Icons.fullscreen_exit,
-                                          color: iconColor,
-                                        ),
-                                      ),
+                                      curPage == 2
+                                          ? IconButton(
+                                              onPressed: () {
+                                                if (curPage == 2) {
+                                                  setFullscreenMusicPlayer();
+                                                } else {
+                                                  setFullscreen();
+                                                }
+                                              },
+                                              icon: Icon(
+                                                fullScreenModeMP == false
+                                                    ? Icons.fullscreen
+                                                    : Icons.fullscreen_exit,
+                                                color: iconColor,
+                                              ),
+                                            )
+                                          : Container(),
                                       // Profile
                                       Container(
                                         width: 50.0,
@@ -6669,6 +7375,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ],
           ),
         ),
+        // FAB
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+        floatingActionButton: useFABPost
+            ? FloatingActionButton(
+                backgroundColor: containerColor,
+                child: Icon(
+                  Icons.add,
+                  color: iconColor,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    "postContentPage",
+                    arguments: {
+                      "curUser": curUser,
+                    },
+                  );
+                },
+              )
+            : Container(),
         // B O T T O M  N A V  B A R
         bottomNavigationBar: isBottomBarVisible == true
             ? DotNavigationBar(
@@ -6707,7 +7433,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         aIC_wallet.animateToStart();
                         aIC_chat.animateToStart();
                         aIC_settings.animateToStart();
-                        curPage = 0;
+                        curPage = 7;
                         setState(() {});
                         return true;
                       },
