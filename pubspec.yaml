@@ -67,6 +67,7 @@ dependencies:
   onboarding: ^2.1.0
   nice_intro: ^0.1.6
   loading_animation_widget: ^1.1.0+3
+  like_button: ^2.0.4
 
 
 

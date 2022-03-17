@@ -22,6 +22,7 @@ import 'package:internet_speed_test/callbacks_enum.dart';
 import 'package:internet_speed_test/internet_speed_test.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:http/http.dart' as http;
+import 'package:like_button/like_button.dart';
 import 'package:location/location.dart' as loc;
 import 'package:marquee/marquee.dart';
 import 'package:newsocial/pages/cryptopage.dart';
@@ -3340,7 +3341,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // like post
   var likedList = [];
-  void likePost(dynamic post, bool like) async {
+  Future<void> likePost(dynamic post, bool like) async {
     //"/api/likePost/:liker/:username/:time/:date/:like"
     var date = post["date"];
     var dateArray = date.split("/");
@@ -6003,6 +6004,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Like, Comment & Share Button
                                   Row(
                                     children: [
+                                      /*LikeButton(
+                                        size: 26.0,
+                                        animationDuration: Duration(seconds: 1),
+                                        circleColor: CircleColor(
+                                          start: Color(0xff00ddff),
+                                          end: Color(0xff0099cc),
+                                        ),
+                                        bubblesColor: BubblesColor(
+                                          dotPrimaryColor: Color(0xff33b5e5),
+                                          dotSecondaryColor: Color(0xff0099cc),
+                                        ),
+                                        isLiked: likedList.contains(index),
+                                        onTap: (value) async {
+                                          if (likedList.contains(index)) {
+                                            likedList.remove(index);
+                                            await likePost(
+                                                globalFeed[index], false);
+                                          } else {
+                                            likedList.add(index);
+                                            await likePost(
+                                                globalFeed[index], true);
+                                          }
+                                        },
+                                      ),*/
                                       // Like Button
                                       GestureDetector(
                                         onTap: () {
