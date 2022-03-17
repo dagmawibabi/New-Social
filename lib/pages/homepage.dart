@@ -1142,7 +1142,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   //? Custom Feed
-// Get Content
+  // Get Personal Feed
   bool isCustomFeedLoading = true;
   List customFeed = [];
   bool isFirstTimeCF = true;
@@ -1169,6 +1169,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           dynamic customFeed1 = customFeed0.reversed;
           customFeed = customFeed1.toList();
           isCustomFeedLoading = false;
+          setState(() {});
+        }
+      }
+    });
+  }
+
+  // Get Global Feed
+  bool isGlobalFeedLoading = true;
+  List globalFeed = [];
+  bool isFirstTimeGF = true;
+  void getAllFeed() async {
+    isGlobalFeedLoading = true;
+    setState(() {});
+    Timer.periodic(Duration(seconds: 1), (timer) async {
+      var url = await Uri.parse(
+          "https://glacial-everglades-59975.herokuapp.com/api/getAllPosts");
+      var response = await http.get(url);
+      var responseJSON = jsonDecode(response.body);
+      List globalFeed0 = responseJSON;
+      if (isFirstTimeCF) {
+        dynamic globalFeed1 = globalFeed0.reversed;
+        globalFeed = globalFeed1.toList();
+        isFirstTimeGF = false;
+        isGlobalFeedLoading = false;
+        setState(() {});
+      } else {
+        if (globalFeed.length != globalFeed0.length) {
+          dynamic globalFeed1 = globalFeed0.reversed;
+          globalFeed = globalFeed1.toList();
+          isGlobalFeedLoading = false;
           setState(() {});
         }
       }
@@ -2624,7 +2654,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   static Color feedCardShadow = Colors.grey[400]!;
   static Color bottomNavBarColor = Colors.grey[200]!;
   static Color modalBottomSheetColor = Colors.grey[200]!;
-  static Color selectedTabColor = Colors.deepPurple;
+  static Color selectedTabColor = Colors.greenAccent;
   static List<Color> cardGradient = [
     Color(0xffb3ffab),
     Color(0xff12fff7),
@@ -2956,6 +2986,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardShadow = Colors.grey[800]!;
       bottomNavBarColor = Colors.grey[900]!;
       modalBottomSheetColor = Colors.grey[900]!;
+      selectedTabColor = Colors.greenAccent;
+
       cardGradient = [
         Color(0x11C85C5C),
         Color(0x112F86A6),
@@ -3027,6 +3059,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       feedCardShadow = Colors.grey[400]!;
       bottomNavBarColor = Colors.grey[200]!;
       modalBottomSheetColor = Colors.grey[200]!;
+      selectedTabColor = Colors.blue;
+
       cardGradient = [
         Color(0xffb3ffab),
         Color(0xff12fff7),
@@ -3313,7 +3347,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Weather
     //askPermissions(); // Makes it slower
     getWeather();
-    getCustomFeed();
+    getAllFeed();
     // HomePage INIT
     chosenSubreddit = getRandom(subredditList);
     chosenSubredditSort = getRandom(feedSortValues);
@@ -5756,248 +5790,310 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
 
       // Post - 7
-      !isCustomFeedLoading
+      !isGlobalFeedLoading
           ? SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   // Feed Card
-                  return GestureDetector(
-                    onLongPress: () {
-                      themeEditorOptionIndex = 4;
-                      themeEditorColorPicker(false);
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
-                      padding: EdgeInsets.only(
-                          top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(fullScreenMode ? 0.0 : 20.0),
-                        ),
-                        color: feedCardsColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: feedCardShadow,
-                            blurRadius: 4.0,
+                  return Column(
+                    children: [
+                      GestureDetector(
+                        onLongPress: () {
+                          themeEditorOptionIndex = 4;
+                          themeEditorColorPicker(false);
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
+                          padding: EdgeInsets.only(
+                              top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(fullScreenMode ? 0.0 : 20.0),
+                            ),
+                            color: feedCardsColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: feedCardShadow,
+                                blurRadius: 4.0,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Author, time and date
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Author of content
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 0.0, bottom: 15.0),
-                                child: Row(
-                                  children: [
-                                    // Author
-                                    GestureDetector(
-                                      onLongPress: () {
-                                        themeEditorOptionIndex = 0;
-                                        themeEditorColorPicker(false);
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20.0)),
-                                        ),
-                                        clipBehavior: Clip.hardEdge,
-                                        child: CachedNetworkImage(
-                                          imageUrl: curUser["dp"],
-                                          width: 40.0,
-                                        ),
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                              // Author, time and date
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Author of content
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 0.0, bottom: 17.0),
+                                    child: Row(
                                       children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Text(
-                                            curUser["username"].toString(),
-                                            style: TextStyle(
-                                              fontSize: 18.0,
-                                              color: textColor,
-                                              //fontWeight: FontWeight.bold,
+                                        // Author DP
+                                        GestureDetector(
+                                          onLongPress: () {
+                                            themeEditorOptionIndex = 0;
+                                            themeEditorColorPicker(false);
+                                          },
+                                          child: Container(
+                                            width: 38.0,
+                                            height: 38.0,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child: FittedBox(
+                                              fit: BoxFit.cover,
+                                              child: CachedNetworkImage(
+                                                imageUrl: globalFeed[index]
+                                                    ["dp"],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Text(
-                                            customFeed[index]["time"]
-                                                .toString(),
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: textColorDim,
-                                              //fontWeight: FontWeight.bold,
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0),
+                                              child: Text(
+                                                globalFeed[index]["username"]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: 18.0,
+                                                  color: textColor.withOpacity(
+                                                      isDarkMode ? 0.85 : 0.7),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0),
+                                              child: Text(
+                                                globalFeed[index]["time"]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                  color: textColorDim,
+                                                  //fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                              // Date
-                              Text(
-                                customFeed[index]["date"].toString(),
-                                style: TextStyle(
-                                  fontSize: 12.0,
-                                  color: textColorDim,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Title
-                          GestureDetector(
-                            onLongPress: fullScreenMode
-                                ? () {}
-                                : () {
-                                    themeEditorOptionIndex = 5;
-                                    themeEditorColorPicker(false);
-                                  },
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 0.0),
-                              child: Text(
-                                customFeed[index]["title"]
-                                    .toString()
-                                    .toUpperCase(),
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 19.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4.0),
-                          // Body of content
-                          GestureDetector(
-                            onLongPress: fullScreenMode
-                                ? () {}
-                                : () {
-                                    themeEditorOptionIndex = 6;
-                                    themeEditorColorPicker(false);
-                                  },
-                            child: Text(
-                              customFeed[index]["body"],
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: textColorDim,
-                                fontSize: 20.0,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 14.0),
-                          Divider(),
-                          SizedBox(height: 0.0),
-                          // Subreddit title, Share and Download Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Ionicons.heart,
-                                  color: Colors.pinkAccent,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.comment_outlined,
-                                  color: iconColor,
-                                ),
-                              ),
-                              // Share and Download Buttons
-                              Row(
-                                children: [
-                                  // Share Button
-                                  GestureDetector(
-                                    onLongPress: () {
-                                      themeEditorOptionIndex = 0;
-                                      themeEditorColorPicker(false);
-                                    },
-                                    child: IconButton(
-                                      onPressed: () {
-                                        String shareLink = customFeed[index]
-                                                ["title"] +
-                                            "\n" +
-                                            customFeed[index]["body"];
-                                        Share.share(
-                                            'Check this out @ Aurora \n\n${shareLink}');
-                                      },
-                                      icon: Icon(
-                                        Icons.share_outlined,
-                                        color: iconColor,
-                                      ),
-                                    ),
                                   ),
-                                  // Download Button
-                                  /*downloadingImageIndex == index
-                                            ? (downloadingImage == false
-                                                ? GestureDetector(
-                                                    onLongPress: () {
-                                                      themeEditorOptionIndex =
-                                                          0;
-                                                      themeEditorColorPicker(
-                                                          false);
-                                                    },
-                                                    child: IconButton(
-                                                      onPressed: () async {},
-                                                      icon: Icon(
-                                                        downloadingImageDone ==
-                                                                true
-                                                            ? Icons.done
-                                                            : Ionicons
-                                                                .download_outline,
-                                                        color:
-                                                            downloadingImageDone ==
-                                                                    true
-                                                                ? Colors.green
-                                                                : iconColor,
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 25.0,
-                                                    height: 25.0,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      color: iconColor,
-                                                    ),
-                                                  ))
-                                            : IconButton(
-                                                onPressed: () async {},
-                                                icon: Icon(
-                                                  Ionicons.download_outline,
-                                                  color: iconColor,
-                                                ),
-                                              ),
-                                      */
+                                  // Date
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.more_horiz_outlined,
+                                          color: iconColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
+                              // Title
+                              GestureDetector(
+                                onLongPress: fullScreenMode
+                                    ? () {}
+                                    : () {
+                                        themeEditorOptionIndex = 5;
+                                        themeEditorColorPicker(false);
+                                      },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 0.0),
+                                  child: Text(
+                                    globalFeed[index]["title"].toString(),
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 19.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4.0),
+                              // Body of content
+                              GestureDetector(
+                                onLongPress: fullScreenMode
+                                    ? () {}
+                                    : () {
+                                        themeEditorOptionIndex = 6;
+                                        themeEditorColorPicker(false);
+                                      },
+                                child: Text(
+                                  globalFeed[index]["body"],
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: textColorDim,
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 14.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    globalFeed[index]["date"].toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: textColorDim,
+                                      //fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 2.0),
+                              Divider(color: textColorDimmer.withOpacity(0.4)),
+                              // Action Buttons
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Like & Comment Button
+                                  Row(
+                                    // Like Button
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Ionicons.heart,
+                                          color: Colors.pinkAccent,
+                                        ),
+                                      ),
+                                      // Commends
+                                      Transform(
+                                        alignment: Alignment.center,
+                                        transform: Matrix4.rotationY(pi),
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(
+                                            Ionicons
+                                                .chatbubble_ellipses_outline,
+                                            color: iconColor,
+                                          ),
+                                        ),
+                                      ),
+                                      // Forward
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Ionicons.paper_plane_outline,
+                                          color: iconColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Share and Download Buttons
+                                  Row(
+                                    children: [
+                                      // Share Button
+                                      GestureDetector(
+                                        onLongPress: () {
+                                          themeEditorOptionIndex = 0;
+                                          themeEditorColorPicker(false);
+                                        },
+                                        child: IconButton(
+                                          onPressed: () {
+                                            String shareLink = globalFeed[index]
+                                                    ["title"] +
+                                                "\n" +
+                                                globalFeed[index]["body"];
+                                            Share.share(
+                                                'Check this out @ Aurora \n\n${shareLink}');
+                                          },
+                                          icon: Icon(
+                                            Icons.share_outlined,
+                                            color: iconColor,
+                                          ),
+                                        ),
+                                      ),
+                                      // Download Button
+                                      /*downloadingImageIndex == index
+                                                ? (downloadingImage == false
+                                                    ? GestureDetector(
+                                                        onLongPress: () {
+                                                          themeEditorOptionIndex =
+                                                              0;
+                                                          themeEditorColorPicker(
+                                                              false);
+                                                        },
+                                                        child: IconButton(
+                                                          onPressed: () async {},
+                                                          icon: Icon(
+                                                            downloadingImageDone ==
+                                                                    true
+                                                                ? Icons.done
+                                                                : Ionicons
+                                                                    .download_outline,
+                                                            color:
+                                                                downloadingImageDone ==
+                                                                        true
+                                                                    ? Colors.green
+                                                                    : iconColor,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        width: 25.0,
+                                                        height: 25.0,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: iconColor,
+                                                        ),
+                                                      ))
+                                                : IconButton(
+                                                    onPressed: () async {},
+                                                    icon: Icon(
+                                                      Ionicons.download_outline,
+                                                      color: iconColor,
+                                                    ),
+                                                  ),
+                                          */
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              // Space
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      index == globalFeed.length - 1
+                          ? Column(
+                              children: [
+                                SizedBox(height: 100),
+                                Text(
+                                  "End of Content",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                  ),
+                                ),
+                                SizedBox(height: 200),
+                              ],
+                            )
+                          : Container(),
+                    ],
                   );
                 },
-                childCount: customFeed.length,
+                childCount: globalFeed.length,
               ),
             )
           : SliverToBoxAdapter(
