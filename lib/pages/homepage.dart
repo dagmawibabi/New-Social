@@ -3338,6 +3338,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
+  // like post
+  var likedList = [];
+  void likePost(dynamic post, bool like) async {
+    //"/api/likePost/:liker/:username/:time/:date/:like"
+    var date = post["date"];
+    var dateArray = date.split("/");
+
+    dynamic url = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/likePost/" +
+            curUser["username"] +
+            "/" +
+            post["username"] +
+            "/" +
+            post["time"] +
+            "/" +
+            dateArray[0] +
+            "/" +
+            dateArray[1] +
+            "/" +
+            dateArray[2] +
+            "/" +
+            (like ? "1" : "-1"));
+    var a = await http.get(url);
+    print(a.body);
+    setState(() {});
+  }
+
   //? INIT STATE
   String masterUser = "User0";
   dynamic curUser = {};
@@ -5798,6 +5825,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   return Column(
                     children: [
                       GestureDetector(
+                        onDoubleTap: () {
+                          if (likedList.contains(index)) {
+                            likedList.remove(index);
+                            likePost(globalFeed[index], false);
+                          } else {
+                            likedList.add(index);
+                            likePost(globalFeed[index], true);
+                          }
+                        },
                         onLongPress: () {
                           themeEditorOptionIndex = 4;
                           themeEditorColorPicker(false);
@@ -5893,17 +5929,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       ],
                                     ),
                                   ),
-                                  // Date
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.more_horiz_outlined,
-                                          color: iconColor,
-                                        ),
-                                      ),
-                                    ],
+                                  // Options
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.more_horiz_outlined,
+                                      color: iconColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -5947,6 +5979,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                               ),
                               SizedBox(height: 14.0),
+                              // Date
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -5967,36 +6000,97 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // Like & Comment Button
+                                  // Like, Comment & Share Button
                                   Row(
-                                    // Like Button
                                     children: [
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Ionicons.heart,
-                                          color: Colors.pinkAccent,
+                                      // Like Button
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (likedList.contains(index)) {
+                                            likedList.remove(index);
+                                            likePost(globalFeed[index], false);
+                                          } else {
+                                            likedList.add(index);
+                                            likePost(globalFeed[index], true);
+                                          }
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12.0,
+                                                      vertical: 2.0),
+                                              child: Icon(
+                                                likedList.contains(index)
+                                                    ? Ionicons.heart
+                                                    : Ionicons.heart_outline,
+                                                color: likedList.contains(index)
+                                                    ? Colors.pinkAccent
+                                                    : iconColor, // Colors.pinkAccent,
+                                              ),
+                                            ),
+                                            Text(
+                                              globalFeed[index]["likes"]
+                                                  .toString(),
+                                              style: TextStyle(
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      // Commends
-                                      Transform(
-                                        alignment: Alignment.center,
-                                        transform: Matrix4.rotationY(pi),
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(
-                                            Ionicons
-                                                .chatbubble_ellipses_outline,
-                                            color: iconColor,
-                                          ),
+                                      // Comments
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12.0,
+                                                      vertical: 2.0),
+                                              child: Transform(
+                                                alignment: Alignment.center,
+                                                transform:
+                                                    Matrix4.rotationY(pi),
+                                                child: Icon(
+                                                  Ionicons.chatbubble_outline,
+                                                  color: iconColor,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              "4.5k",
+                                              style: TextStyle(
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       // Forward
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Ionicons.paper_plane_outline,
-                                          color: iconColor,
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12.0,
+                                                      vertical: 2.0),
+                                              child: Icon(
+                                                Ionicons.paper_plane_outline,
+                                                color: iconColor,
+                                              ),
+                                            ),
+                                            Text(
+                                              "2.3k",
+                                              style: TextStyle(
+                                                color: textColor,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
