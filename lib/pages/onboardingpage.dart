@@ -22,6 +22,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   dynamic user = {};
   bool isDarkMode = false;
   bool isLoginForm = false;
+  TextEditingController fullnameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -69,7 +70,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   bool isLoading = false;
   bool isUsernameCorrect = true;
   bool isPasswordCorrect = true;
-  void createNewUser(String username, String password) async {
+  void createNewUser(String fullname, String username, String password) async {
     // reset
     isUsernameTaken = false;
     isUsernameCorrect = true;
@@ -96,6 +97,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (isUsernameTaken == false) {
       dynamic url = Uri.parse(
           "https://glacial-everglades-59975.herokuapp.com/api/createNewUser/" +
+              fullname.toString() +
+              "/" +
               username.toString() +
               "/" +
               password.toString());
@@ -447,7 +450,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
           ),
 
-          // Done
+          //
           // Page 6 - Permissions
           PageModel(
             widget: Column(
@@ -546,6 +549,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ],
             ),
           ),
+
+          //
           // Page 7 - Create An Account
           !allPermissionState
               ? PageModel(
@@ -603,6 +608,28 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                           Spacer(),
+                          // Full name Input
+                          isLoginForm
+                              ? Container()
+                              : TextField(
+                                  controller: fullnameController,
+                                  maxLines: 1,
+                                  decoration: InputDecoration(
+                                    labelText: "Full Name",
+                                    labelStyle: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                    suffixIcon: Icon(
+                                      Icons.person,
+                                      color: Colors.grey[700],
+                                      size: 22.0,
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                  ),
+                                ),
                           // Username Input
                           TextField(
                             controller: usernameController,
@@ -613,7 +640,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 color: Colors.grey,
                               ),
                               suffixIcon: Icon(
-                                Icons.person,
+                                Icons.link,
                                 color: Colors.grey[700],
                                 size: 22.0,
                               ),
@@ -704,7 +731,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           // Password Hint
                           SizedBox(height: 8.0),
                           Text(
-                            "Should be at least 6 characters long, contains numbers and symbols",
+                            "Password should be at least 6 characters long, contains numbers and symbols",
                             style: TextStyle(
                               color: Colors.grey[500],
                             ),
@@ -752,7 +779,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                         loginUser(usernameController.text,
                                             passwordController.text);
                                       } else {
-                                        createNewUser(usernameController.text,
+                                        createNewUser(
+                                            fullnameController.text,
+                                            usernameController.text,
                                             passwordController.text);
                                       }
                                     },

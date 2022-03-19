@@ -1197,14 +1197,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         isGlobalFeedLoading = false;
         setState(() {});
       } else {
-        if (globalFeed.length != globalFeed0.length) {
+        if ((globalFeed.length != globalFeed0.length)) {
           dynamic globalFeed1 = globalFeed0.reversed;
           globalFeed = globalFeed1.toList();
           isGlobalFeedLoading = false;
           setState(() {});
         }
+        // update if likes change
+        for (int i = 0; i < globalFeed.length; i++) {
+          for (int j = 0; j < globalFeed0.length; j++) {
+            if (globalFeed[i]["likers"].length !=
+                globalFeed0[i]["likers"].length) {
+              dynamic globalFeed1 = globalFeed0.reversed;
+              globalFeed = globalFeed1.toList();
+              isGlobalFeedLoading = false;
+              setState(() {});
+            }
+          }
+        }
       }
     });
+  }
+
+  Future<void> refreshCustomFeed() async {
+    isGlobalFeedLoading = true;
+    globalFeed = [];
+    isFirstTimeGF = true;
+    getAllFeed();
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
   }
 
   //? Home Page
@@ -2919,6 +2940,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  // Update Settings
+  Future<void> updateSettings() async {
+    dynamic url1 = Uri.parse(
+        "https://glacial-everglades-59975.herokuapp.com/api/login/" +
+            curUser["username"] +
+            "/" +
+            curUser["password"]);
+    dynamic responseOBJ = await http.get(url1);
+    dynamic responseJSON = jsonDecode(responseOBJ.body);
+    curUser = responseJSON;
+    refreshController.loadComplete();
+    refreshController.refreshCompleted();
+    setState(() {});
+  }
+
   // Colors in theme
   Widget ColorCircle(List<Color> colors) {
     return Container(
@@ -3427,11 +3463,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // like post
   var likedList = [];
-  Future<void> likePost(dynamic post, bool like) async {
+  void likePost(dynamic post) async {
     //"/api/likePost/:liker/:username/:time/:date/:like"
     var date = post["date"];
     var dateArray = date.split("/");
-
+    print(dateArray);
     dynamic url = Uri.parse(
         "https://glacial-everglades-59975.herokuapp.com/api/likePost/" +
             curUser["username"] +
@@ -3440,15 +3476,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             "/" +
             post["time"] +
             "/" +
-            dateArray[0] +
-            "/" +
             dateArray[1] +
             "/" +
-            dateArray[2] +
+            dateArray[0] +
             "/" +
-            (like ? "1" : "-1"));
+            dateArray[2]);
     var a = await http.get(url);
-    print(a.body);
+    print(a);
     setState(() {});
   }
 
@@ -3508,14 +3542,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (initStateX == true) {
       dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
-      /* //? For Debugging
-      curUser = {
+      //? For Debugging
+      /* curUser = {
         "username": "DagmawiBabi",
         "password": "JYMTW2m!",
         "dp":
             "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
       };
-      masterUser = "DagmawiBabi";*/
+      masterUser = "DagmawiBabi";
+      isDarkMode = false;
+      */
+      //? End of debugging
       isDarkMode = (receivedData["isDarkMode"] != "" &&
               receivedData["isDarkMode"] != " " &&
               receivedData["isDarkMode"] != null)
@@ -3526,6 +3563,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               receivedData["currentUser"] != null)
           ? receivedData["currentUser"]
           : "DagmawiBabi";
+      print(curUser);
+
       setDarkMode();
       setState(() {});
       masterUser = (receivedData["masterUser"] != "" &&
@@ -3536,7 +3575,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       initiate();
       initStateX = false;
     }
-    print(curPage);
+
     TabController tabBarController = TabController(length: 3, vsync: this);
     List extensionApps = [
       {
@@ -3613,15 +3652,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
     ];
     List pageOnRefresh = [
-      getHomePageFeedRefresh,
-      sampleFuture,
-      getSongsOnDevice,
-      getCryptoStats,
-      sampleFuture,
-      sampleFuture,
-      sampleFuture,
-      sampleFuture,
-      sampleFuture,
+      getHomePageFeedRefresh, // HomePahe
+      sampleFuture, // Discover Page
+      getSongsOnDevice, // Songs Page
+      getCryptoStats, // Crypto Wallet Page
+      sampleFuture, // Chat Page
+      updateSettings, // Settings Page
+      sampleFuture, // DMs Page
+      refreshCustomFeed, // Post Page
+      sampleFuture, // Shop Page
     ];
     List pagesAppBarExpanded = [
       isSongPlaying == true ? 210.0 : 200.0,
@@ -3957,6 +3996,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     : Container(),
                                 // Feed Card
                                 GestureDetector(
+                                  onHorizontalDragEnd: (dragDetails) {
+                                    if (dragDetails.primaryVelocity! < 0) {
+                                      curPage = 8;
+                                    } else {
+                                      curPage = 7;
+                                    }
+                                    setState(() {});
+                                  },
                                   onLongPress: () {
                                     themeEditorOptionIndex = 4;
                                     themeEditorColorPicker(false);
@@ -4769,7 +4816,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 25.0),
+                  SizedBox(height: 10.0),
+                  // Bio
+                  Text(
+                    "Build, Break and Rebuild!",
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  SizedBox(height: 18.0),
                   // Profile Stats
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -4795,7 +4851,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: Column(
                           children: [
                             Text(
-                              "10.2k",
+                              curUser["numOfFriends"].toString(),
                               style: TextStyle(
                                 fontSize: 18.0,
                                 color: textColor,
@@ -4834,7 +4890,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: Column(
                           children: [
                             Text(
-                              "246.3k",
+                              curUser["numOfFollowers"].toString(),
                               style: TextStyle(
                                 fontSize: 18.0,
                                 color: textColor,
@@ -4873,7 +4929,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: Column(
                           children: [
                             Text(
-                              "12.6M",
+                              curUser["numOfLikes"].toString(),
                               style: TextStyle(
                                 fontSize: 18.0,
                                 color: textColor,
@@ -6556,50 +6612,165 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                     // Switch Account
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.switch_account_outlined,
-                              color: iconColor,
-                            ),
-                            const SizedBox(width: 10.0),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Switch Account",
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                  "Switch to another account",
-                                  style: TextStyle(
-                                    color: textColorDimmer,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                    ExpansionTile(
+                      childrenPadding: const EdgeInsets.all(0.0),
+                      tilePadding: const EdgeInsets.all(0.0),
+                      leading: Icon(
+                        Icons.switch_account_outlined,
+                        color: iconColor,
+                      ),
+                      title: Text(
+                        "Switch Account",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
                         ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.arrow_forward_ios_outlined,
+                      ),
+                      subtitle: Text(
+                        "Switch to another account",
+                        style: TextStyle(
+                          color: textColorDimmer,
+                          fontSize: 12.0,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          //themeEditor();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 14.0),
+                          child: Icon(
+                            Icons.keyboard_arrow_down_outlined,
                             color: iconColor,
-                            size: 18.0,
+                          ),
+                        ),
+                      ),
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: scaffoldBGColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20.0)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Account 1
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 30.0,
+                                        height: 30.0,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20.0)),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: Image.network(
+                                            "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10.0),
+                                      Text(
+                                        "Dagmawi Babi",
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      curUser = {
+                                        "username": "DagmawiBabi",
+                                        "password": "JYMTW2m!",
+                                        "dp":
+                                            "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
+                                      };
+                                      masterUser = "DagmawiBabi";
+                                      isDarkMode = false;
+                                      setState(() {});
+                                    },
+                                    icon: Icon(
+                                      Icons.login_outlined,
+                                      color: iconColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(color: textColorDimmer.withOpacity(0.2)),
+                              // Account 2
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 30.0,
+                                        height: 30.0,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20.0)),
+                                        ),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: Image.network(
+                                            "https://i.pinimg.com/originals/50/ea/49/50ea49a4d5e8cd1077f0247852750152.gif",
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10.0),
+                                      Text(
+                                        "PowerTag",
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      curUser = {
+                                        "username": "PowerTag",
+                                        "password": "JYMTW2m!",
+                                        "dp":
+                                            "https://i.pinimg.com/originals/50/ea/49/50ea49a4d5e8cd1077f0247852750152.gif",
+                                      };
+                                      masterUser = "PowerTag";
+                                      isDarkMode = false;
+                                      setState(() {});
+                                    },
+                                    icon: Icon(
+                                      Icons.login_outlined,
+                                      color: iconColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              //Divider(color: textColorDimmer.withOpacity(0.2)),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    //Divider(color: textColorDimmer.withOpacity(0.2))
                     // Logout
                     GestureDetector(
                       onTap: () {
@@ -6963,14 +7134,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   return Column(
                     children: [
                       GestureDetector(
-                        onDoubleTap: () {
-                          if (likedList.contains(index)) {
-                            likedList.remove(index);
-                            likePost(globalFeed[index], false);
+                        onHorizontalDragEnd: (dragDetails) {
+                          if (dragDetails.primaryVelocity! < 0) {
+                            curPage = 0;
                           } else {
-                            likedList.add(index);
-                            likePost(globalFeed[index], true);
+                            curPage = 7;
                           }
+                          setState(() {});
+                        },
+                        onDoubleTap: () {
+                          likePost(globalFeed[index]);
+                          setState(() {});
                         },
                         onLongPress: () {
                           themeEditorOptionIndex = 4;
@@ -7170,59 +7344,73 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   // Like, Comment & Share Button
                                   Row(
                                     children: [
-                                      /*LikeButton(
-                                        size: 26.0,
-                                        animationDuration: Duration(seconds: 1),
-                                        circleColor: CircleColor(
-                                          start: Color(0xff00ddff),
-                                          end: Color(0xff0099cc),
-                                        ),
-                                        bubblesColor: BubblesColor(
-                                          dotPrimaryColor: Color(0xff33b5e5),
-                                          dotSecondaryColor: Color(0xff0099cc),
-                                        ),
-                                        isLiked: likedList.contains(index),
-                                        onTap: (value) async {
-                                          if (likedList.contains(index)) {
-                                            likedList.remove(index);
-                                            await likePost(
-                                                globalFeed[index], false);
-                                          } else {
-                                            likedList.add(index);
-                                            await likePost(
-                                                globalFeed[index], true);
-                                          }
-                                        },
-                                      ),*/
                                       // Like Button
+                                      /*GestureDetector(
+                                        onTap: () {},
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          child: Column(
+                                            children: [
+                                              LikeButton(
+                                                onTap: (isLiked) {
+                                                  print("kids again");
+                                                  if (likedList
+                                                      .contains(index)) {
+                                                    likedList.remove(index);
+                                                    likePost(globalFeed[index],
+                                                        false);
+                                                    return Future.value(false);
+                                                  } else {
+                                                    likedList.add(index);
+                                                    likePost(globalFeed[index],
+                                                        true);
+                                                    return Future.value(false);
+                                                  }
+                                                },
+                                                size: 26.0,
+                                                isLiked:
+                                                    likedList.contains(index),
+                                              ),
+                                              Text(
+                                                globalFeed[index]["likes"]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  color: textColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),*/
                                       GestureDetector(
                                         onTap: () {
-                                          if (likedList.contains(index)) {
-                                            likedList.remove(index);
-                                            likePost(globalFeed[index], false);
-                                          } else {
-                                            likedList.add(index);
-                                            likePost(globalFeed[index], true);
-                                          }
+                                          likePost(globalFeed[index]);
+                                          setState(() {});
                                         },
                                         child: Column(
                                           children: [
                                             Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 12.0,
+                                                      horizontal: 9.0,
                                                       vertical: 2.0),
                                               child: Icon(
-                                                likedList.contains(index)
+                                                globalFeed[index]["likers"]
+                                                        .contains(
+                                                            curUser["username"])
                                                     ? Ionicons.heart
                                                     : Ionicons.heart_outline,
-                                                color: likedList.contains(index)
+                                                color: globalFeed[index]
+                                                            ["likers"]
+                                                        .contains(
+                                                            curUser["username"])
                                                     ? Colors.pinkAccent
                                                     : iconColor, // Colors.pinkAccent,
                                               ),
                                             ),
                                             Text(
-                                              globalFeed[index]["likes"]
+                                              (globalFeed[index]["likes"])
                                                   .toString(),
                                               style: TextStyle(
                                                 color: textColor,
