@@ -66,27 +66,34 @@ class _PostContentPageState extends State<PostContentPage> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
     if (isFirstTime) {
-      dynamic receivedData = ModalRoute.of(context)!.settings.arguments;
       curUser = receivedData["curUser"];
-      print(curUser);
       isFirstTime = false;
     }
+    bool isDarkMode = receivedData["isDarkMode"];
+    Color iconColor = receivedData["iconColor"];
+    Color textColor = receivedData["textColor"];
+    Color containerColor = receivedData["containerColor"];
+    Color feedCardShadow = receivedData["feedCardShadow"];
+    Color textColorDim = receivedData["textColorDim"];
+    Color textColorDimmer = receivedData["textColorDimmer"];
+    Color scaffoldBGColor = receivedData["scaffoldBGColor"];
     return Scaffold(
-      backgroundColor: Colors.grey[200]!,
+      backgroundColor: scaffoldBGColor,
       appBar: AppBar(
-        backgroundColor: Colors.grey[200]!,
+        backgroundColor: scaffoldBGColor,
         elevation: 0.0,
         title: Text(
           "New Post",
           style: TextStyle(
-            color: Colors.black,
+            color: textColor,
             fontWeight: FontWeight.bold,
             fontSize: 22.0,
           ),
         ),
         iconTheme: IconThemeData(
-          color: Colors.black,
+          color: iconColor,
         ),
       ),
       body: Container(
@@ -106,12 +113,16 @@ class _PostContentPageState extends State<PostContentPage> {
                 controller: titleTextController,
                 style: TextStyle(
                   fontSize: 19.0,
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Title",
                   hintStyle: TextStyle(
                     fontSize: 19.0,
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -123,7 +134,7 @@ class _PostContentPageState extends State<PostContentPage> {
               height: 300.0,
               padding: const EdgeInsets.only(left: 15.0, right: 5.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: feedCardShadow.withOpacity(0.2),
                 borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 //border: Border.all(color: Colors.black),
               ),
@@ -132,81 +143,89 @@ class _PostContentPageState extends State<PostContentPage> {
                 controller: bodyTextController,
                 style: TextStyle(
                   fontSize: 20.0,
+                  color: textColor,
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Body",
                   hintStyle: TextStyle(
                     fontSize: 20.0,
+                    color: textColor,
                   ),
                 ),
               ),
             ),
             SizedBox(height: 10.0),
             // Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Post Button
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.grey[200]!),
-                  ),
-                  onPressed: () {
-                    postContent(titleTextController.text.trim(),
-                        bodyTextController.text.trim());
-                  },
-                  child: isLoading
-                      ? LoadingAnimationWidget.staggeredDotsWave(
-                          color: Colors.greenAccent,
-                          size: 25.0,
-                        )
-                      : Row(
-                          children: [
-                            Icon(
-                              Icons.post_add,
-                              color: Colors.black,
-                              size: 22.0,
-                            ),
-                            SizedBox(width: 5.0),
-                            Text(
-                              "Post",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Post Button
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(isDarkMode
+                          ? feedCardShadow.withOpacity(0.5)
+                          : containerColor),
+                    ),
+                    onPressed: () {
+                      postContent(titleTextController.text.trim(),
+                          bodyTextController.text.trim());
+                    },
+                    child: isLoading
+                        ? LoadingAnimationWidget.staggeredDotsWave(
+                            color: Colors.greenAccent,
+                            size: 25.0,
+                          )
+                        : Row(
+                            children: [
+                              Icon(
+                                Icons.post_add,
+                                color: iconColor,
+                                size: 22.0,
                               ),
-                            ),
-                          ],
-                        ),
-                ), // Attach
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.grey[200]!),
+                              SizedBox(width: 5.0),
+                              Text(
+                                "Post",
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
-                  onPressed: () {},
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.attach_file_outlined,
-                        color: Colors.black,
-                        size: 22.0,
-                      ),
-                      SizedBox(width: 5.0),
-                      Text(
-                        "Attach",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.0,
+                  // Attach
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(isDarkMode
+                          ? feedCardShadow.withOpacity(0.5)
+                          : containerColor),
+                    ),
+                    onPressed: () {},
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.attach_file_outlined,
+                          color: iconColor,
+                          size: 22.0,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 5.0),
+                        Text(
+                          "Attach",
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

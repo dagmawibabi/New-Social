@@ -68,6 +68,7 @@ dependencies:
   nice_intro: ^0.1.6
   loading_animation_widget: ^1.1.0+3
   like_button: ^2.0.4
+  image_picker: ^0.8.4+11
 
 
 

@@ -814,10 +814,3 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 }
-
-/* 
-  Feed + Weather
-  Music Player
-  Crypto Wallet
-  Chat
-*/

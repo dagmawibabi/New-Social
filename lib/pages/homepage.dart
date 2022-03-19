@@ -18,6 +18,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hive/hive.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:internet_speed_test/callbacks_enum.dart';
 import 'package:internet_speed_test/internet_speed_test.dart';
 import 'package:ionicons/ionicons.dart';
@@ -3334,7 +3335,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (context) {
         return Container(
           decoration: BoxDecoration(
-            color: containerColor,
+            color: modalBottomSheetColor,
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
           ),
           clipBehavior: Clip.hardEdge,
@@ -3486,6 +3487,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  // Pick DP
+  ImagePicker _picker = ImagePicker();
+  String dpPath = "";
+  bool dpChanged = false;
+  XFile? dpImage;
+  void pickDP() async {
+    // Pick an image
+    dpImage = await _picker.pickImage(source: ImageSource.gallery);
+    print("-------------------------");
+    dpPath = dpImage!.path;
+    print("-------------------------");
+    dpChanged = true;
+    setState(() {});
+    // Capture a photo
+    //XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+  }
+
   //? INIT STATE
   String masterUser = "User0";
   dynamic curUser = {};
@@ -3574,8 +3592,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           : "DagmawiBabi";
       initiate();
       initStateX = false;
+      //getSongsOnDevice();
     }
-
     TabController tabBarController = TabController(length: 3, vsync: this);
     List extensionApps = [
       {
@@ -3652,7 +3670,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
     ];
     List pageOnRefresh = [
-      getHomePageFeedRefresh, // HomePahe
+      getHomePageFeedRefresh, // Home Page
       sampleFuture, // Discover Page
       getSongsOnDevice, // Songs Page
       getCryptoStats, // Crypto Wallet Page
@@ -3663,15 +3681,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       sampleFuture, // Shop Page
     ];
     List pagesAppBarExpanded = [
-      isSongPlaying == true ? 210.0 : 200.0,
-      60.0,
-      20.0,
-      isCryptoPageLoadingError == true ? 200.0 : 0.0, //300.0,
-      280.0,
-      20.0,
-      20.0,
-      isSongPlaying == true ? 210.0 : 200.0,
-      isSongPlaying == true ? 210.0 : 200.0,
+      isSongPlaying == true ? 250.0 : 200.0, // Home Page
+      60.0, // Discover Page
+      20.0, // Songs Page
+      isCryptoPageLoadingError == true ? 200.0 : 0.0, // Crypto Wallet Page
+      280.0, // Chat Page
+      20.0, // Settings Page
+      20.0, // DMs Page
+      isSongPlaying == true ? 250.0 : 200.0, // Post Page
+      isSongPlaying == true ? 250.0 : 200.0, // Shop Page
     ];
     List pagesAppBarFlexibleSpace = [
       // Home Page
@@ -4750,60 +4768,81 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Profile Picture
-                  Container(
-                    //color: Colors.red,
-                    width: 150.0,
-                    height: 150.0,
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        // Dp
-                        WidgetCircularAnimator(
-                          size: 200.0,
-                          innerColor: getRandom(isDarkMode == true
-                              ? Colors.accents
-                              : Colors.primaries),
-                          outerColor: getRandom(isDarkMode == true
-                              ? Colors.accents
-                              : Colors.primaries),
-                          child: Container(
-                            width: 30.0,
-                            height: 30.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey[900],
-                              //borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                            child: FittedBox(
-                              fit: BoxFit.cover,
-                              child: Image.network(
-                                curUser["dp"],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        "contentViewerPage",
+                        arguments: {
+                          "image": curUser["dp"],
+                          "shareLink": curUser["dp"],
+                          "downloadingImage": false,
+                          "downloadingImageIndex": 0,
+                          "downloadingImageDone": false,
+                          "index": 0,
+                          "downloadImage": downloadImage,
+                        },
+                      );
+                    },
+                    child: Container(
+                      //color: Colors.red,
+                      width: 150.0,
+                      height: 150.0,
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          // Dp
+                          WidgetCircularAnimator(
+                            size: 200.0,
+                            innerColor: getRandom(isDarkMode == true
+                                ? Colors.accents
+                                : Colors.primaries),
+                            outerColor: getRandom(isDarkMode == true
+                                ? Colors.accents
+                                : Colors.primaries),
+                            child: Container(
+                              width: 30.0,
+                              height: 30.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey[900],
+                                //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: dpChanged
+                                    ? Image.file(File(dpPath))
+                                    : Image.network(
+                                        curUser["dp"],
+                                      ),
                               ),
                             ),
                           ),
-                        ),
-                        // Change DP Btn
-                        Container(
-                          width: 40.0,
-                          height: 40.0,
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.grey[850]!
-                                : Color.fromARGB(255, 214, 214, 214),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(100.0)),
-                          ),
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.photo_camera_outlined,
-                              color: iconColor,
-                              size: 22.0,
+                          // Change DP Btn
+                          Container(
+                            width: 40.0,
+                            height: 40.0,
+                            decoration: BoxDecoration(
+                              color: isDarkMode
+                                  ? Colors.grey[850]!
+                                  : Color.fromARGB(255, 214, 214, 214),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(100.0)),
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                pickDP();
+                              },
+                              icon: Icon(
+                                Icons.photo_camera_outlined,
+                                color: iconColor,
+                                size: 22.0,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 18.0),
@@ -6677,13 +6716,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         child: FittedBox(
                                           fit: BoxFit.cover,
                                           child: Image.network(
-                                            "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
+                                            curUser["dp"],
                                           ),
                                         ),
                                       ),
                                       SizedBox(width: 10.0),
                                       Text(
-                                        "Dagmawi Babi",
+                                        curUser["username"],
                                         style: TextStyle(
                                           color: textColor,
                                           fontWeight: FontWeight.bold,
@@ -6693,17 +6732,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ],
                                   ),
                                   IconButton(
-                                    onPressed: () {
-                                      curUser = {
-                                        "username": "DagmawiBabi",
-                                        "password": "JYMTW2m!",
-                                        "dp":
-                                            "https://i.pinimg.com/originals/e9/f9/41/e9f9410b61725f6c15ebf3cd982e2c09.gif",
-                                      };
-                                      masterUser = "DagmawiBabi";
-                                      isDarkMode = false;
-                                      setState(() {});
-                                    },
+                                    onPressed: () {},
                                     icon: Icon(
                                       Icons.login_outlined,
                                       color: iconColor,
@@ -6730,13 +6759,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         child: FittedBox(
                                           fit: BoxFit.cover,
                                           child: Image.network(
-                                            "https://i.pinimg.com/originals/50/ea/49/50ea49a4d5e8cd1077f0247852750152.gif",
+                                            curUser["dp"],
                                           ),
                                         ),
                                       ),
                                       SizedBox(width: 10.0),
                                       Text(
-                                        "PowerTag",
+                                        curUser["username"] + "_2",
                                         style: TextStyle(
                                           color: textColor,
                                           fontWeight: FontWeight.bold,
@@ -6746,17 +6775,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ],
                                   ),
                                   IconButton(
-                                    onPressed: () {
-                                      curUser = {
-                                        "username": "PowerTag",
-                                        "password": "JYMTW2m!",
-                                        "dp":
-                                            "https://i.pinimg.com/originals/50/ea/49/50ea49a4d5e8cd1077f0247852750152.gif",
-                                      };
-                                      masterUser = "PowerTag";
-                                      isDarkMode = false;
-                                      setState(() {});
-                                    },
+                                    onPressed: () {},
                                     icon: Icon(
                                       Icons.login_outlined,
                                       color: iconColor,
@@ -7127,199 +7146,296 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       // Post - 7
       !isGlobalFeedLoading
-          ? SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  // Feed Card
-                  return Column(
-                    children: [
-                      GestureDetector(
-                        onHorizontalDragEnd: (dragDetails) {
-                          if (dragDetails.primaryVelocity! < 0) {
-                            curPage = 0;
-                          } else {
-                            curPage = 7;
-                          }
-                          setState(() {});
-                        },
-                        onDoubleTap: () {
-                          likePost(globalFeed[index]);
-                          setState(() {});
-                        },
-                        onLongPress: () {
-                          themeEditorOptionIndex = 4;
-                          themeEditorColorPicker(false);
-                        },
-                        child: Container(
-                          //globalFeed[index]["dp"]
-                          width: MediaQuery.of(context).size.width,
-                          margin: EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
-                          padding: EdgeInsets.only(
-                              top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
-                          decoration: feedCardBG
-                              ? BoxDecoration(
-                                  image: DecorationImage(
-                                    // ignore: unnecessary_cast
-                                    image: NetworkImage(globalFeed[index]["dp"])
-                                        as ImageProvider,
-
-                                    fit: BoxFit.cover,
-                                    opacity: isDarkMode ? 0.01 : 0.02,
-                                    filterQuality: FilterQuality.high,
-                                    colorFilter: ColorFilter.mode(
-                                        containerColor, BlendMode.colorBurn),
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(
-                                        fullScreenMode ? 0.0 : 20.0),
-                                  ),
-                                  color: feedCardsColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: feedCardShadow,
-                                      blurRadius: 4.0,
-                                    ),
-                                  ],
-                                )
-                              : BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(
-                                        fullScreenMode ? 0.0 : 20.0),
-                                  ),
-                                  color: feedCardsColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: feedCardShadow,
-                                      blurRadius: 4.0,
-                                    ),
-                                  ],
+          ? globalFeed.length == 0
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    height: MediaQuery.of(context).size.height - 150.0,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 50.0),
+                        Image.asset(
+                          getRandom(error_illustrations),
+                        ),
+                        const SizedBox(height: 20.0),
+                        Text(
+                          "Wow, Such Empty!",
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10.0),
+                        // Create new post Button
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              "postContentPage",
+                              arguments: {
+                                "curUser": curUser,
+                                "isDarkMode": isDarkMode,
+                                "containerColor": containerColor,
+                                "feedCardShadow": feedCardShadow,
+                                "iconColor": iconColor,
+                                "textColor": textColor,
+                                "textColorDim": textColorDim,
+                                "textColorDimmer": textColorDimmer,
+                                "scaffoldBGColor": scaffoldBGColor,
+                              },
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isDarkMode == false
+                                  ? Colors.grey[900]
+                                  : Colors.grey[850],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 60.0, vertical: 12.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: const [
+                                Icon(
+                                  Icons.post_add,
+                                  color: Colors.white,
                                 ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Author, time and date
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Author of content
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 0.0, bottom: 17.0),
-                                    child: Row(
-                                      children: [
-                                        // Author DP
-                                        GestureDetector(
-                                          onLongPress: () {
-                                            themeEditorOptionIndex = 0;
-                                            themeEditorColorPicker(false);
-                                          },
-                                          child: Container(
-                                            width: 38.0,
-                                            height: 38.0,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.0)),
-                                            ),
-                                            clipBehavior: Clip.hardEdge,
-                                            child: FittedBox(
-                                              fit: BoxFit.cover,
-                                              child: CachedNetworkImage(
-                                                imageUrl: globalFeed[index]
-                                                    ["dp"],
-                                              ),
-                                            ),
-                                          ),
+                                SizedBox(width: 5.0),
+                                Text(
+                                  "Create New Post",
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 5.0),
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      // Feed Card
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onHorizontalDragEnd: (dragDetails) {
+                              if (dragDetails.primaryVelocity! < 0) {
+                                curPage = 0;
+                              } else {
+                                curPage = 7;
+                              }
+                              setState(() {});
+                            },
+                            onDoubleTap: () {
+                              likePost(globalFeed[index]);
+                              setState(() {});
+                            },
+                            onLongPress: () {
+                              themeEditorOptionIndex = 4;
+                              themeEditorColorPicker(false);
+                            },
+                            child: Container(
+                              //globalFeed[index]["dp"]
+                              width: MediaQuery.of(context).size.width,
+                              margin:
+                                  EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
+                              padding: EdgeInsets.only(
+                                  top: 10.0,
+                                  bottom: 5.0,
+                                  left: 10.0,
+                                  right: 10.0),
+                              decoration: feedCardBG
+                                  ? BoxDecoration(
+                                      image: DecorationImage(
+                                        // ignore: unnecessary_cast
+                                        image: NetworkImage(
+                                                globalFeed[index]["dp"])
+                                            as ImageProvider,
+
+                                        fit: BoxFit.cover,
+                                        opacity: isDarkMode ? 0.01 : 0.02,
+                                        filterQuality: FilterQuality.high,
+                                        colorFilter: ColorFilter.mode(
+                                            containerColor,
+                                            BlendMode.colorBurn),
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            fullScreenMode ? 0.0 : 20.0),
+                                      ),
+                                      color: feedCardsColor,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: feedCardShadow,
+                                          blurRadius: 4.0,
                                         ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0),
-                                              child: Text(
-                                                globalFeed[index]["username"]
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontSize: 18.0,
-                                                  color: textColor.withOpacity(
-                                                      isDarkMode ? 0.85 : 0.7),
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0),
-                                              child: Text(
-                                                globalFeed[index]["time"]
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontSize: 12.0,
-                                                  color: textColorDim,
-                                                  //fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                      ],
+                                    )
+                                  : BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            fullScreenMode ? 0.0 : 20.0),
+                                      ),
+                                      color: feedCardsColor,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: feedCardShadow,
+                                          blurRadius: 4.0,
                                         ),
                                       ],
                                     ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Author, time and date
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Author of content
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, bottom: 17.0),
+                                        child: Row(
+                                          children: [
+                                            // Author DP
+                                            GestureDetector(
+                                              onLongPress: () {
+                                                themeEditorOptionIndex = 0;
+                                                themeEditorColorPicker(false);
+                                              },
+                                              child: Container(
+                                                width: 38.0,
+                                                height: 38.0,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              20.0)),
+                                                ),
+                                                clipBehavior: Clip.hardEdge,
+                                                child: FittedBox(
+                                                  fit: BoxFit.cover,
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: globalFeed[index]
+                                                        ["dp"],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8.0),
+                                                  child: Text(
+                                                    globalFeed[index]
+                                                            ["username"]
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      color:
+                                                          textColor.withOpacity(
+                                                              isDarkMode
+                                                                  ? 0.85
+                                                                  : 0.7),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8.0),
+                                                  child: Text(
+                                                    globalFeed[index]["time"]
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 12.0,
+                                                      color: textColorDim,
+                                                      //fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Options
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.more_horiz_outlined,
+                                          color: iconColor,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  // Options
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.more_horiz_outlined,
-                                      color: iconColor,
+                                  // Title
+                                  GestureDetector(
+                                    onLongPress: fullScreenMode
+                                        ? () {}
+                                        : () {
+                                            themeEditorOptionIndex = 5;
+                                            themeEditorColorPicker(false);
+                                          },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 0.0),
+                                      child: Text(
+                                        globalFeed[index]["title"].toString(),
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 19.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              // Title
-                              GestureDetector(
-                                onLongPress: fullScreenMode
-                                    ? () {}
-                                    : () {
-                                        themeEditorOptionIndex = 5;
-                                        themeEditorColorPicker(false);
-                                      },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 0.0),
-                                  child: Text(
-                                    globalFeed[index]["title"].toString(),
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 19.0,
-                                      fontWeight: FontWeight.bold,
+                                  const SizedBox(height: 4.0),
+                                  // Body of content
+                                  GestureDetector(
+                                    onLongPress: fullScreenMode
+                                        ? () {}
+                                        : () {
+                                            themeEditorOptionIndex = 6;
+                                            themeEditorColorPicker(false);
+                                          },
+                                    child: Text(
+                                      globalFeed[index]["body"],
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        color: textColorDim,
+                                        fontSize: 20.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 4.0),
-                              // Body of content
-                              GestureDetector(
-                                onLongPress: fullScreenMode
-                                    ? () {}
-                                    : () {
-                                        themeEditorOptionIndex = 6;
-                                        themeEditorColorPicker(false);
-                                      },
-                                child: Text(
-                                  globalFeed[index]["body"],
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: textColorDim,
-                                    fontSize: 20.0,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 14.0),
-                              // Date
-                              /*
+                                  SizedBox(height: 14.0),
+                                  // Date
+                                  /*
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -7334,18 +7450,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ],
                               ),
                               */
-                              SizedBox(height: 2.0),
-                              //Divider(color: textColorDimmer.withOpacity(0.4)),
-                              // Action Buttons
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Like, Comment & Share Button
+                                  SizedBox(height: 2.0),
+                                  //Divider(color: textColorDimmer.withOpacity(0.4)),
+                                  // Action Buttons
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      // Like Button
-                                      /*GestureDetector(
+                                      // Like, Comment & Share Button
+                                      Row(
+                                        children: [
+                                          // Like Button
+                                          /*GestureDetector(
                                         onTap: () {},
                                         child: Padding(
                                           padding:
@@ -7383,123 +7499,127 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           ),
                                         ),
                                       ),*/
-                                      GestureDetector(
-                                        onTap: () {
-                                          likePost(globalFeed[index]);
-                                          setState(() {});
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                          GestureDetector(
+                                            onTap: () {
+                                              likePost(globalFeed[index]);
+                                              setState(() {});
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
                                                       horizontal: 9.0,
                                                       vertical: 2.0),
-                                              child: Icon(
-                                                globalFeed[index]["likers"]
-                                                        .contains(
-                                                            curUser["username"])
-                                                    ? Ionicons.heart
-                                                    : Ionicons.heart_outline,
-                                                color: globalFeed[index]
-                                                            ["likers"]
-                                                        .contains(
-                                                            curUser["username"])
-                                                    ? Colors.pinkAccent
-                                                    : iconColor, // Colors.pinkAccent,
-                                              ),
-                                            ),
-                                            Text(
-                                              (globalFeed[index]["likes"])
-                                                  .toString(),
-                                              style: TextStyle(
-                                                color: textColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      // Comments
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12.0,
-                                                      vertical: 2.0),
-                                              child: Transform(
-                                                alignment: Alignment.center,
-                                                transform:
-                                                    Matrix4.rotationY(pi),
-                                                child: Icon(
-                                                  Ionicons.chatbubble_outline,
-                                                  color: iconColor,
+                                                  child: Icon(
+                                                    globalFeed[index]["likers"]
+                                                            .contains(curUser[
+                                                                "username"])
+                                                        ? Ionicons.heart
+                                                        : Ionicons
+                                                            .heart_outline,
+                                                    color: globalFeed[index]
+                                                                ["likers"]
+                                                            .contains(curUser[
+                                                                "username"])
+                                                        ? Colors.pinkAccent
+                                                        : iconColor, // Colors.pinkAccent,
+                                                  ),
                                                 ),
-                                              ),
+                                                Text(
+                                                  (globalFeed[index]["likes"])
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Text(
-                                              "4.5k",
-                                              style: TextStyle(
-                                                color: textColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      // Forward
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                          ),
+                                          // Comments
+                                          GestureDetector(
+                                            onTap: () {},
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
                                                       horizontal: 12.0,
                                                       vertical: 2.0),
-                                              child: Icon(
-                                                Ionicons.paper_plane_outline,
+                                                  child: Transform(
+                                                    alignment: Alignment.center,
+                                                    transform:
+                                                        Matrix4.rotationY(pi),
+                                                    child: Icon(
+                                                      Ionicons
+                                                          .chatbubble_outline,
+                                                      color: iconColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "4.5k",
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Forward
+                                          GestureDetector(
+                                            onTap: () {},
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 12.0,
+                                                      vertical: 2.0),
+                                                  child: Icon(
+                                                    Ionicons
+                                                        .paper_plane_outline,
+                                                    color: iconColor,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "2.3k",
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Share and Download Buttons
+                                      Row(
+                                        children: [
+                                          // Share Button
+                                          GestureDetector(
+                                            onLongPress: () {
+                                              themeEditorOptionIndex = 0;
+                                              themeEditorColorPicker(false);
+                                            },
+                                            child: IconButton(
+                                              onPressed: () {
+                                                String shareLink =
+                                                    globalFeed[index]["title"] +
+                                                        "\n" +
+                                                        globalFeed[index]
+                                                            ["body"];
+                                                Share.share(
+                                                    'Check this out @ Aurora \n\n${shareLink}');
+                                              },
+                                              icon: Icon(
+                                                Icons.share_outlined,
                                                 color: iconColor,
                                               ),
                                             ),
-                                            Text(
-                                              "2.3k",
-                                              style: TextStyle(
-                                                color: textColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // Share and Download Buttons
-                                  Row(
-                                    children: [
-                                      // Share Button
-                                      GestureDetector(
-                                        onLongPress: () {
-                                          themeEditorOptionIndex = 0;
-                                          themeEditorColorPicker(false);
-                                        },
-                                        child: IconButton(
-                                          onPressed: () {
-                                            String shareLink = globalFeed[index]
-                                                    ["title"] +
-                                                "\n" +
-                                                globalFeed[index]["body"];
-                                            Share.share(
-                                                'Check this out @ Aurora \n\n${shareLink}');
-                                          },
-                                          icon: Icon(
-                                            Icons.share_outlined,
-                                            color: iconColor,
                                           ),
-                                        ),
-                                      ),
-                                      // Download Button
-                                      /*downloadingImageIndex == index
+                                          // Download Button
+                                          /*downloadingImageIndex == index
                                                 ? (downloadingImage == false
                                                     ? GestureDetector(
                                                         onLongPress: () {
@@ -7540,35 +7660,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                     ),
                                                   ),
                                           */
+                                        ],
+                                      ),
                                     ],
                                   ),
+                                  // Space
                                 ],
                               ),
-                              // Space
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      index == globalFeed.length - 1
-                          ? Column(
-                              children: [
-                                SizedBox(height: 100),
-                                Text(
-                                  "End of Content",
-                                  style: TextStyle(
-                                    color: textColorDimmer,
-                                  ),
-                                ),
-                                SizedBox(height: 200),
-                              ],
-                            )
-                          : Container(),
-                    ],
-                  );
-                },
-                childCount: globalFeed.length,
-              ),
-            )
+                          index == globalFeed.length - 1
+                              ? Column(
+                                  children: [
+                                    SizedBox(height: 100),
+                                    Text(
+                                      "End of Content",
+                                      style: TextStyle(
+                                        color: textColorDimmer,
+                                      ),
+                                    ),
+                                    SizedBox(height: 200),
+                                  ],
+                                )
+                              : Container(),
+                        ],
+                      );
+                    },
+                    childCount: globalFeed.length,
+                  ),
+                )
           : SliverToBoxAdapter(
               child: Container(
                 height: MediaQuery.of(context).size.height - 150.0,
@@ -7689,151 +7809,158 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // Home Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
-        child: isSongPlaying == true
-            ? Container(
-                decoration: BoxDecoration(
-                  color: containerColor,
-                  border: Border.all(
-                    color: feedCardShadow.withOpacity(0.3),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        musicListBottomSheet(context);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.music_note_outlined,
-                            color: iconColor,
-                          ),
-                          const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 180.0,
-                            height: 20.0,
-                            child: marqueeMusicTitle == true
-                                ? Marquee(
-                                    text: curSong,
-                                    blankSpace: 40.0,
-                                    pauseAfterRound:
-                                        Duration(milliseconds: 1500),
-                                    velocity: 10.0,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  )
-                                : Text(
-                                    curSong,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  ),
-                          ),
-                        ],
+            isSongPlaying == true ? 100.0 : 50.0), // here the desired height
+        child: Column(
+          children: [
+            // Music Notification
+            !isSongPlaying
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                      color: containerColor,
+                      border: Border.all(
+                        color: feedCardShadow.withOpacity(0.3),
                       ),
                     ),
-                    Row(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Rewind
                         GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                -MusicPlayerPage.forwardRewindSpeed);
+                          onTap: () {
+                            musicListBottomSheet(context);
                           },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              backInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_rewind_rounded,
-                              color: iconColor,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.music_note_outlined,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              SizedBox(
+                                width: 180.0,
+                                height: 20.0,
+                                child: marqueeMusicTitle == true
+                                    ? Marquee(
+                                        text: curSong,
+                                        blankSpace: 40.0,
+                                        pauseAfterRound:
+                                            Duration(milliseconds: 1500),
+                                        velocity: 10.0,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      )
+                                    : Text(
+                                        curSong,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Pause Play
-                        IconButton(
-                          onPressed: () {
-                            pausePlaySong();
-                          },
-                          icon: Icon(
-                            isSongPlaying ? Icons.pause : Icons.play_arrow,
-                            color: iconColor,
-                          ),
-                        ),
-                        // Forward
-                        GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                MusicPlayerPage.forwardRewindSpeed);
-                          },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              nextInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_forward_rounded,
-                              color: iconColor,
+                        Row(
+                          children: [
+                            // Rewind
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    -MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  backInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_rewind_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
                             ),
-                          ),
+                            // Pause Play
+                            IconButton(
+                              onPressed: () {
+                                pausePlaySong();
+                              },
+                              icon: Icon(
+                                isSongPlaying ? Icons.pause : Icons.play_arrow,
+                                color: iconColor,
+                              ),
+                            ),
+                            // Forward
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  nextInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_forward_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              )
-            : Container(
-                child: TabBar(
-                  controller: tabBarController,
-                  indicatorColor: containerColor,
-                  onTap: (value) {
-                    print(value);
-                    print("VALUEEEEEEEEEEEEEEE");
-                    curPage = value;
-                    if (value == 0) {
-                      curPage = 7;
-                    }
-                    if (value == 1) {
-                      curPage = 0;
-                    }
-                    if (value == 2) {
-                      curPage = 8;
-                    }
-                    setState(() {});
-                  },
-                  tabs: [
-                    Tab(
-                      icon: Icon(
-                        Icons.home_outlined,
-                        color: curPage == 7 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+            // Tabs
+            Container(
+              child: TabBar(
+                controller: tabBarController,
+                indicatorColor: containerColor,
+                onTap: (value) {
+                  print(value);
+                  print("VALUEEEEEEEEEEEEEEE");
+                  curPage = value;
+                  if (value == 0) {
+                    curPage = 7;
+                  }
+                  if (value == 1) {
+                    curPage = 0;
+                  }
+                  if (value == 2) {
+                    curPage = 8;
+                  }
+                  setState(() {});
+                },
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: curPage == 7 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Ionicons.logo_reddit,
-                        color: curPage == 0 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Ionicons.logo_reddit,
+                      color: curPage == 0 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Icons.shop_two_outlined,
-                        color: curPage == 8 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.shop_two_outlined,
+                      color: curPage == 8 ? selectedTabColor : iconColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+          ],
+        ),
       ),
       // Discover Page
       PreferredSize(
@@ -8352,306 +8479,320 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       // DM Page
       PreferredSize(
-        preferredSize: Size.fromHeight(0.0), // here the desired height
+        preferredSize: Size.fromHeight(50.0), // here the desired height
         child: Container(),
       ),
       // Reddit Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
-        child: isSongPlaying == true
-            ? Container(
-                decoration: BoxDecoration(
-                  color: containerColor,
-                  border: Border.all(
-                    color: feedCardShadow.withOpacity(0.3),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        musicListBottomSheet(context);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.music_note_outlined,
-                            color: iconColor,
-                          ),
-                          const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 180.0,
-                            height: 20.0,
-                            child: marqueeMusicTitle == true
-                                ? Marquee(
-                                    text: curSong,
-                                    blankSpace: 40.0,
-                                    pauseAfterRound:
-                                        Duration(milliseconds: 1500),
-                                    velocity: 10.0,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  )
-                                : Text(
-                                    curSong,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  ),
-                          ),
-                        ],
+            isSongPlaying == true ? 100.0 : 50.0), // here the desired height
+        child: Column(
+          children: [
+            // Music Notification
+            !isSongPlaying
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                      color: containerColor,
+                      border: Border.all(
+                        color: feedCardShadow.withOpacity(0.3),
                       ),
                     ),
-                    Row(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Rewind
                         GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                -MusicPlayerPage.forwardRewindSpeed);
+                          onTap: () {
+                            musicListBottomSheet(context);
                           },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              backInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_rewind_rounded,
-                              color: iconColor,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.music_note_outlined,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              SizedBox(
+                                width: 180.0,
+                                height: 20.0,
+                                child: marqueeMusicTitle == true
+                                    ? Marquee(
+                                        text: curSong,
+                                        blankSpace: 40.0,
+                                        pauseAfterRound:
+                                            Duration(milliseconds: 1500),
+                                        velocity: 10.0,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      )
+                                    : Text(
+                                        curSong,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Pause Play
-                        IconButton(
-                          onPressed: () {
-                            pausePlaySong();
-                          },
-                          icon: Icon(
-                            isSongPlaying ? Icons.pause : Icons.play_arrow,
-                            color: iconColor,
-                          ),
-                        ),
-                        // Forward
-                        GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                MusicPlayerPage.forwardRewindSpeed);
-                          },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              nextInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_forward_rounded,
-                              color: iconColor,
+                        Row(
+                          children: [
+                            // Rewind
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    -MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  backInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_rewind_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
                             ),
-                          ),
+                            // Pause Play
+                            IconButton(
+                              onPressed: () {
+                                pausePlaySong();
+                              },
+                              icon: Icon(
+                                isSongPlaying ? Icons.pause : Icons.play_arrow,
+                                color: iconColor,
+                              ),
+                            ),
+                            // Forward
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  nextInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_forward_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              )
-            : Container(
-                child: TabBar(
-                  controller: tabBarController,
-                  indicatorColor: containerColor,
-                  onTap: (value) {
-                    print(value);
-                    print("VALUEEEEEEEEEEEEEEE");
-                    curPage = value;
-                    if (value == 0) {
-                      curPage = 7;
-                    }
-                    if (value == 1) {
-                      curPage = 0;
-                    }
-                    if (value == 2) {
-                      curPage = 8;
-                    }
-                    setState(() {});
-                  },
-                  tabs: [
-                    Tab(
-                      icon: Icon(
-                        Icons.home_outlined,
-                        color: curPage == 7 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+            // Tabs
+            Container(
+              child: TabBar(
+                controller: tabBarController,
+                indicatorColor: containerColor,
+                onTap: (value) {
+                  print(value);
+                  print("VALUEEEEEEEEEEEEEEE");
+                  curPage = value;
+                  if (value == 0) {
+                    curPage = 7;
+                  }
+                  if (value == 1) {
+                    curPage = 0;
+                  }
+                  if (value == 2) {
+                    curPage = 8;
+                  }
+                  setState(() {});
+                },
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: curPage == 7 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Ionicons.logo_reddit,
-                        color: curPage == 0 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Ionicons.logo_reddit,
+                      color: curPage == 0 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Icons.shop_two_outlined,
-                        color: curPage == 8 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.shop_two_outlined,
+                      color: curPage == 8 ? selectedTabColor : iconColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+          ],
+        ),
       ),
       // Shop Page
       PreferredSize(
         preferredSize: Size.fromHeight(
-            isSongPlaying == true ? 50.0 : 50.0), // here the desired height
-        child: isSongPlaying == true
-            ? Container(
-                decoration: BoxDecoration(
-                  color: containerColor,
-                  border: Border.all(
-                    color: feedCardShadow.withOpacity(0.3),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        musicListBottomSheet(context);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.music_note_outlined,
-                            color: iconColor,
-                          ),
-                          const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 180.0,
-                            height: 20.0,
-                            child: marqueeMusicTitle == true
-                                ? Marquee(
-                                    text: curSong,
-                                    blankSpace: 40.0,
-                                    pauseAfterRound:
-                                        Duration(milliseconds: 1500),
-                                    velocity: 10.0,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  )
-                                : Text(
-                                    curSong,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: textColor,
-                                    ),
-                                  ),
-                          ),
-                        ],
+            isSongPlaying == true ? 100.0 : 50.0), // here the desired height
+        child: Column(
+          children: [
+            // Music Notification
+            !isSongPlaying
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                      color: containerColor,
+                      border: Border.all(
+                        color: feedCardShadow.withOpacity(0.3),
                       ),
                     ),
-                    Row(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Rewind
                         GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                -MusicPlayerPage.forwardRewindSpeed);
+                          onTap: () {
+                            musicListBottomSheet(context);
                           },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              backInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_rewind_rounded,
-                              color: iconColor,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.music_note_outlined,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              SizedBox(
+                                width: 180.0,
+                                height: 20.0,
+                                child: marqueeMusicTitle == true
+                                    ? Marquee(
+                                        text: curSong,
+                                        blankSpace: 40.0,
+                                        pauseAfterRound:
+                                            Duration(milliseconds: 1500),
+                                        velocity: 10.0,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      )
+                                    : Text(
+                                        curSong,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: textColor,
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Pause Play
-                        IconButton(
-                          onPressed: () {
-                            pausePlaySong();
-                          },
-                          icon: Icon(
-                            isSongPlaying ? Icons.pause : Icons.play_arrow,
-                            color: iconColor,
-                          ),
-                        ),
-                        // Forward
-                        GestureDetector(
-                          onLongPressDown: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(
-                                MusicPlayerPage.forwardRewindSpeed);
-                          },
-                          onLongPressEnd: (longPressDownDetails) {
-                            assetsAudioPlayer.forwardOrRewind(0.0);
-                          },
-                          child: IconButton(
-                            onPressed: () {
-                              nextInPlaylist();
-                            },
-                            icon: Icon(
-                              Icons.fast_forward_rounded,
-                              color: iconColor,
+                        Row(
+                          children: [
+                            // Rewind
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    -MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  backInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_rewind_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
                             ),
-                          ),
+                            // Pause Play
+                            IconButton(
+                              onPressed: () {
+                                pausePlaySong();
+                              },
+                              icon: Icon(
+                                isSongPlaying ? Icons.pause : Icons.play_arrow,
+                                color: iconColor,
+                              ),
+                            ),
+                            // Forward
+                            GestureDetector(
+                              onLongPressDown: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(
+                                    MusicPlayerPage.forwardRewindSpeed);
+                              },
+                              onLongPressEnd: (longPressDownDetails) {
+                                assetsAudioPlayer.forwardOrRewind(0.0);
+                              },
+                              child: IconButton(
+                                onPressed: () {
+                                  nextInPlaylist();
+                                },
+                                icon: Icon(
+                                  Icons.fast_forward_rounded,
+                                  color: iconColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              )
-            : Container(
-                child: TabBar(
-                  controller: tabBarController,
-                  indicatorColor: containerColor,
-                  onTap: (value) {
-                    print(value);
-                    print("VALUEEEEEEEEEEEEEEE");
-                    curPage = value;
-                    if (value == 0) {
-                      curPage = 7;
-                    }
-                    if (value == 1) {
-                      curPage = 0;
-                    }
-                    if (value == 2) {
-                      curPage = 8;
-                    }
-                    setState(() {});
-                  },
-                  tabs: [
-                    Tab(
-                      icon: Icon(
-                        Icons.home_outlined,
-                        color: curPage == 7 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+            // Tabs
+            Container(
+              child: TabBar(
+                controller: tabBarController,
+                indicatorColor: containerColor,
+                onTap: (value) {
+                  print(value);
+                  print("VALUEEEEEEEEEEEEEEE");
+                  curPage = value;
+                  if (value == 0) {
+                    curPage = 7;
+                  }
+                  if (value == 1) {
+                    curPage = 0;
+                  }
+                  if (value == 2) {
+                    curPage = 8;
+                  }
+                  setState(() {});
+                },
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: curPage == 7 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Ionicons.logo_reddit,
-                        color: curPage == 0 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Ionicons.logo_reddit,
+                      color: curPage == 0 ? selectedTabColor : iconColor,
                     ),
-                    Tab(
-                      icon: Icon(
-                        Icons.shop_two_outlined,
-                        color: curPage == 8 ? selectedTabColor : iconColor,
-                      ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.shop_two_outlined,
+                      color: curPage == 8 ? selectedTabColor : iconColor,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+          ],
+        ),
       ),
     ];
     List pagesAppBarIconTitle = [
@@ -8822,6 +8963,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   "postContentPage",
                                                   arguments: {
                                                     "curUser": curUser,
+                                                    "isDarkMode": isDarkMode,
+                                                    "containerColor":
+                                                        containerColor,
+                                                    "feedCardShadow":
+                                                        feedCardShadow,
+                                                    "iconColor": iconColor,
+                                                    "textColor": textColor,
+                                                    "textColorDim":
+                                                        textColorDim,
+                                                    "textColorDimmer":
+                                                        textColorDimmer,
+                                                    "scaffoldBGColor":
+                                                        scaffoldBGColor,
                                                   },
                                                 );
                                               },
