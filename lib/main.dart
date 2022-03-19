@@ -55,6 +55,9 @@ class _MyAppState extends State<MyApp> {
         "postContentPage": (context) => PostContentPage(),
       },
       theme: ThemeData(
+        fontFamily: "Abel",
+      ),
+      darkTheme: ThemeData(
         fontFamily: "BlenderProBook",
       ),
     );

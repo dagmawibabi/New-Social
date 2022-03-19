@@ -32,6 +32,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:user_profile_avatar/user_profile_avatar.dart';
@@ -1189,7 +1190,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       var response = await http.get(url);
       var responseJSON = jsonDecode(response.body);
       List globalFeed0 = responseJSON;
-      if (isFirstTimeCF) {
+      if (isFirstTimeGF) {
         dynamic globalFeed1 = globalFeed0.reversed;
         globalFeed = globalFeed1.toList();
         isFirstTimeGF = false;
@@ -2072,7 +2073,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  //? Discvover Page
+  //? Discover Page
   // Discover Page Variables
   bool discoverContent = true;
   bool isDiscoverContentLoading = false;
@@ -2632,6 +2633,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int userIndex = 0;
 
   //! New
+  bool borderedSettings = true;
+  bool feedCardBG = false;
   bool useFABPost = false;
   bool grantedStorage = false;
   bool grantedLocation = false;
@@ -2898,6 +2901,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         );
       },
+    );
+  }
+
+  // BG and FG theme color changer
+  void changeTheme(Color fg, Color fg1, Color fg2, Color bg) {
+    iconColor = fg;
+    textColor = fg;
+    textColorDim = fg1;
+    textColorDimmer = fg2;
+    appBarBGColor = bg;
+    scaffoldBGColor = bg;
+    containerColor = bg;
+    feedCardsColor = bg;
+    modalBottomSheetColor = bg;
+    bottomNavBarColor = bg;
+    setState(() {});
+  }
+
+  // Colors in theme
+  Widget ColorCircle(List<Color> colors) {
+    return Container(
+      width: 40.0,
+      height: 40.0,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          tileMode: TileMode.repeated,
+          colors: colors,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(20.0)),
+      ),
     );
   }
 
@@ -3256,6 +3289,59 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void scanAlbumArt() {
     isScanningQR = !isScanningQR;
     setState(() {});
+  }
+
+  void generateProfileQRCode(String data, double size) {
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: containerColor,
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Scan",
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 18.0),
+              QrImage(
+                data: data,
+                version: QrVersions.auto,
+                size: size,
+                foregroundColor: textColor,
+                eyeStyle: QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                ),
+                gapless: false,
+              ),
+              SizedBox(height: 20.0),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                child: Text(
+                  "Scanning this will take you to the profile page of this account",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColorDim,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   //?Cache Memory
@@ -4589,9 +4675,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       SliverToBoxAdapter(
         child: Container(
           margin: const EdgeInsets.only(top: 20.0),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-          ),
+          padding: EdgeInsets.only(
+              left: borderedSettings ? 10.0 : 4.0,
+              right: borderedSettings ? 10.0 : 0.0),
           child: Column(
             children: [
               fullScreenMode == true
@@ -4612,913 +4698,1964 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     )
                   : Container(),
-              // Theme
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Theme",
-                      style: TextStyle(
-                        color: textColorDimmer.withOpacity(0.3),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // DarkMode
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              //? Profile
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        isDarkMode == false
-                            ? Icons.dark_mode
-                            : Icons.light_mode,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Dark Mode",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Changes to a darker theme",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: isDarkMode,
-                    onChanged: (value) {
-                      isDarkMode = value;
-                      setDarkMode();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Theme Editor
-              ExpansionTile(
-                childrenPadding: const EdgeInsets.all(0.0),
-                tilePadding: const EdgeInsets.all(0.0),
-                leading: Icon(
-                  Icons.format_paint_outlined,
-                  color: iconColor,
-                ),
-                subtitle: Text(
-                  "Customize the theme of the app",
-                  style: TextStyle(
-                    color: textColorDimmer,
-                    fontSize: 12.0,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                title: Text(
-                  "Theme Editor",
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                trailing: GestureDetector(
-                  onTap: () {
-                    themeEditor();
-                  },
-                  child: Icon(
-                    Icons.brush,
-                    color: iconColor,
-                  ),
-                ),
-                children: [
+                  // Profile Picture
                   Container(
-                    padding: const EdgeInsets.all(10.0),
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      color: scaffoldBGColor,
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                    ),
-                    child: Column(
+                    //color: Colors.red,
+                    width: 150.0,
+                    height: 150.0,
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.red;
-                                  textColor = Colors.red;
-                                  textColorDim = Colors.red[300]!;
-                                  textColorDimmer = Colors.red[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
+                        // Dp
+                        WidgetCircularAnimator(
+                          size: 200.0,
+                          innerColor: getRandom(isDarkMode == true
+                              ? Colors.accents
+                              : Colors.primaries),
+                          outerColor: getRandom(isDarkMode == true
+                              ? Colors.accents
+                              : Colors.primaries),
+                          child: Container(
+                            width: 30.0,
+                            height: 30.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[900],
+                              //borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Image.network(
+                                curUser["dp"],
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.deepPurple;
-                                  textColor = Colors.deepPurple;
-                                  textColorDim = Colors.deepPurple[300]!;
-                                  textColorDimmer = Colors.deepPurple[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurple,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.lime;
-                                  textColor = Colors.lime;
-                                  textColorDim = Colors.lime[300]!;
-                                  textColorDimmer = Colors.lime[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.lime,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.cyan;
-                                  textColor = Colors.cyan;
-                                  textColorDim = Colors.cyan[300]!;
-                                  textColorDimmer = Colors.cyan[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.cyan,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.amber;
-                                  textColor = Colors.amber;
-                                  textColorDim = Colors.amber[300]!;
-                                  textColorDimmer = Colors.amber[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.indigo;
-                                  textColor = Colors.indigo;
-                                  textColorDim = Colors.indigo[300]!;
-                                  textColorDimmer = Colors.indigo[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.indigo,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.green;
-                                  textColor = Colors.green;
-                                  textColorDim = Colors.green[300]!;
-                                  textColorDimmer = Colors.green[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.yellow;
-                                  textColor = Colors.yellow;
-                                  textColorDim = Colors.yellow[300]!;
-                                  textColorDimmer = Colors.yellow[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.yellow,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.teal;
-                                  textColor = Colors.teal;
-                                  textColorDim = Colors.teal[300]!;
-                                  textColorDimmer = Colors.teal[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.teal,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.lightBlue;
-                                  textColor = Colors.lightBlue;
-                                  textColorDim = Colors.lightBlue[300]!;
-                                  textColorDimmer = Colors.lightBlue[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.lightBlue,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.purple;
-                                  textColor = Colors.purple;
-                                  textColorDim = Colors.purple[300]!;
-                                  textColorDimmer = Colors.purple[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.purple,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.white;
-                                  textColor = Colors.white;
-                                  textColorDim = Colors.white60;
-                                  textColorDimmer = Colors.white38;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                            ],
+                        // Change DP Btn
+                        Container(
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? Colors.grey[850]!
+                                : Color.fromARGB(255, 214, 214, 214),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100.0)),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.deepOrange;
-                                  textColor = Colors.deepOrange;
-                                  textColorDim = Colors.deepOrange[300]!;
-                                  textColorDimmer = Colors.deepOrange[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepOrange,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.pink;
-                                  textColor = Colors.pink;
-                                  textColorDim = Colors.pink[300]!;
-                                  textColorDimmer = Colors.pink[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.pink,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.blue;
-                                  textColor = Colors.blue;
-                                  textColorDim = Colors.blue[300]!;
-                                  textColorDimmer = Colors.blue[100]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.black;
-                                  textColor = Colors.black;
-                                  textColorDim = Colors.black54;
-                                  textColorDimmer = Colors.black38;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.greenAccent;
-                                  textColor = Colors.greenAccent;
-                                  textColorDim = Colors.greenAccent[400]!;
-                                  textColorDimmer = Colors.greenAccent[700]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.greenAccent,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  iconColor = Colors.yellowAccent;
-                                  textColor = Colors.yellowAccent;
-                                  textColorDim = Colors.yellowAccent[400]!;
-                                  textColorDimmer = Colors.yellowAccent[700]!;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  width: 40.0,
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.yellowAccent,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.photo_camera_outlined,
+                              color: iconColor,
+                              size: 22.0,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  SizedBox(height: 18.0),
+                  // Username
+                  Text(
+                    curUser["username"],
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 25.0),
+                  // Profile Stats
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Friends
+                      Container(
+                        width: 110.0,
+                        margin: const EdgeInsets.only(top: 0.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 10.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          color: feedCardsColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: borderedSettings
+                                  ? Colors.transparent
+                                  : feedCardShadow,
+                              blurRadius: 4.0,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "10.2k",
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5.0),
+                            Text(
+                              "Friends",
+                              style: TextStyle(
+                                fontSize: 17.0,
+                                color: textColorDimmer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Followers
+                      Container(
+                        width: 110.0,
+                        margin: const EdgeInsets.only(top: 0.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 10.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          color: containerColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: borderedSettings
+                                  ? Colors.transparent
+                                  : feedCardShadow,
+                              blurRadius: 4.0,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "246.3k",
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5.0),
+                            Text(
+                              "Followers",
+                              style: TextStyle(
+                                fontSize: 17.0,
+                                color: textColorDimmer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Likes
+                      Container(
+                        width: 110.0,
+                        margin: const EdgeInsets.only(top: 0.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 10.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          color: feedCardsColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: borderedSettings
+                                  ? Colors.transparent
+                                  : feedCardShadow,
+                              blurRadius: 4.0,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "12.6M",
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5.0),
+                            Text(
+                              "Likes",
+                              style: TextStyle(
+                                fontSize: 17.0,
+                                color: textColorDimmer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
+              ),
+              SizedBox(height: 20.0),
+
+              //? Account
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Account",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Privacy
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.privacy_tip_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Privacy",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Modify your privacy options",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: iconColor,
+                            size: 18.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Manage Account
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.person_outline,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Manage Account",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Change password, deactivate account...",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: iconColor,
+                            size: 18.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Security and Login
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.lock_open_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Security and Login",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Modify your Credentials",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: iconColor,
+                            size: 18.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2)),
+                  ],
+                ),
+              ),
+              //? Theme
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                    top: 10.0,
+                    bottom: 10.0,
+                    left: 15.0,
+                    right: (borderedSettings ? 20.0 : 28.0)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Theme",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Theme Editor
+                    ExpansionTile(
+                      childrenPadding: const EdgeInsets.all(0.0),
+                      tilePadding: const EdgeInsets.all(0.0),
+                      leading: Icon(
+                        Icons.format_paint_outlined,
+                        color: iconColor,
+                      ),
+                      subtitle: Text(
+                        "Customize the theme of the app",
+                        style: TextStyle(
+                          color: textColorDimmer,
+                          fontSize: 12.0,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      title: Text(
+                        "Theme Editor",
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          themeEditor();
+                        },
+                        child: Icon(
+                          Icons.brush,
+                          color: iconColor,
+                        ),
+                      ),
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: scaffoldBGColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20.0)),
+                          ),
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.red;
+                                            textColor = Colors.red;
+                                            textColorDim = Colors.red[300]!;
+                                            textColorDimmer = Colors.red[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.deepPurple;
+                                            textColor = Colors.deepPurple;
+                                            textColorDim =
+                                                Colors.deepPurple[300]!;
+                                            textColorDimmer =
+                                                Colors.deepPurple[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.deepPurple,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.lime;
+                                            textColor = Colors.lime;
+                                            textColorDim = Colors.lime[300]!;
+                                            textColorDimmer = Colors.lime[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.lime,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.cyan;
+                                            textColor = Colors.cyan;
+                                            textColorDim = Colors.cyan[300]!;
+                                            textColorDimmer = Colors.cyan[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.cyan,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.amber;
+                                            textColor = Colors.amber;
+                                            textColorDim = Colors.amber[300]!;
+                                            textColorDimmer =
+                                                Colors.amber[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.indigo;
+                                            textColor = Colors.indigo;
+                                            textColorDim = Colors.indigo[300]!;
+                                            textColorDimmer =
+                                                Colors.indigo[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.indigo,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.green;
+                                            textColor = Colors.green;
+                                            textColorDim = Colors.green[300]!;
+                                            textColorDimmer =
+                                                Colors.green[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.yellow;
+                                            textColor = Colors.yellow;
+                                            textColorDim = Colors.yellow[300]!;
+                                            textColorDimmer =
+                                                Colors.yellow[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.yellow,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.teal;
+                                            textColor = Colors.teal;
+                                            textColorDim = Colors.teal[300]!;
+                                            textColorDimmer = Colors.teal[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.teal,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.lightBlue;
+                                            textColor = Colors.lightBlue;
+                                            textColorDim =
+                                                Colors.lightBlue[300]!;
+                                            textColorDimmer =
+                                                Colors.lightBlue[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.lightBlue,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.purple;
+                                            textColor = Colors.purple;
+                                            textColorDim = Colors.purple[300]!;
+                                            textColorDimmer =
+                                                Colors.purple[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.purple,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.white;
+                                            textColor = Colors.white;
+                                            textColorDim = Colors.white60;
+                                            textColorDimmer = Colors.white38;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.deepOrange;
+                                            textColor = Colors.deepOrange;
+                                            textColorDim =
+                                                Colors.deepOrange[300]!;
+                                            textColorDimmer =
+                                                Colors.deepOrange[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.deepOrange,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.pink;
+                                            textColor = Colors.pink;
+                                            textColorDim = Colors.pink[300]!;
+                                            textColorDimmer = Colors.pink[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.pink,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.blue;
+                                            textColor = Colors.blue;
+                                            textColorDim = Colors.blue[300]!;
+                                            textColorDimmer = Colors.blue[100]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.black;
+                                            textColor = Colors.black;
+                                            textColorDim = Colors.black54;
+                                            textColorDimmer = Colors.black38;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.greenAccent;
+                                            textColor = Colors.greenAccent;
+                                            textColorDim =
+                                                Colors.greenAccent[400]!;
+                                            textColorDimmer =
+                                                Colors.greenAccent[700]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.greenAccent,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            iconColor = Colors.yellowAccent;
+                                            textColor = Colors.yellowAccent;
+                                            textColorDim =
+                                                Colors.yellowAccent[400]!;
+                                            textColorDimmer =
+                                                Colors.yellowAccent[700]!;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: Colors.yellowAccent,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.0)),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(color: textColorDimmer.withOpacity(0.2)),
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Colors.white,
+                                                Colors.white54,
+                                                Colors.white38,
+                                                Colors.black);
+                                            setState(() {});
+                                          },
+                                          child: ColorCircle(
+                                              [Colors.white, Colors.black]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xff6E85B2),
+                                                Color(0xdd6E85B2),
+                                                Color(0x886E85B2),
+                                                Color(0xff261C2C));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xff6E85B2),
+                                            Color(0xff261C2C)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffC84B31),
+                                                Color(0xddC84B31),
+                                                Color(0x88C84B31),
+                                                Color(0xff000000));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffC84B31),
+                                            Color(0xff191919)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffEEB76B),
+                                                Color(0xddEEB76B),
+                                                Color(0x88EEB76B),
+                                                Color(0xff310B0B));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffEEB76B),
+                                            Color(0xff310B0B)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffECB365),
+                                                Color(0xddECB365),
+                                                Color(0x88ECB365),
+                                                Color(0xff041C32));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffECB365),
+                                            Color(0xff041C32)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffD8E9A8),
+                                                Color(0xddD8E9A8),
+                                                Color(0x88D8E9A8),
+                                                Color(0xff191A19));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffD8E9A8),
+                                            Color(0xff191A19)
+                                          ]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffF05454),
+                                                Color(0xddF05454),
+                                                Color(0x88F05454),
+                                                Color(0xff222831));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffF05454),
+                                            Color(0xff222831)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffF4ABC4),
+                                                Color(0xddF4ABC4),
+                                                Color(0x88F4ABC4),
+                                                Color(0xff060930));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffF4ABC4),
+                                            Color(0xff060930)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xffFFFCDC),
+                                                Color(0xddFFFCDC),
+                                                Color(0x88FFFCDC),
+                                                Color(0xff52734D));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xffFFFCDC),
+                                            Color(0xff52734D)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xff161D6F),
+                                                Color(0xdd161D6F),
+                                                Color(0x88161D6F),
+                                                Color(0xff95E1D3));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xff161D6F),
+                                            Color(0xff95E1D3)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Color(0xff9A0680),
+                                                Color(0xdd9A0680),
+                                                Color(0x889A0680),
+                                                Color(0xff11052C));
+                                          },
+                                          child: ColorCircle([
+                                            Color(0xff9A0680),
+                                            Color(0xff11052C)
+                                          ]),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            changeTheme(
+                                                Colors.black,
+                                                Colors.black,
+                                                Colors.black,
+                                                Colors.white);
+                                          },
+                                          child: ColorCircle([
+                                            Colors.black,
+                                            Colors.white,
+                                          ]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2))
+                  ],
+                ),
+              ),
+              //? Weather
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Weather",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Enable Metric System
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              useMetricMesurementSystem == true
+                                  ? Ionicons.thermometer_outline
+                                  : Icons.device_thermostat_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Use the Metric Mesurement System",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Uses °Centigrade, Meter, Kilograms...",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: useMetricMesurementSystem,
+                          onChanged: (value) {
+                            useMetricMesurementSystem = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2))
+                    //? Layout
+                  ],
+                ),
+              ),
+              //? Layout
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Layout",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Enable FAB Post Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              useFABPost == true
+                                  ? Ionicons.remove_circle_outline
+                                  : Ionicons.add_circle_outline,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Enable FAB To Post",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Use a floating action button for ease of posting",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: useFABPost,
+                          onChanged: (value) {
+                            useFABPost = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Enable App Bar Images
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              enableFlexibleSpace == false
+                                  ? Icons.image_not_supported_outlined
+                                  : Icons.image_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "App Bar Images",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Removes illustrations from the app bar",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: enableFlexibleSpace,
+                          onChanged: (value) {
+                            enableFlexibleSpace = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Floating Nav-Bar
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              isNavBarFloating == false
+                                  ? Icons.call_to_action
+                                  : Icons.call_to_action_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Floating Nav-Bar",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Sticks/Floats the bottom navigation bar",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: isNavBarFloating,
+                          onChanged: (value) {
+                            isNavBarFloating = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              //? Micro-Interactions
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Microinteractions",
+                            style: TextStyle(
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Reduce Animations
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              reduceAnimations == false
+                                  ? Icons.blur_on_rounded
+                                  : Icons.blur_off_rounded,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Reduce Animations",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Stops waving and particle animations",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: reduceAnimations,
+                          onChanged: (value) {
+                            reduceAnimations = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Scroll Music Title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              marqueeMusicTitle == false
+                                  ? Icons.music_off_outlined
+                                  : Icons.music_note_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Marquee Music Title",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Enables/Disables music titles from scrolling",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: marqueeMusicTitle,
+                          onChanged: (value) {
+                            marqueeMusicTitle = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Hide Bottom Nav Bar
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              hideBottomNav == true
+                                  ? Icons.highlight_off_rounded
+                                  : Icons.navigation_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Hide Nav-Bar On Scroll",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                SizedBox(
+                                  width: 250.0,
+                                  child: Text(
+                                    "Hides the bottom navigation bar when scrolling",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: hideBottomNav,
+                          onChanged: (value) {
+                            hideBottomNav = value;
+                            hideBottomNavBar();
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Enter fullscreen mode on scroll
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              fullScreenOnScroll == true
+                                  ? Icons.fullscreen_exit_outlined
+                                  : Icons.fullscreen,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Enter Fullscreen Mode On Scroll",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 17.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                SizedBox(
+                                  width: 250.0,
+                                  child: Text(
+                                    "Enters into a submersive mode when scrolling",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: fullScreenOnScroll,
+                          onChanged: (value) {
+                            hideBottomNav =
+                                value == true ? true : hideBottomNav;
+                            fullScreenOnScroll = value;
+                            hideBottomNavBar();
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Feed Card Background
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              feedCardBG == false
+                                  ? Icons.image_not_supported_outlined
+                                  : Icons.image_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Feed Card Backgrounds",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Changes feed card's background to the post's profile pic",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 10.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: feedCardBG,
+                          onChanged: (value) {
+                            feedCardBG = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Bordered Settings
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              borderedSettings == false
+                                  ? Icons.browser_not_supported_rounded
+                                  : Icons.border_style_rounded,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Bordered Settings",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Adds shaded borders around settings",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 10.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          activeColor: iconColor,
+                          inactiveThumbColor: iconColor.withOpacity(0.2),
+                          value: borderedSettings,
+                          onChanged: (value) {
+                            borderedSettings = value;
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2)),
+                  ],
+                ),
               ),
               //Divider(color: textColorDimmer.withOpacity(0.2))
-              // Weather
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Weather",
-                      style: TextStyle(
-                        color: textColorDimmer.withOpacity(0.3),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+              //? Help
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
                     ),
                   ],
                 ),
-              ),
-              // Enable Metric System
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        useMetricMesurementSystem == true
-                            ? Ionicons.thermometer_outline
-                            : Icons.device_thermostat_outlined,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
                         children: [
                           Text(
-                            "Use the Metric Mesurement System",
+                            "Help",
                             style: TextStyle(
-                              color: textColor,
-                              fontSize: 16.0,
+                              color: textColorDimmer.withOpacity(0.3),
+                              fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Uses °Centigrade, Meter, Kilograms...",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
                         ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: useMetricMesurementSystem,
-                    onChanged: (value) {
-                      useMetricMesurementSystem = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              //Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Layout
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Layout",
-                      style: TextStyle(
-                        color: textColorDimmer.withOpacity(0.3),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              // Enable FAB Post Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        useFABPost == true
-                            ? Ionicons.remove_circle_outline
-                            : Ionicons.add_circle_outline,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    // Aurora FAQ
+                    GestureDetector(
+                      onTap: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Enable FAB To Post",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Use a floating action button for ease of posting",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: useFABPost,
-                    onChanged: (value) {
-                      useFABPost = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              // Micro-Interactions
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "Microinteractions",
-                      style: TextStyle(
-                        color: textColorDimmer.withOpacity(0.3),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Enable App Bar Images
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        enableFlexibleSpace == false
-                            ? Icons.image_not_supported_outlined
-                            : Icons.image_outlined,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "App Bar Images",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Removes illustrations from the app bar",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: enableFlexibleSpace,
-                    onChanged: (value) {
-                      enableFlexibleSpace = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Reduce Animations
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        reduceAnimations == false
-                            ? Icons.blur_on_rounded
-                            : Icons.blur_off_rounded,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Reduce Animations",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Stops waving and particle animations",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: reduceAnimations,
-                    onChanged: (value) {
-                      reduceAnimations = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Scroll Music Title
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        marqueeMusicTitle == false
-                            ? Icons.music_off_outlined
-                            : Icons.music_note_outlined,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Marquee Music Title",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Enables/Disables music titles from scrolling",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: marqueeMusicTitle,
-                    onChanged: (value) {
-                      marqueeMusicTitle = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Hide Bottom Nav Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        hideBottomNav == true
-                            ? Icons.highlight_off_rounded
-                            : Icons.navigation_outlined,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Hide Nav-Bar On Scroll",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          SizedBox(
-                            width: 250.0,
-                            child: Text(
-                              "Hides the bottom navigation bar when scrolling",
-                              style: TextStyle(
-                                color: textColorDimmer,
-                                fontSize: 12.0,
-                                overflow: TextOverflow.ellipsis,
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.question_answer_outlined,
+                                color: iconColor,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: hideBottomNav,
-                    onChanged: (value) {
-                      hideBottomNav = value;
-                      hideBottomNavBar();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Enter fulscreen mode on scroll
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        fullScreenOnScroll == true
-                            ? Icons.fullscreen_exit_outlined
-                            : Icons.fullscreen,
-                        color: iconColor,
-                      ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Enter Fullscreen Mode On Scroll",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          SizedBox(
-                            width: 250.0,
-                            child: Text(
-                              "Enters into a submersive mode when scrolling",
-                              style: TextStyle(
-                                color: textColorDimmer,
-                                fontSize: 12.0,
-                                overflow: TextOverflow.ellipsis,
+                              const SizedBox(width: 10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Aurora FAQ",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                    "Logout of this account",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: iconColor,
+                              size: 18.0,
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: fullScreenOnScroll,
-                    onChanged: (value) {
-                      hideBottomNav = value == true ? true : hideBottomNav;
-                      fullScreenOnScroll = value;
-                      hideBottomNavBar();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              // Scroll Music Title
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        isNavBarFloating == false
-                            ? Icons.call_to_action
-                            : Icons.call_to_action_outlined,
-                        color: iconColor,
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Privacy Policy
+                    GestureDetector(
+                      onTap: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.library_books_outlined,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Privacy Policy",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                    "Logout of this account",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: iconColor,
+                              size: 18.0,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Terms of Service
+                    GestureDetector(
+                      onTap: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.text_snippet_outlined,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Terms of Service",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                    "Logout of this account",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: iconColor,
+                              size: 18.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2)),
+                  ],
+                ),
+              ),
+              //? Login
+              Container(
+                margin: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 15.0,
+                  right: (borderedSettings ? 2.0 : 10.0),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: feedCardsColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: borderedSettings
+                          ? feedCardShadow
+                          : Colors.transparent,
+                      blurRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 10.0),
+                      child: Row(
                         children: [
                           Text(
-                            "Floating Nav-Bar",
+                            "Login",
                             style: TextStyle(
-                              color: textColor,
+                              color: textColorDimmer.withOpacity(0.3),
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            "Sticks/Floats the bottom navigation bar",
-                            style: TextStyle(
-                              color: textColorDimmer,
-                              fontSize: 12.0,
+                        ],
+                      ),
+                    ),
+                    // Switch Account
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.switch_account_outlined,
+                              color: iconColor,
+                            ),
+                            const SizedBox(width: 10.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Switch Account",
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  "Switch to another account",
+                                  style: TextStyle(
+                                    color: textColorDimmer,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: iconColor,
+                            size: 18.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(color: textColorDimmer.withOpacity(0.2)),
+                    // Logout
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(
+                            context, "onboardingPage");
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Ionicons.log_out_outline,
+                                color: iconColor,
+                              ),
+                              const SizedBox(width: 10.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                    "Logout of this account",
+                                    style: TextStyle(
+                                      color: textColorDimmer,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: iconColor,
+                              size: 18.0,
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  Switch(
-                    activeColor: iconColor,
-                    inactiveThumbColor: iconColor.withOpacity(0.2),
-                    value: isNavBarFloating,
-                    onChanged: (value) {
-                      isNavBarFloating = value;
-                      setState(() {});
-                    },
-                  ),
-                ],
+                    ),
+                    //Divider(color: textColorDimmer.withOpacity(0.2)),
+                  ],
+                ),
               ),
-              Divider(color: textColorDimmer.withOpacity(0.2)),
-              //Divider(color: textColorDimmer.withOpacity(0.2)),
-              // App Version and Speed Tester
+
+              //? App Version and Speed Tester
               const SizedBox(height: 150.0),
               GestureDetector(
                 onLongPress: () {
@@ -5840,22 +6977,49 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           themeEditorColorPicker(false);
                         },
                         child: Container(
+                          //globalFeed[index]["dp"]
                           width: MediaQuery.of(context).size.width,
                           margin: EdgeInsets.all(fullScreenMode ? 0.0 : 6.0),
                           padding: EdgeInsets.only(
                               top: 10.0, bottom: 5.0, left: 10.0, right: 10.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(fullScreenMode ? 0.0 : 20.0),
-                            ),
-                            color: feedCardsColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: feedCardShadow,
-                                blurRadius: 4.0,
-                              ),
-                            ],
-                          ),
+                          decoration: feedCardBG
+                              ? BoxDecoration(
+                                  image: DecorationImage(
+                                    // ignore: unnecessary_cast
+                                    image: NetworkImage(globalFeed[index]["dp"])
+                                        as ImageProvider,
+
+                                    fit: BoxFit.cover,
+                                    opacity: isDarkMode ? 0.01 : 0.02,
+                                    filterQuality: FilterQuality.high,
+                                    colorFilter: ColorFilter.mode(
+                                        containerColor, BlendMode.colorBurn),
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                        fullScreenMode ? 0.0 : 20.0),
+                                  ),
+                                  color: feedCardsColor,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: feedCardShadow,
+                                      blurRadius: 4.0,
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                        fullScreenMode ? 0.0 : 20.0),
+                                  ),
+                                  color: feedCardsColor,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: feedCardShadow,
+                                      blurRadius: 4.0,
+                                    ),
+                                  ],
+                                ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -5981,6 +7145,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ),
                               SizedBox(height: 14.0),
                               // Date
+                              /*
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -5994,8 +7159,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                 ],
                               ),
+                              */
                               SizedBox(height: 2.0),
-                              Divider(color: textColorDimmer.withOpacity(0.4)),
+                              //Divider(color: textColorDimmer.withOpacity(0.4)),
                               // Action Buttons
                               Row(
                                 mainAxisAlignment:
@@ -7504,6 +8670,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 // Fullscreen and Profile
                                 Row(
                                     children: [
+                                      // DarkMode and QR
+                                      curPage == 5
+                                          ? Row(
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    generateProfileQRCode(
+                                                        "https://www.aurora.com/users/" +
+                                                            curUser["username"],
+                                                        230.0);
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.qr_code,
+                                                    color: iconColor,
+                                                  ),
+                                                ),
+                                                //
+                                                IconButton(
+                                                  onPressed: () {
+                                                    isDarkMode = !isDarkMode;
+                                                    setDarkMode();
+                                                    setState(() {});
+                                                  },
+                                                  icon: Icon(
+                                                    isDarkMode
+                                                        ? Icons
+                                                            .light_mode_outlined
+                                                        : Icons
+                                                            .dark_mode_outlined,
+                                                    color: iconColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Container(),
                                       // Fullscreen
                                       curPage == 2
                                           ? IconButton(
@@ -7522,35 +8723,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               ),
                                             )
                                           : Container(),
-                                      // Profile
-                                      Container(
-                                        width: 50.0,
-                                        height: 50.0,
-                                        margin:
-                                            const EdgeInsets.only(right: 10.0),
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: UserProfileAvatar(
-                                            avatarUrl: curUser["dp"],
-                                            onAvatarTap: () {
-                                              showProfileDialog();
-                                            },
-                                            notificationCount: 4,
-                                            notificationBubbleTextStyle:
-                                                TextStyle(
-                                              fontSize: 15.0,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            avatarSplashColor:
-                                                smartRefresherColor[curPage],
-                                            radius: 20,
-                                            isActivityIndicatorSmall: false,
-                                            avatarBorderData: AvatarBorderData(
-                                              borderColor: Colors.white,
-                                              borderWidth: 1.0,
-                                            ),
-                                          ),
+
+                                      // Notification
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.notifications_none,
+                                          color: iconColor,
                                         ),
                                       ),
                                     ],

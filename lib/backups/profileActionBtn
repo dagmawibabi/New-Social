@@ -1,0 +1,32 @@
+// Profile
+                                      Container(
+                                        width: 50.0,
+                                        height: 50.0,
+                                        margin:
+                                            const EdgeInsets.only(right: 10.0),
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: UserProfileAvatar(
+                                            avatarUrl: curUser["dp"],
+                                            onAvatarTap: () {
+                                              showProfileDialog();
+                                            },
+                                            notificationCount: 4,
+                                            notificationBubbleTextStyle:
+                                                TextStyle(
+                                              fontSize: 15.0,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            avatarSplashColor:
+                                                smartRefresherColor[curPage],
+                                            radius: 20,
+                                            isActivityIndicatorSmall: false,
+                                            avatarBorderData: AvatarBorderData(
+                                              borderColor: Colors.white,
+                                              borderWidth: 1.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    
