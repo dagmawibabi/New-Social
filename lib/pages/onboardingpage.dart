@@ -18,6 +18,9 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
+  //! API URL
+  String apiURL =
+      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   // User Model
   dynamic user = {};
   bool isDarkMode = false;
@@ -80,8 +83,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     setState(() {});
 
     // Check if username exists
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/getAllUsers");
+    dynamic url = Uri.parse(apiURL + "/getAllUsers");
     dynamic userNames = await http.get(url);
     dynamic userNamesJSON = jsonDecode(userNames.body);
     for (var users in userNamesJSON) {
@@ -95,19 +97,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
     /* Password Validation should happen here */
     if (isUsernameTaken == false) {
-      dynamic url = Uri.parse(
-          "https://glacial-everglades-59975.herokuapp.com/api/createNewUser/" +
-              fullname.toString() +
-              "/" +
-              username.toString() +
-              "/" +
-              password.toString());
+      dynamic url = Uri.parse(apiURL +
+          "/createNewUser/" +
+          fullname.toString() +
+          "/" +
+          username.toString() +
+          "/" +
+          password.toString());
       await http.get(url);
-      dynamic url2 = Uri.parse(
-          "https://glacial-everglades-59975.herokuapp.com/api/login/" +
-              username +
-              "/" +
-              password);
+      dynamic url2 = Uri.parse(apiURL + "/login/" + username + "/" + password);
       dynamic responseOBJ = await http.get(url2);
       dynamic responseJSON = jsonDecode(responseOBJ.body);
       user = responseJSON;
@@ -134,8 +132,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     isLoading = true;
     setState(() {});
     // Check if username exists
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/getAllUsers");
+    dynamic url = Uri.parse(apiURL + "/getAllUsers");
     dynamic userNames = await http.get(url);
     dynamic userNamesJSON = jsonDecode(userNames.body);
     isUsernameCorrect = false;
@@ -146,11 +143,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       }
     }
     if (isUsernameCorrect == true) {
-      dynamic url = Uri.parse(
-          "https://glacial-everglades-59975.herokuapp.com/api/login/" +
-              username +
-              "/" +
-              password);
+      dynamic url = Uri.parse(apiURL + "/login/" + username + "/" + password);
       dynamic responseOBJ = await http.get(url);
       try {
         dynamic responseJSON = jsonDecode(responseOBJ.body);

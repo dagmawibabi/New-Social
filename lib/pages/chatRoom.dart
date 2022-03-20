@@ -15,6 +15,9 @@ class ChatRoom extends StatefulWidget {
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  //! API URL
+  String apiURL =
+      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   TextEditingController messageController = TextEditingController();
   // Get Global Chat Messages
   bool initGlobalChat = false;
@@ -26,8 +29,7 @@ class _ChatRoomState extends State<ChatRoom> {
     Timer.periodic(
       Duration(seconds: 1),
       (value) async {
-        dynamic url = Uri.parse(
-            "https://glacial-everglades-59975.herokuapp.com/api/receiveGlobalMessage");
+        dynamic url = Uri.parse(apiURL + "/receiveGlobalMessage");
         dynamic chats = await http.get(url);
         //print(chats.body);
         fetchedChat = [];
@@ -59,11 +61,11 @@ class _ChatRoomState extends State<ChatRoom> {
   String masterUser = "";
   final ScrollController chatScrollController = ScrollController();
   void sendGlobalChat(message) async {
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/sendGlobalMessage/" +
-            masterUser.toString() +
-            "/" +
-            message.toString());
+    dynamic url = Uri.parse(apiURL +
+        "/sendGlobalMessage/" +
+        masterUser.toString() +
+        "/" +
+        message.toString());
     await http.get(url);
     //chatScrollController.jumpTo(chatScrollController.position.maxScrollExtent);
     chatScrollController.animateTo(
@@ -77,15 +79,15 @@ class _ChatRoomState extends State<ChatRoom> {
   final focus = FocusNode();
   bool isEditing = false;
   void editGlobalMessage(message, time, newMessage) async {
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/updateGlobalMessage/" +
-            masterUser.toString() +
-            "/" +
-            message.toString() +
-            "/" +
-            time.toString() +
-            "/" +
-            newMessage.toString());
+    dynamic url = Uri.parse(apiURL +
+        "/updateGlobalMessage/" +
+        masterUser.toString() +
+        "/" +
+        message.toString() +
+        "/" +
+        time.toString() +
+        "/" +
+        newMessage.toString());
     await http.get(url);
     selectedIndex = -1;
     selectedMessage = "";
@@ -103,13 +105,13 @@ class _ChatRoomState extends State<ChatRoom> {
   String selectedTime = "";
   void deleteGlobalMessage(message, time) async {
     print("in container delete function");
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/deleteGlobalMessage/" +
-            masterUser.toString() +
-            "/" +
-            message.toString() +
-            "/" +
-            time.toString());
+    dynamic url = Uri.parse(apiURL +
+        "/deleteGlobalMessage/" +
+        masterUser.toString() +
+        "/" +
+        message.toString() +
+        "/" +
+        time.toString());
     await http.get(url);
     selectedIndex = -1;
     selectedMessage = "";

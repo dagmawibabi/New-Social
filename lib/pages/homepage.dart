@@ -1153,11 +1153,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     isCustomFeedLoading = true;
     setState(() {});
     Timer.periodic(Duration(seconds: 1), (timer) async {
-      var url = await Uri.parse(
-          "https://glacial-everglades-59975.herokuapp.com/api/getPosts/" +
-              curUser["username"] +
-              "/" +
-              curUser["password"]);
+      var url = await Uri.parse(apiURL +
+          "/getPosts/" +
+          curUser["username"] +
+          "/" +
+          curUser["password"]);
       var response = await http.get(url);
       var responseJSON = jsonDecode(response.body);
       List customFeed0 = responseJSON;
@@ -1186,8 +1186,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     isGlobalFeedLoading = true;
     setState(() {});
     Timer.periodic(Duration(seconds: 1), (timer) async {
-      var url = await Uri.parse(
-          "https://glacial-everglades-59975.herokuapp.com/api/getAllPosts");
+      var url = await Uri.parse(apiURL + "/getAllPosts");
       var response = await http.get(url);
       var responseJSON = jsonDecode(response.body);
       List globalFeed0 = responseJSON;
@@ -2654,6 +2653,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List userText = [];
   int userIndex = 0;
 
+  //! API URL
+  String apiURL =
+      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   //! New
   bool borderedSettings = true;
   bool feedCardBG = false;
@@ -2944,10 +2946,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // Update Settings
   Future<void> updateSettings() async {
     dynamic url1 = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/login/" +
-            curUser["username"] +
-            "/" +
-            curUser["password"]);
+        apiURL + "/login/" + curUser["username"] + "/" + curUser["password"]);
     dynamic responseOBJ = await http.get(url1);
     dynamic responseJSON = jsonDecode(responseOBJ.body);
     curUser = responseJSON;
@@ -3424,8 +3423,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     Timer.periodic(
       Duration(seconds: 5),
       (value) async {
-        dynamic url = Uri.parse(
-            "https://glacial-everglades-59975.herokuapp.com/api/receiveGlobalMessage");
+        dynamic url = Uri.parse(apiURL + "/receiveGlobalMessage");
         dynamic chats = await http.get(url);
         //print(chats.body);
         fetchedChat = [];
@@ -3448,11 +3446,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Send to Global Chat
   void sendGlobalChat(message) async {
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/sendGlobalMessage/" +
-            masterUser.toString() +
-            "/" +
-            message.toString());
+    dynamic url = Uri.parse(apiURL +
+        "/sendGlobalMessage/" +
+        masterUser.toString() +
+        "/" +
+        message.toString());
     await http.get(url);
     //chatScrollController.jumpTo(chatScrollController.position.maxScrollExtent);
     chatScrollController.animateTo(
@@ -3469,22 +3467,143 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     var date = post["date"];
     var dateArray = date.split("/");
     print(dateArray);
-    dynamic url = Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/likePost/" +
-            curUser["username"] +
-            "/" +
-            post["username"] +
-            "/" +
-            post["time"] +
-            "/" +
-            dateArray[1] +
-            "/" +
-            dateArray[0] +
-            "/" +
-            dateArray[2]);
+    dynamic url = Uri.parse(apiURL +
+        "/likePost/" +
+        curUser["username"] +
+        "/" +
+        post["username"] +
+        "/" +
+        post["time"] +
+        "/" +
+        dateArray[1] +
+        "/" +
+        dateArray[0] +
+        "/" +
+        dateArray[2]);
     var a = await http.get(url);
     print(a);
     setState(() {});
+  }
+
+  //
+  void likersListBottomSheet(dynamic post) async {
+    // get all users so u can display dp
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: modalBottomSheetColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(20.0),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 15.0),
+              // Title
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Ionicons.heart,
+                          color: Colors.pinkAccent,
+                        ),
+                        SizedBox(width: 10.0),
+                        Text(
+                          "Likes",
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 5.0),
+                      child: Text(
+                        post["likes"].toString(),
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Divider(color: textColorDim.withOpacity(0.6)),
+              SizedBox(height: 5.0),
+              // Likes List
+              Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
+                child: ListView.builder(
+                  itemCount: post["likers"].length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 30.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(
+                                    color: modalBottomSheetColor,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(100.0),
+                                    ),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: FittedBox(
+                                    fit: BoxFit.cover,
+                                    child: Image.network(
+                                      curUser["dp"],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10.0),
+                                Text(
+                                  post["likers"][index],
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Icon(
+                              Ionicons.heart,
+                              color: Colors.pinkAccent,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 5.0),
+                        Divider(color: textColorDimmer.withOpacity(0.2)),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // Pick DP
@@ -4824,9 +4943,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             width: 40.0,
                             height: 40.0,
                             decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? Colors.grey[850]!
-                                  : Color.fromARGB(255, 214, 214, 214),
+                              color: scaffoldBGColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: feedCardShadow,
+                                ),
+                              ],
+                              border: Border.all(
+                                color: textColorDimmer.withOpacity(0.3),
+                              ),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(100.0)),
                             ),
@@ -7234,6 +7359,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       return Column(
                         children: [
                           GestureDetector(
+                            onTap: () {
+                              likersListBottomSheet(globalFeed[index]);
+                            },
                             onHorizontalDragEnd: (dragDetails) {
                               if (dragDetails.primaryVelocity! < 0) {
                                 curPage = 0;
@@ -7499,14 +7627,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           ),
                                         ),
                                       ),*/
-                                          GestureDetector(
-                                            onTap: () {
-                                              likePost(globalFeed[index]);
-                                              setState(() {});
-                                            },
-                                            child: Column(
-                                              children: [
-                                                Padding(
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  likePost(globalFeed[index]);
+                                                  setState(() {});
+                                                },
+                                                child: Padding(
                                                   padding: const EdgeInsets
                                                           .symmetric(
                                                       horizontal: 9.0,
@@ -7526,25 +7654,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                         : iconColor, // Colors.pinkAccent,
                                                   ),
                                                 ),
-                                                Text(
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  likersListBottomSheet(
+                                                      globalFeed[index]);
+                                                },
+                                                child: Text(
                                                   (globalFeed[index]["likes"])
                                                       .toString(),
                                                   style: TextStyle(
                                                     color: textColor,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
+                                          SizedBox(width: 15.0),
+
                                           // Comments
                                           GestureDetector(
                                             onTap: () {},
-                                            child: Column(
+                                            child: Row(
                                               children: [
                                                 Padding(
                                                   padding: const EdgeInsets
                                                           .symmetric(
-                                                      horizontal: 12.0,
+                                                      horizontal: 7.0,
                                                       vertical: 2.0),
                                                   child: Transform(
                                                     alignment: Alignment.center,
@@ -7566,15 +7702,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               ],
                                             ),
                                           ),
+                                          SizedBox(width: 10.0),
+
                                           // Forward
                                           GestureDetector(
                                             onTap: () {},
-                                            child: Column(
+                                            child: Row(
                                               children: [
                                                 Padding(
                                                   padding: const EdgeInsets
                                                           .symmetric(
-                                                      horizontal: 12.0,
+                                                      horizontal: 7.0,
                                                       vertical: 2.0),
                                                   child: Icon(
                                                     Ionicons

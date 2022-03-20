@@ -14,6 +14,9 @@ class PostContentPage extends StatefulWidget {
 }
 
 class _PostContentPageState extends State<PostContentPage> {
+  //! API URL
+  String apiURL =
+      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   TextEditingController titleTextController = TextEditingController();
   TextEditingController bodyTextController = TextEditingController();
 
@@ -21,15 +24,15 @@ class _PostContentPageState extends State<PostContentPage> {
   void postContent(String title, String body) async {
     isLoading = true;
     setState(() {});
-    var url = await Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/createNewPost/" +
-            curUser["username"] +
-            "/" +
-            curUser["password"] +
-            "/" +
-            title +
-            "/" +
-            body);
+    var url = await Uri.parse(apiURL +
+        "/createNewPost/" +
+        curUser["username"] +
+        "/" +
+        curUser["password"] +
+        "/" +
+        title +
+        "/" +
+        body);
     await http.get(url);
     // Success
     /*CherryToast.success(
@@ -50,11 +53,11 @@ class _PostContentPageState extends State<PostContentPage> {
   void getContent() async {
     isLoading = true;
     setState(() {});
-    var url = await Uri.parse(
-        "https://glacial-everglades-59975.herokuapp.com/api/getPosts/" +
-            curUser["username"] +
-            "/" +
-            curUser["password"]);
+    var url = await Uri.parse(apiURL +
+        "/getPosts/" +
+        curUser["username"] +
+        "/" +
+        curUser["password"]);
     var response = await http.get(url);
     var responseJSON = jsonDecode(response.body);
     isLoading = false;
