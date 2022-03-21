@@ -2655,7 +2655,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   //! API URL
   String apiURL =
-      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
+      "http://dagmawibabi.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   //! New
   bool borderedSettings = true;
   bool feedCardBG = false;

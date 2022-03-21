@@ -20,7 +20,7 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   //! API URL
   String apiURL =
-      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
+      "http://dagmawibabi.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   // User Model
   dynamic user = {};
   bool isDarkMode = false;

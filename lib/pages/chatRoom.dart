@@ -17,7 +17,7 @@ class ChatRoom extends StatefulWidget {
 class _ChatRoomState extends State<ChatRoom> {
   //! API URL
   String apiURL =
-      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
+      "http://dagmawibabi.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   TextEditingController messageController = TextEditingController();
   // Get Global Chat Messages
   bool initGlobalChat = false;

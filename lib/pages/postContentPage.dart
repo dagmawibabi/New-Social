@@ -16,7 +16,7 @@ class PostContentPage extends StatefulWidget {
 class _PostContentPageState extends State<PostContentPage> {
   //! API URL
   String apiURL =
-      "https://glacial-everglades-59975.herokuapp.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
+      "http://dagmawibabi.com/aurora/api"; //"http://dagmawibabi.com/aurora/api";
   TextEditingController titleTextController = TextEditingController();
   TextEditingController bodyTextController = TextEditingController();
 
